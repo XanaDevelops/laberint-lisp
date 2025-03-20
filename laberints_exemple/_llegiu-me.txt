@@ -1,0 +1,9 @@
+Aquests són alguns exemples de laberints. Podeu fer-los servir per començar per la segona meitat de la pràctica o per comprovar si la primera part és correcta.
+
+ * Els de mida 10x10 són més petits del que es demana de manera obligatòria. Els hem inclòs només per si necessitéssiu fer una prova a escala més petita.
+ * Els de mida 25x25 són els que es demanen de manera obligatòria.
+ * Els de mida 25x25_diag contenen diagonals. Podeu fer-los com sigui, però millor si no en tenen (de manera opcional).
+ * Els de mida 30x40 i 40x30 no són quadrats. Això és opcional.
+ * Els de mida 50x50 són quadrats, però d'una mida més grossa de la que es demana de manera obligatòria. Això també és opcional.
+
+Esperam que vos vagin bé!
