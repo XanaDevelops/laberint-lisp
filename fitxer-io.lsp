@@ -5,14 +5,14 @@
     )
 )
 
-(defun llegeix-exp-intern(fp)
+(defun-tco llegeix-exp-intern(fp &optional (r nil))
     (let ((e (read fp nil nil)))
         (cond
         ((null e)
-            nil
+            (reverse r)
         )
         (t
-            (cons e (llegeix-exp-intern fp))
+            (llegeix-exp-intern fp (cons e r))
         )
         )
     )

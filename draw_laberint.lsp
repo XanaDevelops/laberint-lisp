@@ -1,5 +1,8 @@
+(load 'tco)
+
 (load 'fitxer-io)
 (load 'graphfx)
+
 
 (setq wall #\#)
 (setq path #\.)
@@ -54,4 +57,5 @@
 (cls)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
-(draw-tile "face" 200 200)
+(draw-tile "rickroll" 250 250)
+(color 0 0 0)
