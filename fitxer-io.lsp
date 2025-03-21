@@ -24,12 +24,12 @@
         contingut
     )
 )
-(defun llegeix-intern (fp)
+(defun-tco llegeix-intern (fp &optional r)
     (let ((c (read-char fp nil nil)))
         (cond
-            ((null c) '())
+            ((null c) r)
         (t 
-            (cons c (llegeix-intern fp))
+            (llegeix-intern fp (cons c r))
         )
         )
     )

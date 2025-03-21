@@ -7,6 +7,7 @@ paint = lambda count: f"(drawrel {count} 0)"
 setColor = lambda color: f"(color {color[0]} {color[1]} {color[2]})"
 
 def conversor(path_in: str, path_out: str) -> None:
+    print(f"Convertint: {path_in}")
     with Image.open(path_in, "r") as bmp, open(path_out, "w") as lsp:
         bmp: Image.Image = bmp
         for y in range(bmp.height):

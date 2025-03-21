@@ -6,12 +6,13 @@
 
 (setq wall #\#)
 (setq path #\.)
+(setq newline #\NewLine)
 
 (defun read-maze(fn)
     (llegeix fn)
 )
 
-(defun paint-maze(maze current-w w h)
+(defun-tco paint-maze(maze x y w h)
     (cond 
         ((null maze)
             nil
@@ -20,42 +21,44 @@
         (let ((elem (car maze)))
             (cond
                 ((eq elem wall)
-                    (paint-wall 50 50)
+                    (paint-wall (+ (* w TILESIZE) x) (+ (* h TILESIZE) y) )
                 )
                 ((eq elem path)
-                    (paint-path -1 -1)
+                    (paint-path (+ (* w TILESIZE) x) (+ (* h TILESIZE) y))
                 )
-                ((eq elem #\NewLine)
+                ((eq elem newline)
                     nil
                 )
                 (t
-                    (paint-unk -1 -1)
+                    (paint-unk (+ (* w TILESIZE) x) (+ (* h TILESIZE) y))
                 )
             )
+            ;(get-key)
+            (paint-maze (cdr maze) x y (cond ((eq elem newline) 0) (t (1+ w))) (cond ((eq elem newline) (1- h)) (t h)))
+
         )
-        (paint-maze (cdr maze) (cond ((= current-w 0) (terpri) w) (t (- current-w 1))) w h)
+
         )
     )
-    t
-    
 )
 
 (defun paint-wall(x y)
-    (draw-tile "face" x y)
+    (draw-tile "wall" x y)
 )
 (defun paint-path(x y)
-    (princ " ")
+    ;(princ " ")
 )
 (defun paint-unk(x y)
-    (princ "?")
+    (draw-tile "error" x y)
 )
-(defun draw-maze(name w h)
+(defun draw-maze(name)
     (cls)
-    (paint-maze (read-maze name) w w h)
+    ; aprofitant \n es pot ignorar la longitud
+    ; la altura es pot suposar maxima, paint-maze atura al extinguir el maze
+    ; o pintar de baix a dalt amb un reverse
+    (paint-maze (reverse (read-maze name)) 25 350 0 0)
 )
-;(draw-maze "laberints_exemple/10x10_massapetit_1.txt" 10 10)
-(cls)
+(draw-maze "laberints_exemple/10x10_massapetit_1.txt")
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
-(draw-tile "rickroll" 250 250)
-(color 0 0 0)
+;(draw-tile "rickroll" 250 250)
