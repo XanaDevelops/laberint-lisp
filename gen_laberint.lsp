@@ -11,6 +11,7 @@
 ;     )
 ;   )
 ; )
+(setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
 ; create a 2D array inicialised to valor
 (defun create-matrix (n m value) 
   (cond 
@@ -23,6 +24,8 @@
   )
 )
 
+
+
 ; Create a list with n repetitions of the element e
 (defun replicate (n e) 
   (cond 
@@ -31,16 +34,19 @@
   )
 )
 
-; Function to set a random matrix value to 'entada
-(defun setEntrada (matrix value) 
+(defun chooseRandomPos (matrix) 
   (let 
     ((i (random (length matrix))) 
       (j (random (length (car matrix))))
     )
-    ; (format t "i = ~A~%" i)
-    ; (format t "j = ~A~%" i)
-    (setq matrix (setValue matrix i j value))
+
+    (list i j)
   )
+)
+; Function to set a random matrix value to 'entada
+(defun setEntrada (matrix value pos) 
+
+  (setq matrix (setValue matrix (car pos) (cadr pos) value))
 )
 ; sets matrix[i][j] = value
 (defun setValue (matrix i j value) 
@@ -59,6 +65,60 @@
     (t (cons (car llista) (changeValue (- index 1) (cdr llista) value)))
   )
 )
+(defun genera-laberint () 
 
+  ; (setq laberint (create-matrix '3 '3 'paret))
+  (let 
+    ((laberint (create-matrix '3 '3 'paret)))
+    (setq pos (chooseRandomPos laberint))
+    (setq laberint (setEntrada laberint 'entrada pos))
+    (setq currentI (car pos))
+    (setq currentJ (cadr pos))
+    (format t "currentI = ~A~%" currentI)
+    (format t "currentJ= ~A~%" currentJ)
+    (format t "laberint = ~A~%" laberint)
+    (casellaAdjacentRandom laberint currentI currentJ)
+  )
+)
+
+
+
+(defun casellaAdjacentRandom (matrix currentI currentJ) 
+  (let 
+    ((newPos 
+       (mapcar 
+         (lambda (llista) 
+           (list (+ currentI (car llista)) (+ currentJ (cadr llista)))
+         )
+         displacements
+       )
+     ) )
+    (let ((validPos (removeElementOFB newPos matrix))) 
+    validPos)
+      
+  
+  )
+)
+
+
+(defun removeElementOFB (llista matrix) 
+  (let 
+    ((rows (length matrix)) (columns (length (car matrix))))
+    (cond 
+      ((null llista) nil)
+      ((and (< (caar llista) rows) 
+            (< (cadar llista) columns)
+            (>= (caar llista) 0)
+            (>= (cadar llista) 0)
+       )
+       (cons 
+         (car llista)
+         (removeElementOFB (cdr llista) matrix)
+       )
+      )
+      (t (removeElementOFB (cdr llista) matrix))
+    )
+  )
+)
 
 
