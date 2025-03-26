@@ -1,13 +1,16 @@
 (load 'tco)
 
+(setq wall #\#)
+(setq path #\.)
+(setq newline #\NewLine)
+(setq mazepos '(64 336))
+
 (load 'fitxer-io)
 (load 'graphfx)
 (load 'user-input)
 
 
-(setq wall #\#)
-(setq path #\.)
-(setq newline #\NewLine)
+
 
 (defun read-maze(fn)
     (llegeix fn)
@@ -62,9 +65,15 @@
     ; aprofitant \n es pot ignorar la longitud
     ; la altura es pot suposar maxima, paint-maze atura al extinguir el maze
     ; o pintar de baix a dalt amb un reverse
-    ;(paint-maze (reverse (read-maze name)) 25 350 0 0 offsetx offsety)
-    (let ((user-input) input)
-        (draw-maze name (cond ((= input 'up) (1+ offsetx)) (t (1- offsetx))) (offsety))
+    (paint-maze (reverse (read-maze name)) (car mazepos) (cadr mazepos) 0 0 offsetx offsety)
+    (let ((input (user-input)))
+        (cond
+        ((eq input 'esq)
+            (top-level) ;;hacky way
+        )
+        )
+        (draw-maze name (cond ((eq input 'right) (1+ offsetx)) ((eq input 'left) (1- offsetx)) (t offsetx))
+                        (cond ((eq input 'up) (1+ offsety)) ((eq input 'down) (1- offsety)) (t offsety)))
     )
 )
 (draw-maze "laberints_exemple/30x40_1.txt")
