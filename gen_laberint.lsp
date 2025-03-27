@@ -1,16 +1,6 @@
 
-; function to create an N*M matrix
-; (defun create-matrix (n m) 
-;   (cond 
-;     ((= n 0) nil)
-;     (t
-;      (let 
-;        ((row (make-array m :initial-element 'paret)))
-;        (append (list row) (create-matrix (1- n) m))
-;      )
-;     )
-;   )
-; )
+(load "libs/listLib.lsp")
+(load "VARSGLOBALS.lsp")
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
 ; create a 2D array inicialised to valor
 (defun create-matrix (n m value) 
@@ -43,8 +33,9 @@
     (list i j)
   )
 )
-; Function to set a random matrix value to 'entada
-(defun setEntrada (matrix value pos) 
+; Function to set a random matrix value to 'value
+; pos = (i,j)
+(defun setMatrixValue (matrix value pos) 
 
   (setq matrix (setValue matrix (car pos) (cadr pos) value))
 )
@@ -71,7 +62,7 @@
   (let 
     ((laberint (create-matrix '3 '3 'paret)))
     (setq pos (chooseRandomPos laberint))
-    (setq laberint (setEntrada laberint 'entrada pos))
+    (setq laberint (setMatrixValue laberint entrada pos))
     (setq currentI (car pos))
     (setq currentJ (cadr pos))
     (format t "currentI = ~A~%" currentI)
@@ -81,8 +72,76 @@
   )
 )
 
+(defun paretIUnicCami (currentI currentJ laberint) 
+
+  (cond 
+    ((not equal (getIJLaberint (list (currentI currentJ) laberint)) paret) (nil))
+    ((equal nil (unicCami (currentI currentJ laberint))) nil)
+    (t t)
+  )
+)
+
+(defun prova () 
+
+  (unicCami 
+    '1
+    '2
+    '((paret paret paret paret paret)
+      (paret paret cami cami paret)
+      (paret paret cami cami paret)
+      (paret cami cami cami paret)
+      (paret paret paret paret paret)
+     )
+  )
+)
+
+(defun unicCami (i j laberint) 
+  (let 
+    ((adjacents 
+       (casellaAdjacentRandom laberint i j)
+     ) 
+    )
+
+    (cond 
+      ( ; dado que la casella actual o es entrada/paret.
+       ; Solo verificaremos que ninguna de las casella vecinas sea cami
+       (= 0 (repetitionsX cami (getValors adjacents laberint)))
+
+       t
+      )
+    )
+  )
+)
+
+  ; Dada una llista de incides (i, j) crea una lista con sus correspondientes
+  ;valores del laberint
+(defun getValors (pos laberint) 
+  (cond 
+    ((null pos) nil)
+    (t (cons (getIJLaberint (car pos) laberint) (getValors (cdr pos) laberint)))
+  )
+)
+  ; Devuelve el valor de l = (i,j) del laberinto. Más explicación no puedo dar :)
+(defun getIJLaberint (l laberint) 
+  (let 
+    ((i (car l)) 
+      (j (cadr l))
+    )
+    (cond 
+      ((/= 0 i)
+       (getIJLaberint (list (- i 1) j) (cdr laberint))
+      )
+      (t (getElementI j (car laberint)))
+    )
+  )
+)
 
 
+
+
+
+
+  ; retorna un casella adyacente random a la posicion (currentI, currentJ)
 (defun casellaAdjacentRandom (matrix currentI currentJ) 
   (let 
     ((newPos 
@@ -92,15 +151,17 @@
          )
          displacements
        )
-     ) )
-    (let ((validPos (removeElementOFB newPos matrix))) 
-    validPos)
-      
-  
+     ) 
+    )
+    ; validPos és una llista de llistes
+    (let 
+      ((validPos (removeElementOFB newPos matrix)))
+      validPos
+    )
   )
 )
 
-
+  ; Elimina pares (x y) que etan fuera de indice (Out of Bound)
 (defun removeElementOFB (llista matrix) 
   (let 
     ((rows (length matrix)) (columns (length (car matrix))))
@@ -120,5 +181,3 @@
     )
   )
 )
-
-
