@@ -3,7 +3,7 @@
 (setq wall #\#)
 (setq path #\.)
 (setq newline #\NewLine)
-(setq mazepos '(64 300))
+(setq mazepos '(64 304))
 
 (load 'fitxer-io)
 (load 'graphfx)
@@ -76,7 +76,7 @@
                         (cond ((eq input 'up) (+ offsety TILESIZE)) ((eq input 'down) (- offsety TILESIZE)) (t offsety)))
     )
 )
-(draw-maze "laberints_exemple/30x40_1.txt")
+(draw-maze "laberints_exemple/25x25_1.txt")
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
 ;(draw-tile "rickroll" 250 250)
