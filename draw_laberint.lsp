@@ -3,7 +3,7 @@
 (setq wall #\#)
 (setq path #\.)
 (setq newline #\NewLine)
-(setq mazepos '(64 336))
+(setq mazepos '(64 300))
 
 (load 'fitxer-io)
 (load 'graphfx)
@@ -72,8 +72,8 @@
             (top-level) ;;hacky way
         )
         )
-        (draw-maze name (cond ((eq input 'right) (1+ offsetx)) ((eq input 'left) (1- offsetx)) (t offsetx))
-                        (cond ((eq input 'up) (1+ offsety)) ((eq input 'down) (1- offsety)) (t offsety)))
+        (draw-maze name (cond ((eq input 'right) (+ offsetx TILESIZE)) ((eq input 'left) (- offsetx TILESIZE)) (t offsetx))
+                        (cond ((eq input 'up) (+ offsety TILESIZE)) ((eq input 'down) (- offsety TILESIZE)) (t offsety)))
     )
 )
 (draw-maze "laberints_exemple/30x40_1.txt")
