@@ -4,6 +4,7 @@ from PIL import Image
 TILE_PATH: str = "tiles/"
 
 paint = lambda count: f"(drawrel {count} 0)"
+move = lambda count: f"(moverel {count} 0)"
 setColor = lambda color: f"(color {color[0]} {color[1]} {color[2]})"
 
 def conversor(path_in: str, path_out: str) -> None:
@@ -17,13 +18,20 @@ def conversor(path_in: str, path_out: str) -> None:
                 color: tuple[int, int, int, int] = bmp.getpixel((x,y))
                 if color != lastColor:
                     if lastColor != None:
-                        lsp.write(setColor(lastColor) + paint(consecutive))
+                        if len(lastColor) == 3 or lastColor[3] == 255:
+                            lsp.write(setColor(lastColor) + paint(consecutive))
+                        else:
+                            lsp.write(move(consecutive))
                     lastColor = color
                     consecutive = 1
                 else:
                     consecutive += 1
-                
-            lsp.write(setColor(color)+paint(consecutive)+f"(moverel {-bmp.width} -1)\n")
+                    
+            if len(color) == 3 or color[3] == 255:
+                lsp.write(setColor(lastColor) + paint(consecutive))
+            else:
+                lsp.write(move(consecutive))
+            lsp.write(f"(moverel {-bmp.width} -1)\n")
 
 def main() -> None:
     print("conversor .bmp a .lsp para practica laberinto")
