@@ -1,9 +1,11 @@
 (load 'tco)
 
-(setq wall #\#)
-(setq path #\.)
+(setq paret #\#)
+(setq cami #\.)
+(setq entrada #\e)
+(setq sortida #\s)
 (setq newline #\NewLine)
-(setq mazepos '(64 304))
+(setq mazepos '(64 320))
 
 (load 'fitxer-io)
 (load 'graphfx)
@@ -16,33 +18,39 @@
     (llegeix fn)
 )
 
-(defun-tco paint-maze(maze x y w h offsetx offsety)
+(defun-tco paint-maze(maze x y w h offset-tile-x offset-tile-y)
     (cond 
         ((null maze)
             nil
         )
         (t 
-        (let ((elem (car maze)))
+        (let ((elem (car maze)) (xtile (+ (* (+ w offset-tile-x) TILESIZE) x)) (ytile (+ (* (+ h offset-tile-y) TILESIZE) y)))
             (cond
-                ((eq elem wall)
-                    (paint-wall (+ (* (+ w offsetx) TILESIZE) x) (+ (* (+ h offsety) TILESIZE) y))
+                ((eq elem paret)
+                    (paint-paret xtile ytile)
                 )
-                ((eq elem path)
-                    (paint-path (+ (* (+ w offsetx) TILESIZE) x) (+ (* (+ h offsety) TILESIZE) y))
+                ((eq elem cami)
+                    (paint-cami xtile ytile)
+                )
+                ((eq elem entrada)
+                    (draw-tile "start" xtile ytile)
+                )
+                ((eq elem sortida)
+                    (draw-tile "end" xtile ytile)
                 )
                 ((eq elem newline)
                     nil
                 )
                 (t
-                    (paint-unk (+ (* (+ w offsetx) TILESIZE) x) (+ (* (+ h offsety) TILESIZE) y))
+                    (paint-unk xtile ytile)
                 )
             )
             ;(get-key)
             (paint-maze 
             ;x y w h
             (cdr maze) x y (cond ((eq elem newline) 0) (t (1+ w))) (cond ((eq elem newline) (1- h)) (t h))
-            ;offsetx offsety
-            offsetx offsety
+            ;offset-tile-x offset-tile-y
+            offset-tile-x offset-tile-y
             )
 
         )
@@ -51,32 +59,44 @@
     )
 )
 
-(defun paint-wall(x y)
+(defun paint-paret(x y)
     (draw-tile "wall" x y)
 )
-(defun paint-path(x y)
+(defun paint-cami(x y)
     ;(princ " ")
 )
 (defun paint-unk(x y)
     (draw-tile "error" x y)
 )
-(defun-tco draw-maze(name &optional (offsetx 0) (offsety 0))
+(defun-tco game-loop(name &optional (maze-data nil) (offset-tile-x 0) (offset-tile-y 0))
     (cls)
-    ; aprofitant \n es pot ignorar la longitud
-    ; la altura es pot suposar maxima, paint-maze atura al extinguir el maze
-    ; o pintar de baix a dalt amb un reverse
-    (paint-maze (reverse (read-maze name)) (car mazepos) (cadr mazepos) 0 0 offsetx offsety)
+    (cond
+    ((null maze-data)
+       (game-loop name (reverse (read-maze name)) offset-tile-x offset-tile-y)
+    )
+    (t 
+        ; aprofitant \n es pot ignorar la longitud
+    ; al pintar per zones, es pot "ignorar" el tamany
+    (paint-maze maze-data (car mazepos) (cadr mazepos) 0 0 offset-tile-x offset-tile-y)
     (let ((input (user-input)))
         (cond
         ((eq input 'esq)
-            (top-level) ;;hacky way
+            nil 
         )
+        (t
+        (game-loop name maze-data
+                        (cond ((eq input 'right) (+ offset-tile-x TILESIZE)) ((eq input 'left) (- offset-tile-x TILESIZE)) (t offset-tile-x))
+                        (cond ((eq input 'up) (+ offset-tile-y TILESIZE)) ((eq input 'down) (- offset-tile-y TILESIZE)) (t offset-tile-y))
+        
+        ))
         )
-        (draw-maze name (cond ((eq input 'right) (+ offsetx TILESIZE)) ((eq input 'left) (- offsetx TILESIZE)) (t offsetx))
-                        (cond ((eq input 'up) (+ offsety TILESIZE)) ((eq input 'down) (- offsety TILESIZE)) (t offsety)))
+    )
+    )
+    
+        
     )
 )
-(draw-maze "laberints_exemple/25x25_1.txt")
+(game-loop "laberints_exemple/25x25_1.txt")
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
 ;(draw-tile "rickroll" 250 250)
