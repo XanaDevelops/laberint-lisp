@@ -74,7 +74,7 @@
 (defun cls-player(x y)
     (draw-tile "white" x y)
 )
-(defun-tco game-loop(name &optional (maze-data nil) (maze-x 0) (maze-y 0) (player-x 32) (player-y -32) (isfirst t))
+(defun-tco game-loop(name &optional (maze-data nil) (maze-x 0) (maze-y 0) (player-x 32) (player-y -32) (repaint t))
     
     (cond
     ((null maze-data)
@@ -86,7 +86,7 @@
     (let (  (pdrawx (+ player-x (car mazepos) maze-x))
             (pdrawy (+ player-y (cadr mazepos) maze-y)))
     (cond
-    ((or (eq t t) (= (rem player-x (* TILESIZE TILESIZE)) 0) (= (rem (abs player-y) (* TILESIZE TILESIZE)) 0))
+    ((or (eq repaint t))
         (cls)
         (paint-maze maze-data (+ (car mazepos) maze-x) (+ (cadr mazepos) maze-y))
     )
@@ -122,20 +122,46 @@
 
         (cls-player pdrawx pdrawy)
 
-        (game-loop name maze-data
-                            (let ((aux (mod newpx (* TILESIZE TILESIZE))))
-                                (cond
-                                    ((> aux (* TILESIZE (1- TILESIZE)))
-                                        (- )
-                                    )
-                                )
+        (let ((r (and (eq input 'right) (> (+ newpx maze-x) 240))) (l (and (eq input 'left) (< (+ newpx maze-x) 16)))
+              (u (and (eq input 'up) (> (+ newpy maze-y) -16))) (d (and (eq input 'down) (< (+ newpy maze-y) -240)))
+            )
+            (game-loop name maze-data
+                            (cond
+                            ((eq r t)
+                                (- maze-x 240)
                             )
-                            maze-y
+                            ((eq l t)
+                                (+ maze-x 240)
+                            )
+                            (t 
+                                maze-x
+                            )
+                            )
+                            (cond
+                            ((eq u t)
+                                (- maze-y 240)
+                            )
+                            ((eq d t)
+                                (+ maze-y 240)
+                            )
+                            (t 
+                                maze-y
+                            )
+                            )
                             newpx
                             newpy
-                            nil
+                            (cond
+                                ((or r l u d)
+                                    t
+                                )
+                                (t 
+                                    nil
+                                )
+                            )
 
-        ))
+            )
+        )
+        )
         )
     )
     )
