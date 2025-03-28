@@ -14,6 +14,8 @@
 (load 'graphfx)
 (load 'user-input)
 
+(setq dbg nil)
+
 
 
 
@@ -74,7 +76,8 @@
 (defun cls-player(x y)
     (draw-tile "white" x y)
 )
-(defun-tco game-loop(name &optional (maze-data nil) (offset-tile-x 0) (offset-tile-y 0) (player-x -1) (player-y -1))
+(defun-tco game-loop(name &optional (maze-data nil) (offset-tile-x 0) (offset-tile-y 0) (player-x 32) (player-y -32) (isfirst t))
+    
     (cond
     ((null maze-data)
        (game-loop name (reverse (read-maze name)) offset-tile-x offset-tile-y player-x player-y)
@@ -82,17 +85,34 @@
     (t 
         ; aprofitant \n es pot ignorar la longitud
     ; al pintar per zones, es pot "ignorar" el tamany
+    (let (  (pdrawx (+ player-x (car mazepos) (+ (* offset-tile-x TILESIZE))))
+            (pdrawy (+ player-y (cadr mazepos) (- (* offset-tile-y TILESIZE)))))
     (cond
-    ((= player-x -1)
+    ((or (eq t t) (= (rem player-x (* TILESIZE TILESIZE)) 0) (= (rem (abs player-y) (* TILESIZE TILESIZE)) 0))
         (cls)
         (paint-maze maze-data (car mazepos) (cadr mazepos) 0 0 offset-tile-x offset-tile-y)
     )
-    (t 
-        (draw-tile "luigi" (+ player-x (car mazepos) (- (* offset-tile-x TILESIZE))) (+ player-y (cadr mazepos) (- (* offset-tile-y TILESIZE))))
     )
-    )
+    (draw-tile "luigi" pdrawx pdrawy)
     
-    
+    (color 0 0 0 255 255 255)
+    (goto-xy 0 0)
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (goto-xy 0 0)
+    (print player-x)
+    (print player-y)
+    (print pdrawx)
+    (print pdrawy)
+    (print dbg)
+    (print offset-tile-x)
+    (print offset-tile-y)
 
     (let* ((input (user-input)) (newpx (cond ((eq input 'right) (+ player-x player-speed)) ((eq input 'left) (- player-x player-speed)) (t player-x)))
                                 (newpy (cond ((eq input 'up) (+ player-y player-speed)) ((eq input 'down) (- player-y player-speed)) (t player-y))))
@@ -102,21 +122,40 @@
         )
         (t
 
-        (cls-player (+ player-x (car mazepos) (- (* offset-tile-x TILESIZE))) (+ player-y (cadr mazepos) (- (* offset-tile-y TILESIZE))))
+        (cls-player pdrawx pdrawy)
 
         (game-loop name maze-data
-                            offset-tile-x offset-tile-y
+                            ;offset-tile-x offset-tile-y
+                            (-  (let ((ox (- newpx (* TILESIZE offset-tile-x))))
+                                (setq dbg ox)
+                                (cond   ((> ox (* TILESIZE (1- TILESIZE)))
+                                            (+ offset-tile-x TILESIZE)
+                                        )
+                                        ((< ox TILESIZE)
+                                            (- offset-tile-x TILESIZE)
+                                        )
+                                        (t
+                                            offset-tile-x
+                                        )
+                                )
+                                )
+                            )
+                            ;(- (* (floor (abs newpy) (* TILESIZE TILESIZE)) TILESIZE))
+                            offset-tile-y
                             newpx
                             newpy
+                            nil
 
         ))
         )
     )
     )
     )
+    )
 )
 (cls)
 (game-loop "laberints_exemple/25x25_1.txt")
+(color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
 ;(draw-tile "rickroll" 250 250)
