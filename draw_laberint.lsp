@@ -178,8 +178,15 @@
     (print maze-x)
     (print maze-y)
 
-    (let* ((input (user-input)) (newpx (cond ((eq input 'right) (+ player-x player-speed)) ((eq input 'left) (- player-x player-speed)) (t player-x)))
-                                (newpy (cond ((eq input 'up) (+ player-y player-speed)) ((eq input 'down) (- player-y player-speed)) (t player-y))))
+    (let* ((input (user-input)) (newpx (cond    ((and (eq input 'right) (can-move-h maze-data (+ player-x 16) player-y)) (+ player-x player-speed))
+                                                ((and (eq input 'left) (can-move-h maze-data (- player-x player-speed) player-y)) (- player-x player-speed))
+                                                (t player-x))
+                                )
+                                (newpy (cond    ((and (eq input 'up) (can-move-v maze-data player-x (- player-y -2))) (+ player-y player-speed))
+                                                ((and (eq input 'down) (can-move-v maze-data player-x (+ player-y -17))) (- player-y player-speed))
+                                                (t player-y))
+                                )
+            )
         (cond
         ((eq input 'esq)
             nil 
@@ -214,8 +221,7 @@
                                 maze-y
                             )
                             )
-                            newpx
-                            newpy
+                            newpx newpy
                             (cond
                                 ((or r l u d)
                                     t
@@ -232,6 +238,18 @@
     )
     )
     )
+    )
+)
+
+(defun can-move-h (maze x y)
+    (let ((xtile (floor x TILESIZE)) (ytile (floor (- y) TILESIZE)) (ytile2 (floor (+ (- y) 15) TILESIZE)))
+        (not (or (eq (get-in-maze maze xtile ytile) paret) (eq (get-in-maze maze xtile ytile2) paret)))
+    )
+)
+
+(defun can-move-v (maze x y)
+    (let ((xtile (floor x TILESIZE)) (xtile2 (floor (+ x 15) TILESIZE)) (ytile (floor (- y) TILESIZE)))
+        (not (or (eq (get-in-maze maze xtile ytile) paret) (eq (get-in-maze maze xtile2 ytile) paret)))
     )
 )
 
