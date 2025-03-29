@@ -74,11 +74,30 @@
 (defun cls-player(x y)
     (draw-tile "white" x y)
 )
+
+(defun-tco find-start(maze &optional (i 0) (j 0))
+    (let ((casella (car maze)))
+    (cond
+        ((eq casella entrada)
+            (list i j)
+        )
+        ((eq casella newline)
+            (find-start (cdr maze) 0 (1+ j))
+        )
+        (t
+            (find-start (cdr maze) (1+ i) j)
+        )
+    )
+        
+    )
+)
+
 (defun-tco game-loop(name &optional (maze-data nil) (maze-x 0) (maze-y 0) (player-x 32) (player-y -32) (repaint t))
-    
     (cond
     ((null maze-data)
-       (game-loop name (reverse (read-maze name)) maze-x maze-y player-x player-y)
+        (let* ((maze-data (reverse (read-maze name))) (start-pos (find-start maze-data)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
+        (game-loop name maze-data (* -240 (floor x 240)) (* 240 (floor y -240)) x y)
+        )
     )
     (t 
         ; aprofitant \n es pot ignorar la longitud
@@ -168,8 +187,9 @@
     )
     )
 )
+
 (cls)
-(game-loop "laberints_exemple/25x25_1.txt")
+(game-loop "laberints_exemple/50x50_1.txt")
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
