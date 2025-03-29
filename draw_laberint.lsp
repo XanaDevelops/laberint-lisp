@@ -75,27 +75,49 @@
     (draw-tile "white" x y)
 )
 
-(defun-tco find-start(maze &optional (i 0) (j 0))
-    (let ((casella (car maze)))
+
+(defun-tco find-in-maze(maze casella &optional (i 0) (j 0))
+    (let ((c (car maze)))
     (cond
-        ((eq casella entrada)
+        ((or (eq c casella) (null maze))
             (list i j)
         )
-        ((eq casella newline)
-            (find-start (cdr maze) 0 (1+ j))
+        ((eq c newline)
+            (find-in-maze (cdr maze) casella 0 (1+ j))
         )
         (t
-            (find-start (cdr maze) (1+ i) j)
+            (find-in-maze (cdr maze) casella (1+ i) j)
         )
     )
-        
+    )
+)
+
+(defun-tco get-in-maze(maze x y)
+    (let ((c (car maze)))
+        (cond
+        ((or (< x 0) (< y 0) (null maze))
+            newline
+        )
+        ((and (= x 0) (= y 0))
+            c
+        )
+        ((eq c newline)
+            (get-in-maze (cdr maze) x (1- y))
+        )
+        ((> y 0)
+            (get-in-maze (cdr maze) x y)
+        )
+        (t
+            (get-in-maze (cdr maze) (1- x) y)
+        )
+        )
     )
 )
 
 (defun-tco game-loop(name &optional (maze-data nil) (maze-x 0) (maze-y 0) (player-x 32) (player-y -32) (repaint t))
     (cond
     ((null maze-data)
-        (let* ((maze-data (reverse (read-maze name))) (start-pos (find-start maze-data)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
+        (let* ((maze-data (reverse (read-maze name))) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
         (game-loop name maze-data (* -240 (floor x 240)) (* 240 (floor y -240)) x y)
         )
     )
@@ -110,8 +132,32 @@
         (paint-maze maze-data (+ (car mazepos) maze-x) (+ (cadr mazepos) maze-y))
     )
     )
+    ;repintar tiles caminables
+    ;(si el camí te un tile propi refer això a repintar davall personatge)
+    (let* ((pos (find-in-maze maze-data entrada)) (x (+ (* (car pos) TILESIZE) (car mazepos) maze-x))
+                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) maze-y)))
+        (cond
+        ((and (<= (abs (- pdrawx x)) 16) (<= (abs (- pdrawy y)) 16))
+            (draw-tile "start" x y)
+        )
+        )
+        
+    )
+    (let* ((pos (find-in-maze maze-data sortida)) (x (+ (* (car pos) TILESIZE) (car mazepos) maze-x))
+                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) maze-y)))
+        (cond
+        ((and (<= (abs (- pdrawx x)) 16) (<= (abs (- pdrawy y)) 16))
+            (draw-tile "end" x y)
+        )
+        )
+        
+    )
+    
+
     (draw-tile "luigi" pdrawx pdrawy)
     
+    
+
     (color 0 0 0 255 255 255)
     (goto-xy 0 0)
     (princ "        \n")
@@ -127,7 +173,8 @@
     (print player-y)
     (print pdrawx)
     (print pdrawy)
-    (print dbg)
+    (print (get-in-maze maze-data (floor player-x TILESIZE) (- (floor player-y TILESIZE))))
+    (print (find-in-maze maze-data entrada))
     (print maze-x)
     (print maze-y)
 
