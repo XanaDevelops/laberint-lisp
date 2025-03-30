@@ -23,9 +23,16 @@
 )
 )
 
-(putprop 'player 30 'z)
-(putprop 'player 10 'x)
-(putprop 'player 15 'y)
-(print (symbol-plist 'player))
-(print (symbol-plist (update-prop 'player 'x 20)))
+(defun getx (a)
+    (get a 'x)
+)
+(defun gety (a)
+    (get a 'y)
+)
+
+;(putprop 'player 30 'z)
+;(putprop 'player 10 'x)
+;(putprop 'player 15 'y)
+;(print (symbol-plist 'player))
+;(print (symbol-plist (update-prop 'player 'x 20)))
 
