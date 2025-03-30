@@ -17,8 +17,6 @@
 (setq dbg nil)
 
 
-
-
 (defun read-maze(fn)
     (llegeix fn)
 )
