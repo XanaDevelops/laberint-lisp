@@ -1,7 +1,7 @@
 (defun update-prop (c prop val &optional (props -1))
     (cond
         ((eq props -1)
-            (update-prop 'new prop val (symbol-plist c))
+            (update-prop (gensym "NEW-") prop val (symbol-plist c))
         )
         ((null props)
             c

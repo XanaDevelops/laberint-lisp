@@ -113,45 +113,46 @@
     )
 )
 
-(defun-tco game-loop(name &optional (maze-data nil) (maze-x 0) (maze-y 0) (player 'player) (repaint t))
+(defun-tco game-loop(name &optional (maze 'maze) (player 'player) (repaint t))
     (cond
-    ((null maze-data)
+    ((null (get maze 'data))
         (let* ((maze-data (reverse (read-maze name))) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
+        (putprop maze (* -240 (floor x 240)) 'x)
+        (putprop maze (* 240 (floor y -240)) 'y)
+        (putprop maze maze-data 'data)
         (putprop player x 'x)
         (putprop player y 'y)
-        (game-loop name maze-data (* -240 (floor x 240)) (* 240 (floor y -240)) player)
+        (game-loop name maze player)
         )
     )
     (t 
         ; aprofitant \n es pot ignorar la longitud
     ; al pintar per zones, es pot "ignorar" el tamany
-    (let (  (pdrawx (+ (getx player) (car mazepos) maze-x))
-            (pdrawy (+ (gety player) (cadr mazepos) maze-y)))
+    (let (  (pdrawx (+ (getx player) (car mazepos) (getx maze)))
+            (pdrawy (+ (gety player) (cadr mazepos) (gety maze))))
     (cond
     ((or (eq repaint t))
         (cls)
-        (paint-maze maze-data (+ (car mazepos) maze-x) (+ (cadr mazepos) maze-y))
+        (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
     )
     )
     ;repintar tiles caminables
     ;(si el camí te un tile propi refer això a repintar davall personatge)
-    (let* ((pos (find-in-maze maze-data entrada)) (x (+ (* (car pos) TILESIZE) (car mazepos) maze-x))
-                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) maze-y)))
+    (let* ((pos (find-in-maze (get maze 'data) entrada)) (x (+ (* (car pos) TILESIZE) (car mazepos) (getx maze)))
+                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) (gety maze))))
         (cond
         ((and (<= (abs (- pdrawx x)) 16) (<= (abs (- pdrawy y)) 16))
             (draw-tile "start" x y)
         )
         )
-        
     )
-    (let* ((pos (find-in-maze maze-data sortida)) (x (+ (* (car pos) TILESIZE) (car mazepos) maze-x))
-                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) maze-y)))
+    (let* ((pos (find-in-maze (get maze 'data) sortida)) (x (+ (* (car pos) TILESIZE) (car mazepos) (getx maze)))
+                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) (gety maze))))
         (cond
         ((and (<= (abs (- pdrawx x)) 16) (<= (abs (- pdrawy y)) 16))
             (draw-tile "end" x y)
         )
         )
-        
     )
     
 
@@ -173,18 +174,18 @@
     (print (symbol-plist player))
     (print pdrawx)
     (print pdrawy)
-    (print (get-in-maze maze-data (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
-    (print (find-in-maze maze-data entrada))
-    (print maze-x)
-    (print maze-y)
+    (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
+    (print (find-in-maze (get maze 'data) sortida))
+    (print (getx maze))
+    (print (gety maze))
 
     (let* ((input (user-input)) (px (getx player)) (py (gety player))
-                                (newpx (cond    ((and (eq input 'right) (can-move-h maze-data (+ px 16) py)) (+ px player-speed))
-                                                ((and (eq input 'left) (can-move-h maze-data (- px player-speed) py)) (- px player-speed))
+                                (newpx (cond    ((and (eq input 'right) (can-move-h (get maze 'data) (+ px 16) py)) (+ px player-speed))
+                                                ((and (eq input 'left) (can-move-h (get maze 'data) (- px player-speed) py)) (- px player-speed))
                                                 (t px))
                                 )
-                                (newpy (cond    ((and (eq input 'up) (can-move-v maze-data px (- py -2))) (+ py player-speed))
-                                                ((and (eq input 'down) (can-move-v maze-data px (+ py -17))) (- py player-speed))
+                                (newpy (cond    ((and (eq input 'up) (can-move-v (get maze 'data) px (- py -2))) (+ py player-speed))
+                                                ((and (eq input 'down) (can-move-v (get maze 'data) px (+ py -17))) (- py player-speed))
                                                 (t py))
                                 )
             )
@@ -196,32 +197,13 @@
 
         (cls-player pdrawx pdrawy)
 
-        (let ((r (and (eq input 'right) (> (+ newpx maze-x) 240))) (l (and (eq input 'left) (< (+ newpx maze-x) 16)))
-              (u (and (eq input 'up) (> (+ newpy maze-y) -16))) (d (and (eq input 'down) (< (+ newpy maze-y) -240)))
+        (let* ((r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
+              (u (and (eq input 'up) (> (+ newpy (gety maze)) -16))) (d (and (eq input 'down) (< (+ newpy (gety maze)) -240)))
+              (newmx (cond ((eq r t) (- (getx maze) 240)) ((eq l t) (+ (getx maze) 240)) (t (getx maze))))
+              (newmy (cond ((eq u t) (- (gety maze) 240)) ((eq d t) (+ (gety maze) 240))(t (gety maze))))
             )
-            (game-loop name maze-data
-                            (cond
-                            ((eq r t)
-                                (- maze-x 240)
-                            )
-                            ((eq l t)
-                                (+ maze-x 240)
-                            )
-                            (t 
-                                maze-x
-                            )
-                            )
-                            (cond
-                            ((eq u t)
-                                (- maze-y 240)
-                            )
-                            ((eq d t)
-                                (+ maze-y 240)
-                            )
-                            (t 
-                                maze-y
-                            )
-                            )
+            (game-loop name 
+                            (update-prop (update-prop maze 'x newmx) 'y newmy)
                             (update-prop (update-prop player 'x newpx) 'y newpy)
                             (cond
                                 ((or r l u d)
@@ -255,11 +237,14 @@
 )
 
 (cls)
-(game-loop "laberints_exemple/50x50_1.txt")
+;si peta algo descomentar
+;(trace game-loop)
+;(trace update-prop)
+;(trace find-in-maze)
+;(trace paint-maze)
+
+(game-loop "laberints_exemple/40x30_1.txt")
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
 ;(draw-tile "rickroll" 250 250)
-
-;                       (cond ((eq input 'right) (+ offset-tile-x TILESIZE)) ((eq input 'left) (- offset-tile-x TILESIZE)) (t offset-tile-x))
-;                       (cond ((eq input 'up) (+ offset-tile-y TILESIZE)) ((eq input 'down) (- offset-tile-y TILESIZE)) (t offset-tile-y))

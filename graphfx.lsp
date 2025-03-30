@@ -12,5 +12,5 @@
         (mapcar 'eval (llegeix-exp (strcat (strcat "tiles/" tilename) ".lsp")))
     )
     )
-    
+    t
 )
