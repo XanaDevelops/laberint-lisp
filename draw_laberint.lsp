@@ -70,9 +70,44 @@
 (defun paint-unk(x y)
     (draw-tile "error" x y)
 )
-(defun cls-player(x y)
-    (draw-tile "white" x y)
+(defun get-strname (tile)
+    (cond
+        ((eq tile entrada)
+            "start"
+        )
+        ((eq tile sortida)
+            "end"
+        )
+        ((eq tile paret)
+            "wall"
+        )
+        ((eq tile cami)
+            "path2"
+        )
+        (t
+            "error"
+        )
+    )
 )
+(defun cls-player(xpos ypos maze)
+    (let* ((xtile (floor xpos TILESIZE)) (ytile (floor (- ypos) TILESIZE))
+            (tile (get-in-maze (get maze 'data) xtile ytile)))
+        (draw-tile (get-strname tile) (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
+    (cond 
+        ((> (mod xpos TILESIZE) 0)
+            (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) ytile))
+                (+ (* (1+ xtile) TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
+        )
+        ((> (mod (- ypos) TILESIZE) 0)
+            (draw-tile (get-strname (get-in-maze (get maze 'data) xtile (1+ ytile)))
+                (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
+        )
+    )
+        
+    )
+
+)
+
 
 
 (defun-tco find-in-maze(maze casella &optional (i 0) (j 0))
@@ -138,24 +173,8 @@
     )
     ;repintar tiles caminables
     ;(si el camí te un tile propi refer això a repintar davall personatge)
-    (let* ((pos (find-in-maze (get maze 'data) entrada)) (x (+ (* (car pos) TILESIZE) (car mazepos) (getx maze)))
-                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) (gety maze))))
-        (cond
-        ((and (<= (abs (- pdrawx x)) 16) (<= (abs (- pdrawy y)) 16))
-            (draw-tile "start" x y)
-        )
-        )
-    )
-    (let* ((pos (find-in-maze (get maze 'data) sortida)) (x (+ (* (car pos) TILESIZE) (car mazepos) (getx maze)))
-                                                  (y (+ (* (- (cadr pos)) TILESIZE) (cadr mazepos) (gety maze))))
-        (cond
-        ((and (<= (abs (- pdrawx x)) 16) (<= (abs (- pdrawy y)) 16))
-            (draw-tile "end" x y)
-        )
-        )
-    )
     
-
+    
     (draw-tile "luigi" pdrawx pdrawy)
     
     
@@ -195,7 +214,8 @@
         )
         (t
 
-        (cls-player pdrawx pdrawy)
+        ;(cls-player pdrawx pdrawy)
+        (cls-player (getx player) (gety player) maze)
 
         (let* ((r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
               (u (and (eq input 'up) (> (+ newpy (gety maze)) -16))) (d (and (eq input 'down) (< (+ newpy (gety maze)) -240)))
