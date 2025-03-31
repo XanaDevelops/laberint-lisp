@@ -199,11 +199,11 @@
     (print (gety maze))
 
     (let* ((input (user-input)) (px (getx player)) (py (gety player))
-                                (newpx (cond    ((and (eq input 'right) (can-move-h (get maze 'data) (+ px 16) py)) (+ px player-speed))
+                                (newpx (cond    ((and (eq input 'right) (can-move-h (get maze 'data) (+ px TILESIZE) py)) (+ px player-speed))
                                                 ((and (eq input 'left) (can-move-h (get maze 'data) (- px player-speed) py)) (- px player-speed))
                                                 (t px))
                                 )
-                                (newpy (cond    ((and (eq input 'up) (can-move-v (get maze 'data) px (- py -2))) (+ py player-speed))
+                                (newpy (cond    ((and (eq input 'up) (can-move-v (get maze 'data) px (- py (- player-speed)))) (+ py player-speed))
                                                 ((and (eq input 'down) (can-move-v (get maze 'data) px (+ py -17))) (- py player-speed))
                                                 (t py))
                                 )
@@ -214,7 +214,6 @@
         )
         (t
 
-        ;(cls-player pdrawx pdrawy)
         (cls-player (getx player) (gety player) maze)
 
         (let* ((r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
