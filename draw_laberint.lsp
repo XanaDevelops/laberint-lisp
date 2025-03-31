@@ -148,7 +148,7 @@
     )
 )
 
-(defun-tco game-loop(name &optional (maze 'maze) (player 'player) (repaint t))
+(defun-tco game-loop(name &optional (maze 'maze) (player 'player) (steps 0) (repaint t))
     (cond
     ((null (get maze 'data))
         (let* ((maze-data (reverse (read-maze name))) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
@@ -210,7 +210,7 @@
             )
         (cond
         ((eq input 'esq)
-            nil 
+            steps 
         )
         (t
 
@@ -224,6 +224,7 @@
             (game-loop name 
                             (update-prop (update-prop maze 'x newmx) 'y newmy)
                             (update-prop (update-prop player 'x newpx) 'y newpy)
+                            (1+ steps)
                             (cond
                                 ((or r l u d)
                                     t
@@ -262,7 +263,7 @@
 ;(trace find-in-maze)
 ;(trace paint-maze)
 
-(game-loop "laberints_exemple/40x30_1.txt")
+(print (game-loop "laberints_exemple/40x30_1.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)

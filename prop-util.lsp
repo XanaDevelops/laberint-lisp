@@ -1,3 +1,6 @@
+
+; Actualitza una propietat 'prop' amb el valor 'val de 'c'
+; Funciona creant un nou simbol y copia els valors de 'c'
 (defun update-prop (c prop val &optional (props -1))
     (cond
         ((eq props -1)
