@@ -437,3 +437,12 @@
     (t (cons (mapcar 'car l) (transposta (mapcar 'cdr l))))
   )
 )
+
+
+; Create a list with n repetitions of the element e
+(defun replicate (n e) 
+  (cond 
+    ((= 0 n) nil)
+    (t (cons e (replicate (- n 1) e)))
+  )
+)

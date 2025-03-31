@@ -1,6 +1,8 @@
 
 (load "libs/listLib.lsp")
 (load "VARSGLOBALS.lsp")
+
+
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
 ; create a 2D array inicialised to valor
 (defun create-matrix (n m value) 
@@ -15,14 +17,6 @@
 )
 
 
-
-; Create a list with n repetitions of the element e
-(defun replicate (n e) 
-  (cond 
-    ((= 0 n) nil)
-    (t (cons e (replicate (- n 1) e)))
-  )
-)
 
 (defun chooseRandomPos (matrix) 
   (let 
@@ -60,55 +54,211 @@
 
   ; (setq laberint (create-matrix '3 '3 'paret))
   (let 
-    ((laberint (create-matrix '3 '3 'paret)))
+    ((laberint (create-matrix MIDA MIDA 'paret)))
     (setq pos (chooseRandomPos laberint))
+    ; casella random como 'entrada
     (setq laberint (setMatrixValue laberint entrada pos))
     (setq currentI (car pos))
     (setq currentJ (cadr pos))
-    (format t "currentI = ~A~%" currentI)
-    (format t "currentJ= ~A~%" currentJ)
+    ; (format t "currentI = ~A~%" currentI)
+    ; (format t "currentJ= ~A~%" currentJ)
+
+    (setq laberint (recursiveDFS currentI currentJ laberint))
+    ;  (format t "laberint = ~A~%" laberint)
+    (setq laberint (setMatrixValue laberint sortida (getRandomCamiPos laberint)))
+    (setq laberint (setEdgesParet laberint))
     (format t "laberint = ~A~%" laberint)
-    (casellaAdjacentRandom laberint currentI currentJ)
+    (writeToFile laberint "laberintGenerat.txt")
+  )
+)
+; añade el borde superior
+(defun setEdgesParet (laberint) 
+  (cons (replicate (+ 2 mida) paret) (addParetToFila laberint))
+)
+; añade paret a los extremos de cada fila, y la fila final de paret
+(defun addParetToFila (laberint) 
+  (cond 
+    ((null laberint) (list (replicate (+ 2 mida) paret)))
+    (t
+     (cons 
+       (cons paret (snoc paret (car laberint)))
+       (addParetToFila (cdr laberint))
+     )
+    )
+  )
+)
+  
+
+(defun getRandomCamiPos (laberint) 
+  (let 
+    ((i (random MIDA)) 
+      (j (random MIDA))
+    )
+
+    (cond 
+
+      ((equal (getIJLaberint (list i j) laberint) cami) (list i j))
+      (t (getRandomCamiPos laberint))
+    )
   )
 )
 
-(defun paretIUnicCami (currentI currentJ laberint) 
+(defun writeToFile (laberint file) 
+  (let 
+    ((stream 
+       (open file :direction :output :if-exists :supersede :if-does-not-exist :create)
+     ) 
+    )
+    (cond 
+      (stream
+       (writeRecursivly laberint stream)
+       (close stream)
+      )
+    )
+  )
+)
+
+
+
+(defun writeRecursivly (l stream) 
+  (cond 
+    ((null l) nil)
+    (t
+     (progn 
+
+       (writeLine (car l) stream)
+       (terpri stream)
+       (writeRecursivly (cdr l) stream)
+     )
+    )
+  )
+)
+
+(defun writeLine (line stream) 
 
   (cond 
-    ((not equal (getIJLaberint (list (currentI currentJ) laberint)) paret) (nil))
-    ((equal nil (unicCami (currentI currentJ laberint))) nil)
-    (t t)
-  )
-)
+    ((null line) nil)
+    (t
 
-(defun prova () 
-
-  (unicCami 
-    '1
-    '2
-    '((paret paret paret paret paret)
-      (paret paret cami cami paret)
-      (paret paret cami cami paret)
-      (paret cami cami cami paret)
-      (paret paret paret paret paret)
+     (progn 
+       (write-char (convertirAChar (car line)) stream)
+       (writeLine (cdr line) stream)
      )
+    )
   )
 )
 
+(defun convertirAChar (valor) 
+
+  (cond 
+    ((equal valor sortida) Csortida)
+    ((equal valor entrada) Centrada)
+    ((equal valor paret) Cparet)
+    ((equal valor cami) Ccami)
+  )
+)
+
+
+
+; (defun recursiveDFS (currentI currentJ laberint) 
+;   (cond 
+;     ((not (paretIUnicCami (list currentI currentJ) laberint))
+;      (format t "laberint = ~A~%" laberint)
+;     )
+;     (t
+;      (let 
+;        ; casella random adyacente
+;        ((posActual (casellaAdjacentRandom laberint currentI currentJ)))
+;        (format t "posActual = ~A~%" posActual)
+;        (cond 
+;          ((paretIUnicCami posActual laberint)
+;           (setq laberint (setMatrixValue laberint 'canviat posActual))
+;          )
+;        )
+;        ; llamada recursiva
+;        (recursiveDFS (car posActual) (cadr posActual) laberint)
+;      )
+;     )
+;   )
+; )
+
+(defun acabar (currentI currentJ laberint) 
+  (not 
+    (some 
+      (lambda (pos) (paretIUnicCami pos laberint))
+      (casellesAdjacents laberint currentI currentJ)
+    )
+  )
+)
+
+(defun recursiveDFS (currentI currentJ laberint) 
+  (if (acabar currentI currentJ laberint) 
+    ; (progn
+    ;   (format t " laberint = ~A~%" laberint)
+    laberint
+    ; ) ; return laberint
+    (let 
+      ((posActual (casellaAdjacentRandom laberint currentI currentJ))) ; casella adjaçent random
+      ; (format t "posActual = ~A~%" posActual)
+      (if (paretIUnicCami posActual laberint) 
+        (progn 
+          (setq laberint (setMatrixValue laberint cami posActual))
+          (recursiveDFS (car posActual) (cadr posActual) laberint)
+        ) ; crida recursiva amb el mateix valor
+        (recursiveDFS currentI currentJ laberint)
+      )
+    )
+  )
+)  ;; Si `posActual` no es válida, intenta con otra
+
+; (defun acabar (currentI currentJ laberint) 
+;   (every 
+
+;     (lambda (pos) 
+;       (not (paretIUnicCami pos laberint))
+;     )
+;     (casellesAdjacents laberint currentI currentJ)
+;   )
+; )
+
+; true si ninguna casella comuple que :
+; 1. su valor actual es paret
+; 2. l'Unic cami adjcanet és la pos actual
+(defun paretIUnicCami (posActual laberint) 
+
+  (cond 
+
+    ((and 
+       (equal paret (getIJLaberint posActual laberint))
+       (unicCami (car posActual) (cadr posActual) laberint)
+     )
+     t
+    )
+
+    (t nil)
+  )
+)
+
+
+
+
+; la celda (i, j) tiene un unico camino/entrada adyacente?
 (defun unicCami (i j laberint) 
   (let 
     ((adjacents 
-       (casellaAdjacentRandom laberint i j)
+       (casellesAdjacents laberint i j)
      ) 
     )
 
     (cond 
-      ( ; dado que la casella actual o es entrada/paret.
-       ; Solo verificaremos que ninguna de las casella vecinas sea cami
-       (= 0 (repetitionsX cami (getValors adjacents laberint)))
-
+      ((= 1 
+          (+ (repetitionsX cami (getValors adjacents laberint)) 
+             (repetitionsX entrada (getValors adjacents laberint))
+          )
+       )
        t
       )
+      (t nil)
     )
   )
 )
@@ -121,6 +271,7 @@
     (t (cons (getIJLaberint (car pos) laberint) (getValors (cdr pos) laberint)))
   )
 )
+
   ; Devuelve el valor de l = (i,j) del laberinto. Más explicación no puedo dar :)
 (defun getIJLaberint (l laberint) 
   (let 
@@ -135,12 +286,24 @@
     )
   )
 )
-
-
-
-
-
-
+(defun casellesAdjacents (matrix currentI currentJ) 
+  (let 
+    ((newPos 
+       (mapcar 
+         (lambda (llista) 
+           (list (+ currentI (car llista)) (+ currentJ (cadr llista)))
+         )
+         displacements
+       )
+     ) 
+    )
+    ; validPos és una llista de llistes
+    (let 
+      ((validPos (removeElementOFB newPos matrix)))
+      validPos
+    )
+  )
+)
   ; retorna un casella adyacente random a la posicion (currentI, currentJ)
 (defun casellaAdjacentRandom (matrix currentI currentJ) 
   (let 
@@ -156,7 +319,8 @@
     ; validPos és una llista de llistes
     (let 
       ((validPos (removeElementOFB newPos matrix)))
-      validPos
+      ; devuelve una pos random
+      (getElementI (random (length validPos)) validPos)
     )
   )
 )
@@ -179,5 +343,19 @@
       )
       (t (removeElementOFB (cdr llista) matrix))
     )
+  )
+)
+(defun prova () 
+
+  (acabar 
+    '0
+    '0
+
+    '((paret entrada paret paret paret)
+      (paret paret cami paret paret)
+      (paret paret paret paret paret)
+      (paret paret paret cami paret)
+      (paret paret paret paret paret)
+     )
   )
 )
