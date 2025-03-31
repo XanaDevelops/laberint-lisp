@@ -67,7 +67,7 @@
     ;  (format t "laberint = ~A~%" laberint)
     (setq laberint (setMatrixValue laberint sortida (getRandomCamiPos laberint)))
     (setq laberint (setEdgesParet laberint))
-    (format t "laberint = ~A~%" laberint)
+    ; (format t "laberint = ~A~%" laberint)
     (writeToFile laberint "laberintGenerat.txt")
   )
 )
