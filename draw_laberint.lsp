@@ -65,7 +65,7 @@
     (draw-tile "wall" x y)
 )
 (defun paint-cami(x y)
-    ;(princ " ")
+    (draw-tile "path2" x y)
 )
 (defun paint-unk(x y)
     (draw-tile "error" x y)
