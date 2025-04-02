@@ -2,7 +2,7 @@
 (load "libs/listLib.lsp")
 (load "VARSGLOBALS.lsp")
 (load "fileManagement.lsp")
-
+(load "tco.lsp")
 
 ; Crea una llista de llista i la inicialitza amb 'value'
 ;;; @param n nombre de files
@@ -132,7 +132,9 @@
 )
 
 
-(defun-tco recursiveDFS (currentI currentJ laberint) 
+(defun-tco 
+  recursiveDFS
+  (currentI currentJ laberint)
   (if (acabar currentI currentJ laberint) 
 
     ; (progn
@@ -182,10 +184,10 @@
     )
 
     (cond 
-      ((= 1 
-          (+ (repetitionsX cami (getValors adjacents laberint)) 
-             (repetitionsX entrada (getValors adjacents laberint))
-          )
+      ((>= 1 
+           (+ (repetitionsX cami (getValors adjacents laberint)) 
+              (repetitionsX entrada (getValors adjacents laberint))
+           )
        )
        t
       )
@@ -276,20 +278,7 @@
     )
   )
 )
-(defun prova () 
 
-  (acabar 
-    '0
-    '0
-
-    '((paret entrada paret paret paret)
-      (paret paret cami paret paret)
-      (paret paret paret paret paret)
-      (paret paret paret cami paret)
-      (paret paret paret paret paret)
-     )
-  )
-)
 
 (defun acabarv2 (laberint) 
 
@@ -346,31 +335,132 @@
 (defun randomizedPrim () 
 
   ;Inicialitzar el laberint a 'paret
-  (setq laberint (create-matrix mida mdia 'paret))
-  ;llista buida de parets
-  (setq paretsL '())
-  ; triar posicio random i establir-la a 'cami
-  (setq pos (chooseRandomPos laberint))
-  (setq laberint (setMatrixValue laberint cami pos))
-  ;afegir les partes de pos a la llista de parets
-  (setq paretsL (getParets laberint pos))
+  (let* 
+    ((laberint (create-matrix mida mida paret)) 
+
+      (pos (chooseRandomPos laberint))
+      (laberint (setMatrixValue laberint cami pos))
+      (paretsL (getParets laberint pos))
+      (laberint (recursivePrim paretsL laberint))
+    )
+    (recursivePrim paretsL laberint)
+  )
+
+
+
+  ; )
+  ; (setq )
+  ; ;llista buida de parets
+  ; (setq )
+  ; ; triar posicio random i establir-la a 'cami
+  ; (setq))
+  ; (setq laberint (setMatrixValue laberint cami pos))
+  ; ;afegir les partes de pos a la llista de parets
+  ; (setq )
+
+  ; (setq laberint )
+)
+(defun-tco 
+  recursivePrim
+  (paretsL laberint)
+  (cond 
+    ((null paretsL)
+     laberint
+    )
+    (t
+     (let* 
+       ((randomWall (chooseRandomPos paretsL)) 
+         (cell (oneAdjacentVisited randomWall laberint))
+       )
+       (format t "randomWall:~a~%" randomWall)
+       (format t "laberint: ~a~%" laberint)
+       (format t "Parets:~a~%" paretsL)
+
+       (cond 
+         ((not (null cell))
+          (let* 
+            ((newLaberint (setMatrixValue laberint cami cell)) 
+              (newParetsL 
+                (append paretsL 
+                        (getParets newLaberint cell)
+                )
+              )
+            )
+            (format t "newParets:~a~%" newParetsL)
+            (recursivePrim newParetsL newLaberint)
+          )
+         )
+
+         (t (recursivePrim (remove randomWall paretsL) laberint))
+       )
+     )
+    )
+  )
 )
 
+
+
+
+  ; crea una llista de les parets adjaçents a posActual
 (defun getParets (laberint posActual) 
 
   (let 
     ((adjacents (casellesAdjacents laberint (car posActual) (cadr posActual))))
-    (llistaParetsAdjacents (adjacents laberint))
+    (llistaParetsAdjacents adjacents laberint)
   )
 )
 
+  ;Donada la llista de posiciones adjacents, crea una llista de les que són parets
 (defun llistaParetsAdjacents (adjacents laberint) 
 
   (cond 
     ((null adjacents) nil)
     ((equal paret (getIJLaberint (car adjacents) laberint))
-     (append (car adjacents) (llistaParetsAdjacents (cdr adjacents) laberint))
+     (cons (car adjacents) (llistaParetsAdjacents (cdr adjacents) laberint))
     )
     (t (llistaParetsAdjacents (cdr adjacents) laberint))
   )
 )
+
+
+
+  ; la paret actual té una unica cel·la adjaçent marcada com camí?
+(defun oneAdjacentVisited (currentWallPos laberint) 
+
+  (let 
+    ((adjacents 
+       (casellesAdjacents laberint (car currentWallPos) (cadr currentWallPos))
+     ) 
+    )
+    (let 
+      ((valors (getValors adjacents laberint)))
+      (cond 
+        ((/= 1 (repetitionsX cami valors)) nil)
+        (t (getCell valors adjacents))
+      )
+    )
+  )
+)
+(defun getCell (valors adjacents) 
+  (cond 
+    ((null valors) nil)
+    ((equal (car valors) cami) (car adjacents))
+    (t (getCell (cdr valors) (cdr adjacents)))
+  )
+)
+(defun prova () 
+
+  (getParets 
+
+
+
+    '((paret cami paret paret paret)
+      (paret paret cami paret paret)
+      (paret paret paret paret paret)
+      (paret paret paret cami paret)
+      (paret paret paret paret paret)
+     )
+    '(3 3)
+  )
+)
+
