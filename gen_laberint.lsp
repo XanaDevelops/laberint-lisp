@@ -1,6 +1,7 @@
 
 (load "libs/listLib.lsp")
 (load "VARSGLOBALS.lsp")
+; (load "libs/conjunts.lsp")
 
 
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
@@ -160,28 +161,6 @@
 
 
 
-; (defun recursiveDFS (currentI currentJ laberint) 
-;   (cond 
-;     ((not (paretIUnicCami (list currentI currentJ) laberint))
-;      (format t "laberint = ~A~%" laberint)
-;     )
-;     (t
-;      (let 
-;        ; casella random adyacente
-;        ((posActual (casellaAdjacentRandom laberint currentI currentJ)))
-;        (format t "posActual = ~A~%" posActual)
-;        (cond 
-;          ((paretIUnicCami posActual laberint)
-;           (setq laberint (setMatrixValue laberint 'canviat posActual))
-;          )
-;        )
-;        ; llamada recursiva
-;        (recursiveDFS (car posActual) (cadr posActual) laberint)
-;      )
-;     )
-;   )
-; )
-
 (defun acabar (currentI currentJ laberint) 
   (not 
     (some 
@@ -191,8 +170,11 @@
   )
 )
 
+
+
 (defun recursiveDFS (currentI currentJ laberint) 
   (if (acabar currentI currentJ laberint) 
+ 
     ; (progn
     ;   (format t " laberint = ~A~%" laberint)
     laberint
@@ -205,21 +187,12 @@
           (setq laberint (setMatrixValue laberint cami posActual))
           (recursiveDFS (car posActual) (cadr posActual) laberint)
         ) ; crida recursiva amb el mateix valor
+
         (recursiveDFS currentI currentJ laberint)
       )
     )
   )
-)  ;; Si `posActual` no es válida, intenta con otra
-
-; (defun acabar (currentI currentJ laberint) 
-;   (every 
-
-;     (lambda (pos) 
-;       (not (paretIUnicCami pos laberint))
-;     )
-;     (casellesAdjacents laberint currentI currentJ)
-;   )
-; )
+) 
 
 ; true si ninguna casella comuple que :
 ; 1. su valor actual es paret
@@ -240,8 +213,6 @@
 )
 
 
-
-
 ; la celda (i, j) tiene un unico camino/entrada adyacente?
 (defun unicCami (i j laberint) 
   (let 
@@ -251,7 +222,7 @@
     )
 
     (cond 
-      ((= 1 
+      ((= 1
           (+ (repetitionsX cami (getValors adjacents laberint)) 
              (repetitionsX entrada (getValors adjacents laberint))
           )
@@ -357,5 +328,56 @@
       (paret paret paret cami paret)
       (paret paret paret paret paret)
      )
+  )
+)
+
+(defun acabarv2 (laberint ) 
+
+  (let 
+    ((cords (generateCoordenates (- mida 1))))
+    (not 
+      (some 
+        (lambda (pos) (acabar (car pos) (cadr pos) laberint))
+        cords
+      )
+    )
+  )
+)
+
+
+
+(defun createList (max) 
+  (cond 
+    ((= 0 max) (list 0))
+    (t (append (createList (- max 1)) (list max)))
+  )
+)
+
+(defun permutation (l1 l2) 
+  (cond 
+    ((null l1) nil)
+    (t
+     (append (subperm (car l1) l2) 
+             (permutation (cdr l1) l2)
+     )
+    )
+  )
+)
+
+(defun subperm (v l) 
+  (cond 
+    ((null l) nil)
+    (t (cons (list v (car l)) (subperm v (cdr l))))
+  )
+)
+
+(defun generateCoordenates (max) 
+  ; generar una lista de 0..max
+  (let 
+    ((l1 (createList max)) (l2 (createList max)))
+    (let 
+      ((lparells (permutation l1 l2)))
+      lparells
+    )
   )
 )

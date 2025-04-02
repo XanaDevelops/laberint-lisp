@@ -3,6 +3,8 @@
 (setq cami 'cami)
 (setq sortida 'sortida)
 (setq MIDA 25)
+(setq files 20)
+(setq cols 30)
 (setq Cparet #\#)
 (setq Ccami #\.)
 (setq Centrada #\e)
