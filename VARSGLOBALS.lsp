@@ -3,10 +3,13 @@
 (setq cami 'cami)
 (setq sortida 'sortida)
 (setq MIDA 25)
-(setq files 20)
-(setq cols 30)
+; (setq files 20)
+; (setq cols 30)
+(setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
+
 (setq Cparet #\#)
 (setq Ccami #\.)
 (setq Centrada #\e)
 (setq Csortida #\s)
+
 ; (setq salt newline)

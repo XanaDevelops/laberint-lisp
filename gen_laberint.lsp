@@ -1,11 +1,13 @@
 
 (load "libs/listLib.lsp")
 (load "VARSGLOBALS.lsp")
-; (load "libs/conjunts.lsp")
+(load "fileManagement.lsp")
 
 
-(setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
-; create a 2D array inicialised to valor
+; Crea una llista de llista i la inicialitza amb 'value'
+;;; @param n nombre de files
+;;; @param m nombre de columnes
+;;; @return llista de llistes
 (defun create-matrix (n m value) 
   (cond 
     ((= n 0) nil)
@@ -18,7 +20,7 @@
 )
 
 
-
+; Retorna posició aleatoria (i,j) de la matriu
 (defun chooseRandomPos (matrix) 
   (let 
     ((i (random (length matrix))) 
@@ -28,13 +30,21 @@
     (list i j)
   )
 )
-; Function to set a random matrix value to 'value
-; pos = (i,j)
+
+
+
+  ;Estableix el valor (i,j) de 'matrix' a 'value', sent 'pos'=  (i,j)
+
 (defun setMatrixValue (matrix value pos) 
 
   (setq matrix (setValue matrix (car pos) (cadr pos) value))
 )
+
 ; sets matrix[i][j] = value
+
+
+;  Estableix el valor 'value' a la posició (i,j) de matrix
+
 (defun setValue (matrix i j value) 
   (cond 
     ((/= 0 i)
@@ -43,6 +53,7 @@
     (t (cons (changeValue j (car matrix) value) (cdr matrix)))
   )
 )
+
 ; sets llista[index]=value.
 ;Returns llista
 (defun changeValue (index llista value) 
@@ -51,6 +62,7 @@
     (t (cons (car llista) (changeValue (- index 1) (cdr llista) value)))
   )
 )
+
 (defun genera-laberint () 
 
   ; (setq laberint (create-matrix '3 '3 'paret))
@@ -72,10 +84,12 @@
     (writeToFile laberint "laberintGenerat.txt")
   )
 )
+
 ; añade el borde superior
 (defun setEdgesParet (laberint) 
   (cons (replicate (+ 2 mida) paret) (addParetToFila laberint))
 )
+
 ; añade paret a los extremos de cada fila, y la fila final de paret
 (defun addParetToFila (laberint) 
   (cond 
@@ -104,60 +118,7 @@
   )
 )
 
-(defun writeToFile (laberint file) 
-  (let 
-    ((stream 
-       (open file :direction :output :if-exists :supersede :if-does-not-exist :create)
-     ) 
-    )
-    (cond 
-      (stream
-       (writeRecursivly laberint stream)
-       (close stream)
-      )
-    )
-  )
-)
 
-
-
-(defun writeRecursivly (l stream) 
-  (cond 
-    ((null l) nil)
-    (t
-     (progn 
-
-       (writeLine (car l) stream)
-       (terpri stream)
-       (writeRecursivly (cdr l) stream)
-     )
-    )
-  )
-)
-
-(defun writeLine (line stream) 
-
-  (cond 
-    ((null line) nil)
-    (t
-
-     (progn 
-       (write-char (convertirAChar (car line)) stream)
-       (writeLine (cdr line) stream)
-     )
-    )
-  )
-)
-
-(defun convertirAChar (valor) 
-
-  (cond 
-    ((equal valor sortida) Csortida)
-    ((equal valor entrada) Centrada)
-    ((equal valor paret) Cparet)
-    ((equal valor cami) Ccami)
-  )
-)
 
 
 
@@ -171,10 +132,9 @@
 )
 
 
-
 (defun recursiveDFS (currentI currentJ laberint) 
   (if (acabar currentI currentJ laberint) 
- 
+
     ; (progn
     ;   (format t " laberint = ~A~%" laberint)
     laberint
@@ -222,7 +182,7 @@
     )
 
     (cond 
-      ((= 1
+      ((= 1 
           (+ (repetitionsX cami (getValors adjacents laberint)) 
              (repetitionsX entrada (getValors adjacents laberint))
           )
@@ -331,7 +291,7 @@
   )
 )
 
-(defun acabarv2 (laberint ) 
+(defun acabarv2 (laberint) 
 
   (let 
     ((cords (generateCoordenates (- mida 1))))
@@ -379,5 +339,38 @@
       ((lparells (permutation l1 l2)))
       lparells
     )
+  )
+)
+
+
+(defun randomizedPrim () 
+
+  ;Inicialitzar el laberint a 'paret
+  (setq laberint (create-matrix mida mdia 'paret))
+  ;llista buida de parets
+  (setq paretsL '())
+  ; triar posicio random i establir-la a 'cami
+  (setq pos (chooseRandomPos laberint))
+  (setq laberint (setMatrixValue laberint cami pos))
+  ;afegir les partes de pos a la llista de parets
+  (setq paretsL (getParets laberint pos))
+)
+
+(defun getParets (laberint posActual) 
+
+  (let 
+    ((adjacents (casellesAdjacents laberint (car posActual) (cadr posActual))))
+    (llistaParetsAdjacents (adjacents laberint))
+  )
+)
+
+(defun llistaParetsAdjacents (adjacents laberint) 
+
+  (cond 
+    ((null adjacents) nil)
+    ((equal paret (getIJLaberint (car adjacents) laberint))
+     (append (car adjacents) (llistaParetsAdjacents (cdr adjacents) laberint))
+    )
+    (t (llistaParetsAdjacents (cdr adjacents) laberint))
   )
 )
