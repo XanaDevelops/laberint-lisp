@@ -132,7 +132,7 @@
 )
 
 
-(defun recursiveDFS (currentI currentJ laberint) 
+(defun-tco recursiveDFS (currentI currentJ laberint) 
   (if (acabar currentI currentJ laberint) 
 
     ; (progn
