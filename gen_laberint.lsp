@@ -343,6 +343,7 @@
       (paretsL (getParets laberint pos))
       (laberint (recursivePrim paretsL laberint))
     )
+    (format t "POS: ~a~%" pos)
     (recursivePrim paretsL laberint)
   )
 
@@ -360,36 +361,50 @@
 
   ; (setq laberint )
 )
-(defun-tco 
-  recursivePrim
-  (paretsL laberint)
+(defun recursivePrim (paretsL laberint) 
   (cond 
     ((null paretsL)
-     laberint
+      (writeToFile laberint "laberintGenerat.txt" )
+    ;  laberint
     )
     (t
      (let* 
-       ((randomWall (chooseRandomPos paretsL)) 
+       ((randomWall (chooseRandomWall paretsL)) 
          (cell (oneAdjacentVisited randomWall laberint))
        )
-       (format t "randomWall:~a~%" randomWall)
-       (format t "laberint: ~a~%" laberint)
-       (format t "Parets:~a~%" paretsL)
+      ;  (format t "randomWall:~a~%" randomWall)
+      ;  (format t "laberint: ~a~%" laberint)
+      ;  (format t "Parets:~a~%" paretsL)
 
        (cond 
          ((not (null cell))
           (let* 
             ((newLaberint (setMatrixValue laberint cami cell)) 
+
+              (nl (setMatrixValue newLaberint cami randomWall))
               (newParetsL 
-                (append paretsL 
-                        (getParets newLaberint cell)
+                (addParet 
+                  paretsL
+                  (getParets laberint cell)
                 )
               )
             )
-            (format t "newParets:~a~%" newParetsL)
-            (recursivePrim newParetsL newLaberint)
+            (progn 
+
+              ; (format t "CELL ~a~%" cell)
+              (format t "newParets:~a~%" newParetsL)
+              (format t "Newlaberint: ~a~%" nl)
+              ; (progn
+              (let 
+                ((np (remove randomWall newParetsL)))
+                (recursivePrim np nl)
+              )
+            )
+
+            ; )
           )
          )
+
 
          (t (recursivePrim (remove randomWall paretsL) laberint))
        )
@@ -398,8 +413,31 @@
   )
 )
 
+(defun chooseRandomWall (walls) 
+  (let 
+    ((pos (random (length walls))))
+
+    (nth pos walls)
+  )
+)
 
 
+
+(defun addParet (l1 l2) 
+  (cond 
+    ((null l2) l1)
+    ((pairMember (car l2) l1) (addParet l1 (cdr l2)))
+    (t (addParet (snoc (car l2) l1) (cdr l2)))
+  )
+)
+
+(defun pairMember (pair l) 
+  (cond 
+    ((null l) nil)
+    ((equal pair (car l)) t)
+    (t (pairMember pair (cdr l)))
+  )
+)
 
   ; crea una llista de les parets adjaçents a posActual
 (defun getParets (laberint posActual) 
