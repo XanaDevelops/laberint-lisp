@@ -1,8 +1,8 @@
-
+(load "tco.lsp")
 (load "libs/listLib.lsp")
 (load "VARSGLOBALS.lsp")
 (load "fitxer-io.lsp")
-(load "tco.lsp")
+
 
 ; Crea una llista de llista i la inicialitza amb 'value'
 ;;; @param n nombre de files
@@ -18,7 +18,6 @@
     )
   )
 )
-
 
 
 ; Retorna posició aleatoria (i,j) de la matriu
@@ -64,22 +63,92 @@
   )
 )
 
+(defun getRandomPosition (lista) 
+  (nth (random (length lista)) lista)
+)
 
+(defun prova () 
+  (calcularPosSortida 
+    '(0 0)
+    (constructLlistaCamins 
+      '((paret cami entrada cami) (cami paret paret paret) (cami cami cami cami))
+    )
+  )
+)
   ; (setq laberint (create-matrix '3 '3 'paret))
 (defun genera-laberint () 
   (let* 
     ((laberint (create-matrix MIDA MIDA paret))  ; inicialitzar el laberint amb parets
-      (pos (chooseRandomPos laberint))
+      (pos (getRandomPosition iniciEntrada))
       (laberint (setMatrixValue laberint entrada pos)) ;Establir una posició random com entrada
 
       (laberint (recursiveDFS pos laberint))
-      (laberint (setMatrixValue laberint sortida (getRandomCamiPos laberint))) ; Establir sortida
+      (laberint 
+        (setMatrixValue 
+          laberint
+          sortida
+          (getCasellesMesLlunaya pos (constructLlistaCamins laberint))
+        )
+      ) ; Establir sortida
       (laberint (setEdgesParet laberint))
     ) ;Posar les parets enxternes
+    
+    (format t "posInicia = ~a~%" pos)
     (writeToFile laberint "laberintGenerat.txt")
   ) ;; Guardar el laberint en un arxiu
 )
 
+
+
+(defun getCasellesMesLlunaya (posEntrada llistaCamins) 
+  (let 
+    ((distancies 
+       (mapcar 
+         (lambda (pos) 
+           (+ (abs (- (car posEntrada) (car pos))) 
+              (abs (- (cadr posEntrada) (cadr pos)))
+           )
+         )
+         llistaCamins
+       )
+     ) 
+    )
+     (nth (getIndex (maxim distancies) distancies) llistaCamins)
+    
+  )
+)
+(defun getIndex (e llista &optional (i 0)) 
+  (cond 
+    ((null llista) (- 1))
+    ((equal e (car llista)) i)
+    (t (getIndex e (cdr llista) (+ i 1)))
+  )
+)
+
+(defun constructLlistaCamins (laberint &optional (i 0) (j 0)) 
+  (cond 
+    ((and (= i (- mida 1)) (= j (- mida 1))) nil)
+    ((equal cami (getIJLaberint (list i j) laberint))
+     (cons (list i j) 
+           (constructLlistaCamins 
+             laberint
+             (car (getNextIJ i j))
+             (cadr (getNextIJ i j))
+           )
+     )
+    )
+    (t
+     (constructLlistaCamins laberint (car (getNextIJ i j)) (cadr (getNextIJ i j)))
+    )
+  )
+)
+
+(defun getNextIJ (i j) 
+  (cond 
+    ((= j (- MIDA 1)) (list (+ i 1) 0))
+    (t (list i (+ j 1)))
+  )
+)
 
 
 ; (defun-tco recursiveDFS (pos laberint) 
@@ -112,7 +181,7 @@
      ) 
     )
 
-      (getElementI (random (length adjacents)) adjacents)
+    (getElementI (random (length adjacents)) adjacents)
   )
 )
 
@@ -134,15 +203,13 @@
   )
 )
 
-(defun-tco 
-  recursiveDFS
-  (pos laberint)
+(defun recursiveDFS (pos laberint) 
   (cond 
     ((acabar pos laberint) laberint) ; cas base
     (t
      (let 
        ((posActual (getRandomAdjacent pos laberint))) ; casella adjaçent random
-      ;  (format t "posActual = ~A~%" posActual)
+       ;  (format t "posActual = ~A~%" posActual)
        (cond 
          ((paretIUnicCami posActual laberint)
 
@@ -151,10 +218,14 @@
             (recursiveDFS posActual newLaberint)
           )
          )
-       
+
 
          (t
-          (auxiliarRecursiveDFS (casellesAdjacents laberint pos) laberint)
+          (let 
+            ((casellesAdjacents (casellesAdjacents laberint pos)))
+
+            (auxiliarRecursiveDFS (remove posActual casellesAdjacents) laberint)
+          )
          )
        )
      )
@@ -162,14 +233,14 @@
   )
 )
 
-(defun-tco 
-  auxiliarRecursiveDFS
-  (positions laberint)
+(defun auxiliarRecursiveDFS (positions laberint) 
   (cond 
     ((null positions) laberint) ;base case
     (t
      (let* 
        ((newLaberint (recursiveDFS (car positions) laberint)))
+       (format t "car(positions) = ~a~%" (car positions))
+       (format t " laberintNewAuxiliar = ~a~% " newLaberint)
        (auxiliarRecursiveDFS (cdr positions) newLaberint)
      )
     )

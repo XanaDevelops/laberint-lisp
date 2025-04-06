@@ -3,6 +3,7 @@
 (setq cami 'cami)
 (setq sortida 'sortida)
 (setq MIDA 10)
+(setq iniciEntrada (list (list 0 0) (list (- MIDA 1) 0)))
 ; (setq files 20)
 ; (setq cols 30)
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))

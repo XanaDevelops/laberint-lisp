@@ -446,3 +446,13 @@
     (t (cons e (replicate (- n 1) e)))
   )
 )
+
+(defun maxim (llista) 
+  (cond 
+    ((null (cdr llista)) (car llista))
+    ((< (car llista) (cadr llista)) ; llista(i)< llista(i+1) , we remove llista(i)
+     (maxim (cdr llista))
+    )
+    (t (maxim (cons (car llista) (cddr llista)))) ; llista(i)>llista(i+1), we "remove" llista(i+1)
+  )
+)
