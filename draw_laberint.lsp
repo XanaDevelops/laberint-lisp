@@ -44,10 +44,17 @@
 )
 
 
-(defun-tco paint-maze(maze x y &optional (w 0) (h 0))
+(defun-tco paint-maze(maze x y &optional (w 0) (h 0) (aux nil))
     (cond 
-        ((null maze)
+        ((and (null maze) (null aux))
             t
+        )
+        ((null maze)
+            (paint-maze (car aux) x y  0 (1- h) (cdr aux))
+        )
+        ((null aux)
+            (paint-maze (car maze) x y 0 0 (cdr maze))
+
         )
         (t 
         (let ((elem (car maze)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
@@ -72,11 +79,7 @@
                 )
             )
             ;(get-key)
-            (paint-maze 
-                ;x y w h
-                (cdr maze) x y (cond ((eq elem newline) 0) (t (1+ w))) (cond ((eq elem newline) (1- h)) (t h))
-            )
-
+            (paint-maze (cdr maze) x y (1+ w) h aux)
         )
 
         )
@@ -132,41 +135,36 @@
 
 
 
-(defun-tco find-in-maze(maze casella &optional (i 0) (j 0))
+(defun-tco find-in-maze(maze casella &optional (i 0) (j 0) (aux nil))
     (let ((c (car maze)))
     (cond
-        ((or (eq c casella) (null maze))
+        ((or (eq c casella) (and (null maze) (null aux)))
             (list i j)
         )
-        ((eq c newline)
-            (find-in-maze (cdr maze) casella 0 (1+ j))
+        ((null maze)
+            (find-in-maze (car aux) casella 0 (1+ j) (cdr aux))
+        )
+        ((null aux)
+            (find-in-maze (car maze) casella 0 0 (cdr maze))
         )
         (t
-            (find-in-maze (cdr maze) casella (1+ i) j)
+            (find-in-maze (cdr maze) casella (1+ i) j aux)
         )
     )
     )
 )
 
 (defun-tco get-in-maze(maze x y)
-    (let ((c (car maze)))
-        (cond
-        ((or (< x 0) (< y 0) (null maze))
-            newline
-        )
-        ((and (= x 0) (= y 0))
-            c
-        )
-        ((eq c newline)
-            (get-in-maze (cdr maze) x (1- y))
-        )
-        ((> y 0)
-            (get-in-maze (cdr maze) x y)
-        )
-        (t
-            (get-in-maze (cdr maze) (1- x) y)
-        )
-        )
+    (cond
+    ((and (= x 0) (= y 0))
+        (car maze)
+    )
+    ((> y 0)
+        (get-in-maze (cdr maze) x (1- y))
+    )
+    ((> x 0)
+        (get-in-maze )
+    )
     )
 )
 
@@ -285,7 +283,7 @@
 ;(trace find-in-maze)
 ;(trace paint-maze)
 
-(print (game-loop "laberints_exemple/40x30_1.txt"))
+(print (game-loop "test.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
