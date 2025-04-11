@@ -18,14 +18,36 @@
 (setq dbg nil)
 
 
-(defun read-maze(fn)
-    (llegeix fn)
+(defun-tco read-maze (fn &optional (maze nil) (r nil) (s nil))
+    (cond
+    ((and (null maze) (null r))
+        (read-maze fn (llegeix fn))
+    )
+    (t 
+    (let ((c (car maze)))
+        (cond
+        ((null c)
+            (cons s r)
+        )
+        ((eq c newline)
+            (read-maze fn (cdr maze) (cond ((null r) (cond ((null (car s)) r) (t (list s))))
+                                            (t (cons s r)) )
+                            nil
+            )
+        )
+        (t
+            (read-maze fn (cdr maze) r (cons c s))
+        )
+        )
+    ))
+    )
 )
+
 
 (defun-tco paint-maze(maze x y &optional (w 0) (h 0))
     (cond 
         ((null maze)
-            nil
+            t
         )
         (t 
         (let ((elem (car maze)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
@@ -151,7 +173,7 @@
 (defun-tco game-loop(name &optional (maze 'maze) (player 'player) (steps 0) (repaint t))
     (cond
     ((null (get maze 'data))
-        (let* ((maze-data (reverse (read-maze name))) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
+        (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
         (putprop maze (* -240 (floor x 240)) 'x)
         (putprop maze (* 240 (floor y -240)) 'y)
         (putprop maze maze-data 'data)
