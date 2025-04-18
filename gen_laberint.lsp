@@ -92,12 +92,32 @@
       ) ; Establir sortida
       (laberint (setEdgesParet laberint))
     ) ;Posar les parets enxternes
-    
+
     (format t "posInicia = ~a~%" pos)
     (writeToFile laberint "laberintGenerat.txt")
   ) ;; Guardar el laberint en un arxiu
 )
 
+
+(defun getEdgesCamins (posActual laberint) 
+  (let* 
+    ((adjacents (casellesAdjacents laberint posActual)) 
+      (values (getValors adjacents laberint))
+    )
+    (getCaminsAdjacents adjacents valors)
+  )
+)
+
+(defun getCaminsAdjacents (adjacents valors) 
+
+  (cond 
+    ((null adjacents) nil)
+    ((or (equal (car valors) cami) (equal (car valors) sortida))
+     (cons (car adjacents) (getCaminsAdjacents (cdr adjacents) (cdr valors)))
+    )
+  )
+  (t (getCaminsAdjacents (cdr adjacents) (cdr valors)))
+)
 
 
 (defun getCasellesMesLlunaya (posEntrada llistaCamins) 
@@ -113,8 +133,7 @@
        )
      ) 
     )
-     (nth (getIndex (maxim distancies) distancies) llistaCamins)
-    
+    (nth (getIndex (maxim distancies) distancies) llistaCamins)
   )
 )
 (defun getIndex (e llista &optional (i 0)) 
@@ -151,28 +170,6 @@
 )
 
 
-; (defun-tco recursiveDFS (pos laberint) 
-;   ;; Actualizamos laberint si se cumple la condición
-;   (let* 
-;     ((updated-laberint 
-;        (if (paretIUnicCami pos laberint) 
-;          (setMatrixValue laberint cami pos)
-;          laberint
-;        )
-;      ) 
-
-
-;       (nextPosition (casellaAdjacentRandom updated-laberint pos))
-;     )
-
-;     (if (null nextPosition) 
-;       updated-laberint ; acabar
-;       (recursiveDFS nextPosition updated-laberint)
-;     )
-;   )
-; )
-
-
 ; devuelve la posicion de una celda adyacente random
 (defun getRandomAdjacent (pos laberint) 
   (let 
@@ -192,84 +189,104 @@
       (casellesAdjacents laberint currentPos)
     )
   )
-  ; (acabarRec (casellesAdjacents laberint currentPos) laberint)
 )
 
-(defun acabarRec (adjacents laberint) 
-  (cond 
-    ((null adjacents) t)
-    ((paretIUnicCami (car adjacents) laberint) nil)
-    (t (acabarRec (cdr adjacents) laberint))
+(defun swap (firstIndex secondIndex l) 
+
+  (let* 
+    ((firstValue (getElementI firstIndex l)) 
+      (secondValue (getElementI secondIndex l))
+      (newL (setIValue firstIndex l secondValue))
+    )
+  
+    (setIValue secondIndex newL firstValue)
   )
 )
+
+(defun modernFisher-Yates (l &optional (lastIndex (- (length l) 1))) 
+(cond 
+   ((= 0 lastIndex) l )
+(t (let*  ((randomIdx  (random lastIndex )) 
+ (newList (swap randomIdx lastIndex l ))) 
+  (modernFisher-Yates newList  (- lastIndex  1  )))
+   )
+)
+                                                                                           
+)
+
 
 (defun recursiveDFS (pos laberint) 
-  (cond 
-    ((acabar pos laberint) laberint) ; cas base
-    (t
-     (let 
-       ((posActual (getRandomAdjacent pos laberint))) ; casella adjaçent random
-       ;  (format t "posActual = ~A~%" posActual)
-       (cond 
-         ((paretIUnicCami posActual laberint)
+  (let 
+    ((adjacents (modernFisher-Yates (casellesAdjacents laberint pos))))
+    ; (format t "adjacents = ~a~%" adjacents)
+    (recursiveDFS-list adjacents pos laberint)
+  )
+)
 
-          (let* 
-            ((newLaberint (setMatrixValue laberint cami posActual)))
-            (recursiveDFS posActual newLaberint)
+(defun recursiveDFS-list (adjacents pos laberint) 
+  (if (null adjacents) 
+    laberint
+    (let* 
+      ((next (car adjacents)) 
+        (other (cdr adjacents))
+      )
+      (if (paretIUnicCami next laberint) 
+        ; transformar en paret
+        (let* 
+          ((laberintAcual (setMatrixValue laberint cami next)) 
+            (laberintDespres (recursiveDFS next laberintAcual))
           )
-         )
-
-
-         (t
-          (let 
-            ((casellesAdjacents (casellesAdjacents laberint pos)))
-
-            (auxiliarRecursiveDFS (remove posActual casellesAdjacents) laberint)
-          )
-         )
-       )
-     )
+          ;seguir amb la resta de camins en tornar de la recursivitat
+          (recursiveDFS-list other pos laberintDespres)
+        )
+        ; provar altres camins
+        (recursiveDFS-list other pos laberint)
+      )
     )
   )
 )
 
-(defun auxiliarRecursiveDFS (positions laberint) 
-  (cond 
-    ((null positions) laberint) ;base case
-    (t
-     (let* 
-       ((newLaberint (recursiveDFS (car positions) laberint)))
-       (format t "car(positions) = ~a~%" (car positions))
-       (format t " laberintNewAuxiliar = ~a~% " newLaberint)
-       (auxiliarRecursiveDFS (cdr positions) newLaberint)
-     )
-    )
-  )
-) 
-
-; (defun-tco 
-;   recursiveDFS
-;   (pos laberint)
-;   ;; Actualizamos laberint si se cumple la condición
+; (defun recursiveDFS (pos laberint) 
 ;   (cond 
-;     ((acabar pos laberint) laberint)
-
+;     ((acabar pos laberint) laberint) ; cas base
 ;     (t
-;      (let* 
-;        ((nextPosition (getRandomAdjacent pos laberint)))
-
+;      (let 
+;        ((posActual (getRandomAdjacent pos laberint))) ; casella adjaçent random
+;        ;  (format t "posActual = ~A~%" posActual)
 ;        (cond 
+;          ((paretIUnicCami posActual laberint)
 
-;          ((paretIUnicCami nextPosition laberint)
-;           (recursiveDFS nextPosition (setMatrixValue laberint cami nextPosition))
+;           (let* 
+;             ((newLaberint (setMatrixValue laberint cami posActual)))
+;             (recursiveDFS posActual newLaberint)
+;           )
 ;          )
 
-;          (t (recursiveDFS pos laberint))
+;          (t
+;           (let 
+;             ((casellesAdjacents (casellesAdjacents laberint pos)))
+
+;             (auxiliarRecursiveDFS (remove posActual casellesAdjacents) laberint)
+;           )
+;          )
 ;        )
 ;      )
 ;     )
 ;   )
 ; )
+
+(defun auxiliarRecursiveDFS (positions laberint) 
+  (cond 
+    ((null positions) laberint) ;base case
+    (t
+     (let 
+       ((newLaberint (recursiveDFS (car positions) laberint)))
+       (format t "car(positions) = ~a~%" (car positions))
+       (auxiliarRecursiveDFS (cdr positions) newLaberint)
+     )
+    )
+  )
+) 
 
 ; true si ninguna casella comuple que :
 ; 1. su valor actual es paret
@@ -290,7 +307,7 @@
 )
 
 
-; la celda  pos = (i, j) tiene un unico camino/entrada adyacente?
+;   pos = (i, j) té  un únic camí/entrada adjaçent?
 (defun unicCami (pos laberint) 
   (let 
     ((adjacents 
@@ -353,36 +370,6 @@
     )
   )
 )
-  ; retorna un casella adyacente random a la posicion (currentI, currentJ)
-; (defun casellaAdjacentRandom (matrix pos) 
-;   (let* 
-;     ((positions (casellesAdjacents matrix pos)))
-
-;     ; retorna una casella adjacent random que compleix les condiciones
-;     (casellesAmbUnicCami positions matrix)
-;   )
-; )
-
-; (defun casellesAmbUnicCami (positions laberint) 
-;   (cond 
-;     ((null positions) nil)
-
-;     (t
-;      (let 
-;        ((randomPos (random (length positions))))
-
-;        (cond 
-;          ((paretIUnicCami (getElementI randomPos positions) laberint)
-;           (getElementI randomPos positions)
-;          )
-;          (t
-;           (casellesAmbUnicCami (remove_Elem_ByIndex randomPos positions) laberint)
-;          )
-;        )
-;      )
-;     )
-;   )
-; )
 
 
   ; Elimina pares (x y) que etan fuera de indice (Out of Bound)
@@ -439,21 +426,60 @@
 )
 
 
+; (defun acabarRec (adjacents laberint) 
+;   (cond 
+;     ((null adjacents) t)
+;     ((paretIUnicCami (car adjacents) laberint) nil)
+;     (t (acabarRec (cdr adjacents) laberint))
+;   )
+; )
 
 
-; (defun acabarv2 (laberint) 
+; (defun-tco 
+;   recursiveDFS
+;   (pos laberint)
+;   ;; Actualizamos laberint si se cumple la condición
+;   (cond 
+;     ((acabar pos laberint) laberint)
 
-;   (let 
-;     ((cords (generateCoordenates (- mida 1))))
-;     (not 
-;       (some 
-;         (lambda (pos) (acabar (car pos) (cadr pos) laberint))
-;         cords
-;       )
+;     (t
+;      (let* 
+;        ((nextPosition (getRandomAdjacent pos laberint)))
+
+;        (cond 
+
+;          ((paretIUnicCami nextPosition laberint)
+;           (recursiveDFS nextPosition (setMatrixValue laberint cami nextPosition))
+;          )
+
+;          (t (recursiveDFS pos laberint))
+;        )
+;      )
 ;     )
 ;   )
 ; )
 
+
+; (defun-tco recursiveDFS (pos laberint) 
+;   ;; Actualizamos laberint si se cumple la condición
+;   (let* 
+;     ((updated-laberint 
+;        (if (paretIUnicCami pos laberint) 
+;          (setMatrixValue laberint cami pos)
+;          laberint
+;        )
+;      ) 
+
+
+;       (nextPosition (casellaAdjacentRandom updated-laberint pos))
+;     )
+
+;     (if (null nextPosition) 
+;       updated-laberint ; acabar
+;       (recursiveDFS nextPosition updated-laberint)
+;     )
+;   )
+; )
 
 ; (defun createList (max) 
 ;   (cond 
@@ -492,29 +518,32 @@
 ; )
 
 ; ; ;------------------
-; (defun randomizedPrim () 
+(defun randomizedPrim () 
 
-;   ;Inicialitzar el laberint a 'paret
-;   (let* 
-;     ((laberint (create-matrix mida mida paret)) 
-
-;       (pos (chooseRandomPos laberint))
-;       (laberint (setMatrixValue laberint cami pos))
-;       (paretsL (getParets laberint pos))
-;     )
-;     (format t "POS: ~a~%" pos)
-;     (recursivePrim paretsL laberint)
-;   )
-; )
+  ;Inicialitzar el laberint a 'paret
+  (let* 
+    ((laberint (create-matrix mida mida paret)) 
+      ; casella inicial com a cami
+      (pos (chooseRandomPos laberint))
+      (laberint (setMatrixValue laberint cami pos))
+      ; afegir els parets de la casella
+      (paretsL (getParets laberint pos))
+    )
+    (format t "POS: ~a~%" pos)
+    (recursivePrim paretsL laberint)
+  )
+)
 
 ; (defun recursivePrim (paretsL laberint) 
 ;   (cond 
+;     ; mentre hi ha parets
 ;     ((null paretsL)
 ;      (writeToFile laberint "laberintGenerat.txt")
 ;     )
 ;     (t
 ;      (let* 
-;        ((randomWall (nth (random (length paretsL)) paretsL)) 
+;        ; triar una paret random
+;        ((randomWall (getRandomPosition paretsL)) 
 ;          (cell (oneAdjacentVisited randomWall laberint))
 ;        )
 ;        ;  (format t "randomWall:~a~%" randomWall)
@@ -522,41 +551,69 @@
 ;        ;  (format t "Parets:~a~%" paretsL)
 
 ;        (cond 
-;          ((not (null cell))
+;          ((null cell)
+;           (recursivePrim (remove randomWall paretsL) laberint)
+;          )
+
+;          (t
 ;           (let* 
 ;             ((newLaberint (setMatrixValue laberint cami cell)) 
 
-;               (nl (setMatrixValue newLaberint cami randomWall))
+;               (newLaberint (setMatrixValue newLaberint cami randomWall))
 ;               (newParetsL 
 ;                 (addParet 
 ;                   paretsL
-;                   (getParets nl cell)
+;                   (getParets newLaberint cell)
 ;                 )
 ;               )
-;             )
-;             (progn 
-
-;               ; (format t "CELL ~a~%" cell)
-;               (format t "newParets:~a~%" newParetsL)
-;               (format t "Newlaberint: ~a~%" nl)
-;               ; (progn
-;               (let 
-;                 ((np (remove randomWall newParetsL)))
-;                 (recursivePrim np nl)
-;               )
+;               (recursivePrim (remove randomWall newParetsL) newLaberint)
 ;             )
 
-;             ; )
+
+;             ; (format t "CELL ~a~%" cell)
+;             ; (format t "newParets:~a~%" newParetsL)
+;             ; (format t "Newlaberint: ~a~%" nl)
 ;           )
 ;          )
-
-
-;          (t (recursivePrim (remove randomWall paretsL) laberint))
 ;        )
+       
 ;      )
 ;     )
 ;   )
 ; )
+
+
+(defun recursivePrim (paretsL laberint) 
+  (cond 
+    ((null paretsL)
+     (writeToFile laberint "laberintGenerat.txt")
+    )
+
+    (t
+     (let* 
+       ((randomWall (getRandomPosition paretsL)) 
+         (cell (oneAdjacentVisited randomWall laberint))
+       )
+
+       (cond 
+         ((null cell)
+          (recursivePrim (remove randomWall paretsL) laberint)
+         )
+
+         (t
+          (let* 
+            ((lab1 (setMatrixValue laberint cami cell)) 
+              (lab2 (setMatrixValue lab1 cami randomWall))
+              (newParets (addParet paretsL (getParets lab2 cell)))
+            )
+            (recursivePrim (remove randomWall newParets) lab2)
+          )
+         )
+       )
+     )
+    )
+  )
+)
 
 ; ; (defun chooseRandomWall (walls) 
 ; ;   (let 
@@ -568,66 +625,66 @@
 
 
 
-; (defun addParet (l1 l2) 
-;   (cond 
-;     ((null l2) l1)
-;     ((pairMember (car l2) l1) (addParet l1 (cdr l2)))
-;     (t (addParet (snoc (car l2) l1) (cdr l2)))
-;   )
-; )
+(defun addParet (l1 l2) 
+  (cond 
+    ((null l2) l1)
+    ((pairMember (car l2) l1) (addParet l1 (cdr l2)))
+    (t (addParet (snoc (car l2) l1) (cdr l2)))
+  )
+)
 
-; (defun pairMember (pair l) 
-;   (cond 
-;     ((null l) nil)
-;     ((equal pair (car l)) t)
-;     (t (pairMember pair (cdr l)))
-;   )
-; )
+(defun pairMember (pair l) 
+  (cond 
+    ((null l) nil)
+    ((equal pair (car l)) t)
+    (t (pairMember pair (cdr l)))
+  )
+)
 
-;   ; crea una llista de les parets adjaçents a posActual
-; (defun getParets (laberint posActual) 
+  ; crea una llista de les parets adjaçents a posActual
+(defun getParets (laberint posActual) 
 
-;   (let 
-;     ((adjacents (casellesAdjacents laberint posActual)))
-;     (llistaParetsAdjacents adjacents laberint)
-;   )
-; )
+  (let 
+    ((adjacents (casellesAdjacents laberint posActual)))
+    (llistaParetsAdjacents adjacents laberint)
+  )
+)
 
-;   ;Donada la llista de posiciones adjacents, crea una llista de les que són parets
-; (defun llistaParetsAdjacents (adjacents laberint) 
+  ;Donada la llista de posiciones adjacents, crea una llista de les que són parets
+(defun llistaParetsAdjacents (adjacents laberint) 
 
-;   (cond 
-;     ((null adjacents) nil)
-;     ((equal paret (getIJLaberint (car adjacents) laberint))
-;      (cons (car adjacents) (llistaParetsAdjacents (cdr adjacents) laberint))
-;     )
-;     (t (llistaParetsAdjacents (cdr adjacents) laberint))
-;   )
-; )
+  (cond 
+    ((null adjacents) nil)
+    ((equal paret (getIJLaberint (car adjacents) laberint))
+     (cons (car adjacents) (llistaParetsAdjacents (cdr adjacents) laberint))
+    )
+    (t (llistaParetsAdjacents (cdr adjacents) laberint))
+  )
+)
 
 
 
-;   ; la paret actual té una unica cel·la adjaçent marcada com camí?
-; (defun oneAdjacentVisited (currentWallPos laberint) 
+  ; la paret actual té una unica cel·la adjaçent marcada com camí?
+(defun oneAdjacentVisited (currentWallPos laberint) 
 
-;   (let 
-;     ((adjacents 
-;        (casellesAdjacents laberint currentWallPos)
-;      ) 
-;     )
-;     (let 
-;       ((valors (getValors adjacents laberint)))
-;       (cond 
-;         ((/= 1 (repetitionsX cami valors)) nil)
-;         (t (getCell valors adjacents))
-;       )
-;     )
-;   )
-; )
-; (defun getCell (valors adjacents) 
-;   (cond 
-;     ((null valors) nil)
-;     ((equal (car valors) cami) (car adjacents))
-;     (t (getCell (cdr valors) (cdr adjacents)))
-;   )
-; )
+  (let 
+    ((adjacents 
+       (casellesAdjacents laberint currentWallPos)
+     ) 
+    )
+    (let 
+      ((valors (getValors adjacents laberint)))
+      (cond 
+        ((= 1 (repetitionsX cami valors)) (getCell valors adjacents))
+        (t nil)
+      )
+    )
+  )
+)
+(defun getCell (valors adjacents) 
+  (cond 
+    ((null valors) nil)
+    ((equal (car valors) cami) (car adjacents))
+    (t (getCell (cdr valors) (cdr adjacents)))
+  )
+)

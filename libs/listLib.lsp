@@ -210,6 +210,12 @@
   )
 )
 
+(defun setIValue (n l e) 
+  (cond 
+    ((= n 0) (cons e (cdr l)))
+    (t (cons (car l) (setIValue (- n 1) (cdr l) e)))
+  )
+)
 
 ;inserts newE to elementL's right
 (defun insereix-dreta (elementL newE l) 

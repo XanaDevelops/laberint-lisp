@@ -2,7 +2,7 @@
 (setq entrada 'entrada)
 (setq cami 'cami)
 (setq sortida 'sortida)
-(setq MIDA 10)
+(setq MIDA 25)
 (setq iniciEntrada (list (list 0 0) (list (- MIDA 1) 0)))
 ; (setq files 20)
 ; (setq cols 30)
