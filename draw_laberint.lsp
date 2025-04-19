@@ -98,6 +98,8 @@
 (defun paint-unk(x y)
     (draw-tile "error" x y)
 )
+
+; TODO: canviar a recorrer rec un array
 (defun get-strname (tile)
     (cond
         ((eq tile entrada)
@@ -131,11 +133,15 @@
                 (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
         )
     )
-        
     )
-
 )
 
+;retorna t si ha guanyat, nil si no
+(defun check-win (maze player)
+    (let* ((xpos (getx player)) (ypos (gety player)))
+    
+    )
+)
 
 
 (defun-tco find-in-maze(maze casella &optional (i 0) (j 0) (aux nil))
@@ -182,8 +188,7 @@
         (putprop maze maze-data 'data)
         (putprop player x 'x)
         (putprop player y 'y)
-        (pprint (get maze 'data))
-        (get-key)
+        (putprop maze (find-in-maze (get maze 'data) sortida) 'sortida)
         (game-loop name maze player)
         )
     )
@@ -220,7 +225,7 @@
     (print pdrawx)
     (print pdrawy)
     (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
-    (print (find-in-maze (get maze 'data) sortida))
+    (print (get maze 'sortida))
     (print (getx maze))
     (print (gety maze))
 
@@ -251,14 +256,7 @@
                             (update-prop (update-prop maze 'x newmx) 'y newmy)
                             (update-prop (update-prop player 'x newpx) 'y newpy)
                             (1+ steps)
-                            (cond
-                                ((or r l u d)
-                                    t
-                                )
-                                (t 
-                                    nil
-                                )
-                            )
+                            (cond ((or r l u d) t) (t nil))
 
             )
         )
