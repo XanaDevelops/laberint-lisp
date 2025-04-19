@@ -17,6 +17,11 @@
 
 (setq dbg nil)
 
+;README
+; SC -> Screen Coords. Coordenades respecte la finestra
+; GC -> Game Coords. Coordenades ingame
+; TC -> Tile Coords. Coordenada del tile (index sobre el laberint)
+
 
 (defun-tco read-maze (fn &optional (maze nil) (r nil) (s nil))
     (cond
@@ -43,21 +48,19 @@
     )
 )
 
-
-(defun-tco paint-maze(maze x y &optional (w 0) (h 0) (aux nil))
+; pinta el laberint a (x,y) SC
+(defun-tco paint-maze(maze x y &optional (w 0) (h 0) (row (car maze)))
     (cond 
-        ((and (null maze) (null aux))
+        ((and (null maze) (null row))
             t
         )
-        ((null maze)
-            (paint-maze (car aux) x y  0 (1- h) (cdr aux))
-        )
-        ((null aux)
-            (paint-maze (car maze) x y 0 0 (cdr maze))
+        
+        ((null row)
+            (paint-maze (cdr maze) x y 0 (1- h))
 
         )
         (t 
-        (let ((elem (car maze)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
+        (let ((elem (car row)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
             (cond
                 ((eq elem paret)
                     (paint-paret xtile ytile)
@@ -79,7 +82,7 @@
                 )
             )
             ;(get-key)
-            (paint-maze (cdr maze) x y (1+ w) h aux)
+            (paint-maze maze x y (1+ w) h (cdr row))
         )
 
         )
@@ -154,17 +157,19 @@
     )
 )
 
-(defun-tco get-in-maze(maze x y)
-    (cond
-    ((and (= x 0) (= y 0))
-        (car maze)
-    )
-    ((> y 0)
-        (get-in-maze (cdr maze) x (1- y))
-    )
-    ((> x 0)
-        (get-in-maze )
-    )
+;                                          pots fer això
+(defun-tco get-in-maze(maze x y &optional (row (car maze)))
+    (cond 
+        ((and (= x 0) (= y 0))
+            ; retornar valor
+            (car row)
+        )
+        ((> y 0)
+            (get-in-maze (cdr maze) x (1- y))
+        )
+        ((> x 0)
+            (get-in-maze maze (1- x) y (cdr row))
+        )
     )
 )
 
@@ -177,6 +182,8 @@
         (putprop maze maze-data 'data)
         (putprop player x 'x)
         (putprop player y 'y)
+        (pprint (get maze 'data))
+        (get-key)
         (game-loop name maze player)
         )
     )
@@ -193,10 +200,9 @@
     )
     ;repintar tiles caminables
     ;(si el camí te un tile propi refer això a repintar davall personatge)
-    
+
     
     (draw-tile "luigi" pdrawx pdrawy)
-    
     
 
     (color 0 0 0 255 255 255)
