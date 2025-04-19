@@ -138,8 +138,15 @@
 
 ;retorna t si ha guanyat, nil si no
 (defun check-win (maze player)
-    (let* ((xpos (getx player)) (ypos (gety player)))
-    
+    (let* ((xpos (getx player)) (ypos (* -1 (gety player))) (xsor (* (car (get maze 'sortida)) TILESIZE)) (ysor (* (cadr (get maze 'sortida)) TILESIZE)))
+        (cond
+            ((< (+ (abs (- xpos xsor)) (abs (- ypos ysor)) ) (/ TILESIZE 2))
+                t
+            )
+            (t 
+                nil
+            )
+        )
     )
 )
 
@@ -242,6 +249,10 @@
         (cond
         ((eq input 'esq)
             steps 
+        )
+        ((check-win maze player)
+            (princ "HAS GUANYAT!!!!!!!!!!!")
+            steps
         )
         (t
 
