@@ -1,5 +1,6 @@
 (load 'tco)
 
+; constants
 (setq paret #\#)
 (setq cami #\.)
 (setq entrada #\e)
@@ -22,7 +23,7 @@
 ; GC -> Game Coords. Coordenades ingame
 ; TC -> Tile Coords. Coordenada del tile (index sobre el laberint)
 
-
+; llegeix el laberint del fitxer i crea un doble array
 (defun-tco read-maze (fn &optional (maze nil) (r nil) (s nil))
     (cond
     ((and (null maze) (null r))
@@ -60,6 +61,7 @@
 
         )
         (t 
+        ; pinta el tile corresponent
         (let ((elem (car row)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
             (cond
                 ((eq elem paret)
@@ -119,10 +121,13 @@
         )
     )
 )
+; borra el tile del jugador de forma optima, mirant quines caselles hi és sobre
 (defun cls-player(xpos ypos maze)
     (let* ((xtile (floor xpos TILESIZE)) (ytile (floor (- ypos) TILESIZE))
             (tile (get-in-maze (get maze 'data) xtile ytile)))
+        ; sempre esta sobre l'origen de arredonir les coordenades
         (draw-tile (get-strname tile) (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
+    ;comprova quina casella del costat
     (cond 
         ((> (mod xpos TILESIZE) 0)
             (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) ytile))
@@ -150,7 +155,8 @@
     )
 )
 
-
+; cerca la primera occurencia de casella sobre maze[][]
+; retorna (i,j) indexos sobre maze[][]
 (defun-tco find-in-maze(maze casella &optional (i 0) (j 0) (aux nil))
     (let ((c (car maze)))
     (cond
@@ -170,6 +176,7 @@
     )
 )
 
+; retorna la casella en maze[y][x]
 ;                                          pots fer això
 (defun-tco get-in-maze(maze x y &optional (row (car maze)))
     (cond 
@@ -186,10 +193,12 @@
     )
 )
 
+;loop principal del joc
 (defun-tco game-loop(name &optional (maze 'maze) (player 'player) (steps 0) (repaint t))
     (cond
     ((null (get maze 'data))
-        (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) 16)) (y (* (cadr start-pos) -16)))
+        ; en la primera cridada inicialitza els valors per defecte
+        (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) TILESIZE)) (y (* (cadr start-pos) (* -1 TILESIZE))))
         (putprop maze (* -240 (floor x 240)) 'x)
         (putprop maze (* 240 (floor y -240)) 'y)
         (putprop maze maze-data 'data)
@@ -200,23 +209,20 @@
         )
     )
     (t 
-        ; aprofitant \n es pot ignorar la longitud
-    ; al pintar per zones, es pot "ignorar" el tamany
+    ; obte les posicions de dibuixat del jugador
     (let (  (pdrawx (+ (getx player) (car mazepos) (getx maze)))
             (pdrawy (+ (gety player) (cadr mazepos) (gety maze))))
     (cond
-    ((or (eq repaint t))
+    ((or (eq repaint t)) ;principalment al canviar de pantalla
         (cls)
         (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
     )
     )
-    ;repintar tiles caminables
-    ;(si el camí te un tile propi refer això a repintar davall personatge)
 
-    
+    ; dibuixa el jugador    
     (draw-tile "luigi" pdrawx pdrawy)
     
-
+    ; DEBUG
     (color 0 0 0 255 255 255)
     (goto-xy 0 0)
     (princ "              \n")
@@ -235,7 +241,9 @@
     (print (get maze 'sortida))
     (print (getx maze))
     (print (gety maze))
+    ; DEBUG
 
+    ; llegeix entrada i calcula nova posició, comproba colisions
     (let* ((input (user-input)) (px (getx player)) (py (gety player))
                                 (newpx (cond    ((and (eq input 'right) (can-move-h (get maze 'data) (+ px TILESIZE) py)) (+ px player-speed))
                                                 ((and (eq input 'left) (can-move-h (get maze 'data) (- px player-speed) py)) (- px player-speed))
@@ -247,22 +255,27 @@
                                 )
             )
         (cond
+        ; sortir del joc
         ((eq input 'esq)
             steps 
         )
         ((check-win maze player)
-            (princ "HAS GUANYAT!!!!!!!!!!!")
+            (princ "HAS GUANYAT!!!!!!!!!!!\n") ; missatge provisional
             steps
         )
         (t
 
+        ;borra tile del jugador
         (cls-player (getx player) (gety player) maze)
 
+        ; calcula nova posició del laberint, depenent de a quina direcció es vol anar i la posició del jugador respecte la pantala
+        ; fa scroll o no
         (let* ((r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
               (u (and (eq input 'up) (> (+ newpy (gety maze)) -16))) (d (and (eq input 'down) (< (+ newpy (gety maze)) -240)))
               (newmx (cond ((eq r t) (- (getx maze) 240)) ((eq l t) (+ (getx maze) 240)) (t (getx maze))))
               (newmy (cond ((eq u t) (- (gety maze) 240)) ((eq d t) (+ (gety maze) 240))(t (gety maze))))
             )
+            ; nou estat de la partida
             (game-loop name 
                             (update-prop (update-prop maze 'x newmx) 'y newmy)
                             (update-prop (update-prop player 'x newpx) 'y newpy)
