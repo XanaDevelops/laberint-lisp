@@ -6,13 +6,13 @@
 (setq DFS 'DFS)
 (setq PRIM 'PRIM)
 (setq RDV 'RDV) ; recursive division
-(setq algorismeGeneracio PRIM)
+(setq algorismeGeneracio RDV)
 (setq HORIZONTAL 1)
 (setq VERTICAL 0)
 
 
-(setq FILES 30)
-(setq COLUMNES 50)
+(setq FILES (- 50 2)) ; 2 de files extra de parets que s'afegeixen
+(setq COLUMNES (- 50 2))
 (setq iniciEntrada (list (list 0 0) (list (- FILES 1) 0)))
 
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))

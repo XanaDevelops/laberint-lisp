@@ -24,7 +24,7 @@
   (cond 
     ((equal DFS algorismeGeneracio) (algoritmeDFS))
     ((equal PRIM algorismeGeneracio) (randomizedPrim))
-    (t (divisioRecursiva)) ; extra, encara no s'ha implementat
+    (t (divisioRecursiva)) 
   )
 )
 
@@ -40,15 +40,19 @@
 )
 
 
+
   ;Estableix el valor (i,j) de 'matrix' a 'value', sent 'pos'=  (i,j)
 
 (defun setMatrixValue (matrix value pos) 
 
-  (setq matrix (setValue matrix (car pos) (cadr pos) value))
+  (let ( (matrix (setValue matrix (car pos) (cadr pos) value)))
+    ;  (format t "Setting ~a at ~a. Laberint: ~a~%" value pos matrix)
+
+    matrix
+  )
 )
 
 ; sets matrix[i][j] = value
-
 
 ;  Estableix el valor 'value' a la posició (i,j) de matrix
 
@@ -74,14 +78,6 @@
   (nth (random (length lista)) lista)
 )
 
-(defun prova () 
-  (calcularPosSortida 
-    '(0 0)
-    (constructLlistaCamins 
-      '((paret cami entrada cami) (cami paret paret paret) (cami cami cami cami))
-    )
-  )
-)
 
 (defun algoritmeDFS () 
   (let* 
@@ -90,10 +86,10 @@
       (laberint (setMatrixValue laberint entrada pos)) ;Establir una posició random com entrada
 
       ; (laberint (recursiveDFS pos laberint))
-      (adjacents  (modernFisher-Yates (casellesAdjacents laberint pos)))
+      (adjacents (modernFisher-Yates (casellesAdjacents laberint pos)))
       (laberint (dfs-tail adjacents pos laberint))
-        
-      
+
+
       (laberint 
         (setMatrixValue 
           laberint
@@ -104,7 +100,7 @@
       (laberint (setEdgesParet laberint))
     ) ;Posar les parets enxternes
 
-    (format t "posInicia = ~a~%" pos)
+   
     (writeToFile laberint OutputFileName)
   ) ;; Guardar el laberint en un arxiu
 )
@@ -265,10 +261,10 @@
 ; )
 
     
-  
 
 
-(defun-tco dfs-tail
+(defun-tco 
+  dfs-tail
   (adjacents pos laberint)
   (cond 
     ;Si no hi ha moviment adjaçent possible, tornem
@@ -278,20 +274,21 @@
 
     (t
      (let* 
-       ((next (car adjacents)) ; triar veïnat adjaçent aleatori
+       ((next (car adjacents))  ; triar veïnat adjaçent aleatori
          (other (cdr adjacents)) ;  resta de veïnats adjaçents
        )
-       (cond  
+       (cond 
          ((paretIUnicCami next laberint) ; és casella paret i té un únic camí adjaçent?
           (let* 
             ((newLaberint (setMatrixValue laberint cami next)) 
               ;; remanam els adjaçents de NEXT
-              (parets2 (modernFisher-Yates 
+              (parets2 
+                (modernFisher-Yates 
                   (casellesAdjacents newLaberint next)
                 )
               )
-              ; Afegir els veïnats adjaçents de next a la llista 
-              
+              ; Afegir els veïnats adjaçents de next a la llista
+
               (newParets (append parets2 other))
             )
             ; crida recursiva per la casella triada
@@ -299,7 +296,7 @@
           )
          )
 
-        ; Provem amb la resta de veïnats
+         ; Provem amb la resta de veïnats
          (t
           (dfs-tail other pos laberint)
          )
@@ -514,29 +511,36 @@
 
 ; tercer algorisme de la generació d'un laberint: DIVISIÓ RECURSIVA 
 
-; n files, m columnes
+
 (defun triaOrientacio (cols filas) 
-
   (cond 
-    ((< cols filas) t)
-    ((> cols filas) nil)
-    (t (zerop (random 2))) ; aleatori: 0 --> T, 1 --> NIL
+    ((< cols filas) 0)
+    ((> cols filas) 1)
+    (t (random 2))
   )
-)  
-
+) 
 
 (defun divisioRecursiva () 
   (let* 
     ((laberint (create-matrix FILES COLUMNES paret)) 
       (orient-inicial (triaOrientacio COLUMNES FILES))
       (newLaberint 
-        (divide-recursiu laberint FILES COLUMNES orient-inicial 0 0)
+        (divide-recursiu 
+          laberint
+          FILES
+          COLUMNES
+          (triaOrientacio COLUMNES FILES)
+          0
+          0
+        )
       )
-      (laberintAmbParetsExteriors (setEdgesParet newLaberint))
+      (laberintAmbParetsExternes (setEdgesParet newLaberint))
     )
-    (writeToFile laberintAmbParetsExteriors OutputFileName)
+    (writeToFile laberintAmbParetsExternes OutputFileName)
   )
 )
+
+
 
 
 (defun-tco 
@@ -551,95 +555,30 @@
      (let* 
        (
         ;Iniciam les variables segons l'orientació actual de la subregió
-        (horizontal orient)
+        (horizontal (= orient 0))
 
-        (wx 
-          (cond 
-            (horizontal posX)
-            (t (+ posX (random (1- cols))))
-          )
-        )
-        (wy 
-          (cond 
-            (horizontal (+ posY (random (1- filas))))
-            (t posY)
-          )
-        )
-        (px 
-          (cond 
-            (horizontal (+ wx (random cols)))
-            (t wx)
-          )
-        )
-        (py 
-          (cond 
-            (horizontal wy)
-            (t (+ wy (random filas)))
-          )
-        )
-        (dx 
-          (cond 
-            (horizontal 1)
-            (t 0)
-          )
-        )
-        (dy 
-          (cond 
-            (horizontal 0)
-            (t 1)
-          )
-        )
-        (longitud 
-          (cond 
-            (horizontal cols)
-            (t filas)
-          )
-        )
+        (wx (cond (horizontal posX) (t (+ posX (random (1- cols))))))
+        (wy (cond (horizontal (+ posY (random (1- filas)))) (t posY)))
+        (px (cond (horizontal (+ wx (random cols))) (t wx)))
+        (py (cond (horizontal wy) (t (+ wy (random filas)))))
+        (dx (cond (horizontal 1) (t 0)))
+        (dy (cond (horizontal 0) (t 1)))
+        (longitud (cond (horizontal cols) (t filas)))
 
         ; Dibuixarem les partes de
         (lab (draw-wall laberint wx wy px py dx dy longitud))
 
         ;; Subregió 1
-        (f1 
-          (cond 
-            (horizontal (+ (- wy posY) 1))
-            (t filas)
-          )
-        )
-        (c1 
-          (cond 
-            (horizontal cols)
-            (t (+ (- wx posX) 1))
-          )
-        )
+        (f1 (cond (horizontal (+ (- wy posY) 1)) (t filas)))
+        (c1 (cond (horizontal cols) (t (+ (- wx posX) 1))))
         (x1 posX)
         (y1 posY)
 
         ;; Subregió 2
-        (f2 
-          (cond 
-            (horizontal (- filas f1))
-            (t filas)
-          )
-        )
-        (c2 
-          (cond 
-            (horizontal cols)
-            (t (- cols c1))
-          )
-        )
-        (x2 
-          (cond 
-            (horizontal posX)
-            (t (+ posX c1))
-          )
-        )
-        (y2 
-          (cond 
-            (horizontal (+ posY f1))
-            (t posY)
-          )
-        )
+        (f2 (cond (horizontal (- filas f1)) (t filas)))
+        (c2 (cond (horizontal cols) (t (- cols c1))))
+        (x2 (cond (horizontal posX) (t (+ posX c1))))
+        (y2 (cond (horizontal (+ posY f1)) (t posY)))
 
         (lab1 (funcall 'divide-recursiu lab f1 c1 (triaOrientacio c1 f1) x1 y1))
        )
@@ -649,23 +588,26 @@
   )
 )
 
-; inici de la linea (wx, wy)
-; posicio del cami (px, py)
-; fi de la linea (dx, dy)
-; longitud: nombre de caselles a omplir
-(defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0)) 
+
+
+; ; inici de la linea (wx, wy)
+; ; posicio del cami (px, py)
+; ; fi de la linea (dx, dy)
+; ; longitud: nombre de caselles a omplir
+(defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0))
   (cond 
     ((= i longitud) laberint)
     (t
      (let* 
        ((cx (+ wx (* i dx))) 
-         (cy (+ wy (* i dy)))
-         (newLaberint 
-           (cond 
-             ((and (= cx px) (= cy py)) laberint)
-             (t (setMatrixValue laberint cami (list cx cy)))
-           )
-         )
+        (cy (+ wy (* i dy)))
+        (newLaberint 
+          (cond 
+            ((and (= cx px) (= cy py)) 
+             (setMatrixValue laberint cami (list cy cx ))) 
+            (t laberint)                                  
+          )
+        )
        )
        (draw-wall newLaberint wx wy px py dx dy longitud (+ i 1))
      )
