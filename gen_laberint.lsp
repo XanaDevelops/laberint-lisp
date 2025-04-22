@@ -24,7 +24,7 @@
   (cond 
     ((equal DFS algorismeGeneracio) (algoritmeDFS))
     ((equal PRIM algorismeGeneracio) (randomizedPrim))
-    (t (divisioRecursiva)) 
+    (t (divisioRecursiva))
   )
 )
 
@@ -45,7 +45,8 @@
 
 (defun setMatrixValue (matrix value pos) 
 
-  (let ( (matrix (setValue matrix (car pos) (cadr pos) value)))
+  (let 
+    ((matrix (setValue matrix (car pos) (cadr pos) value)))
     ;  (format t "Setting ~a at ~a. Laberint: ~a~%" value pos matrix)
 
     matrix
@@ -89,18 +90,18 @@
       (adjacents (modernFisher-Yates (casellesAdjacents laberint pos)))
       (laberint (dfs-tail adjacents pos laberint))
 
-
+      ; Establir sortida
       (laberint 
         (setMatrixValue 
           laberint
           sortida
           (getCasellesMesLlunaya pos (constructLlistaCamins laberint))
         )
-      ) ; Establir sortida
+      )
       (laberint (setEdgesParet laberint))
     ) ;Posar les parets enxternes
 
-   
+
     (writeToFile laberint OutputFileName)
   ) ;; Guardar el laberint en un arxiu
 )
@@ -525,22 +526,53 @@
     ((laberint (create-matrix FILES COLUMNES paret)) 
       (orient-inicial (triaOrientacio COLUMNES FILES))
       (newLaberint 
-        (divide-recursiu 
-          laberint
-          FILES
-          COLUMNES
-          (triaOrientacio COLUMNES FILES)
-          0
-          0
-        )
+        (divide-recursiu laberint FILES COLUMNES orient-inicial 0 0)
       )
       (laberintAmbParetsExternes (setEdgesParet newLaberint))
+      (pos (getRandomPosition iniciEntrada))
+      (newLaberint (setMatrixValue laberintAmbParetsExternes entrada pos)) ;Establir una posició random com entrada
+      ; set sortida --> posició de les més llunyanes a posEntrada
+      (laberint 
+        (setMatrixValue 
+          newLaberint
+          sortida
+          (getCasellesMesLlunaya 
+            pos
+            (obtenirCaminsAccessibles 
+              newLaberint
+              (constructLlistaCamins newLaberint)
+            )
+          )
+        )
+      )
     )
-    (writeToFile laberintAmbParetsExternes OutputFileName)
+    (encontrar-par-maxima-distancia laberint)
+    (writeToFile laberint OutputFileName)
   )
 )
 
-
+(defun obtenirCaminsAccessibles (laberint llistaCamins &optional (i 0)) 
+  (cond 
+    ((= i (- (length llistaCamins) 1)) nil)
+    (t
+     (let* 
+       ((camiActual (getElementI i llistaCamins)) 
+         (casellesAdjacents (casellesAdjacents laberint camiActual))
+       )
+       (cond 
+         ((not (some (lambda (pos) (memberL pos llistaCamins )) casellesAdjacents))
+          (obtenirCaminsAccessibles laberint llistaCamins (+ i 1))
+         )
+         (t
+          (cons camiActual 
+                (obtenirCaminsAccessibles laberint llistaCamins (+ i 1))
+          )
+         )
+       )
+     )
+    )
+  )
+)
 
 
 (defun-tco 
@@ -594,20 +626,21 @@
 ; ; posicio del cami (px, py)
 ; ; fi de la linea (dx, dy)
 ; ; longitud: nombre de caselles a omplir
-(defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0))
+(defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0)) 
   (cond 
     ((= i longitud) laberint)
     (t
      (let* 
        ((cx (+ wx (* i dx))) 
-        (cy (+ wy (* i dy)))
-        (newLaberint 
-          (cond 
-            ((and (= cx px) (= cy py)) 
-             (setMatrixValue laberint cami (list cy cx ))) 
-            (t laberint)                                  
-          )
-        )
+         (cy (+ wy (* i dy)))
+         (newLaberint 
+           (cond 
+             ((and (= cx px) (= cy py))
+              (setMatrixValue laberint cami (list cy cx))
+             )
+             (t laberint)
+           )
+         )
        )
        (draw-wall newLaberint wx wy px py dx dy longitud (+ i 1))
      )
