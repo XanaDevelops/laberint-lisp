@@ -95,7 +95,7 @@
         (setMatrixValue 
           laberint
           sortida
-          (getCasellesMesLlunaya pos (constructLlistaCamins laberint))
+          (getCasellaMesLlunyana pos (constructLlistaCamins laberint))
         )
       )
       (laberint (setEdgesParet laberint))
@@ -128,7 +128,7 @@
 )
 
 
-(defun getCasellesMesLlunaya (posEntrada llistaCamins) 
+(defun getCasellaMesLlunyana (posEntrada llistaCamins) 
   (let 
     ((distancies 
        (mapcar 
@@ -169,13 +169,13 @@
     )
   )
 )
-
+; aquest metode es crida quan s'afegeixen les parets al laberint --> canvi de nombre de files/columnes
 (defun getNextIJ (i j) 
   (cond 
     ; darrera columna i es pot avançar a la següent fila
-    ((and (= j (- COLUMNES 1)) (< i (- FILES 1))) (list (+ i 1) 0))
+    ((and (= j (- (+ COLUMNES 2) 1)) (< i (- (+ 2 FILES) 1))) (list (+ i 1) 0))
     ; columna no final
-    ((< j (- COLUMNES 1)) (list i (+ j 1)))
+    ((< j (- (+ 2 COLUMNES) 1)) (list i (+ j 1)))
 
     (t nil) ; posició erronea
   )
@@ -443,12 +443,29 @@
       ; afegir els parets de la casella
       (paretsL (getLlistaAdjacentsX pos laberint paret))
       (newLaberint (recursivePrim paretsL laberint))
-      (finalLaberint (setEdgesParet newLaberint))
-    )
+      (laberintAmbParetsExternes (setEdgesParet newLaberint))
 
-    ;set entrada i sortida
+      (camins (constructLlistaCamins laberintAmbParetsExternes))
+      (caminsAccessibles 
+        (obtenirCaminsAccessibles laberintAmbParetsExternes camins)
+      )
+      (posEntrada (getPrimerODarrer caminsAccessibles))
 
-    (writeToFile finalLaberint OutputFileName)
+      (laberintAmbEntrada 
+        (setMatrixValue laberintAmbParetsExternes entrada posEntrada)
+      ) ;Establir una posició random com entrada
+      ;set sortida --> posició de les més llunyanes a posEntrada
+      (laberintComplet 
+        (setMatrixValue 
+          laberintAmbEntrada
+          sortida
+          (getCasellaMesLlunyana posEntrada caminsAccessibles)
+        )
+      )
+  
+  )
+
+    (writeToFile laberintComplet OutputFileName)
   )
 )
 
@@ -521,52 +538,66 @@
   )
 ) 
 
+(defun getPrimerODarrer (llista) 
+
+  (let 
+    ((ran (random 2)))
+
+    (cond 
+      ((= ran 1) (car llista))
+      (t (car (last llista)))
+    )
+  )
+)
+
 (defun divisioRecursiva () 
   (let* 
-    ((laberint (create-matrix FILES COLUMNES cami)) 
+    ((laberint (create-matrix FILES COLUMNES paret)) 
       (orient-inicial (triaOrientacio COLUMNES FILES))
-      (newLaberint 
-        (divide-recursiu laberint FILES COLUMNES orient-inicial 0 0)
-      )
+      (newLaberint (divide-recursiu laberint FILES COLUMNES orient-inicial 0 0))
       (laberintAmbParetsExternes (setEdgesParet newLaberint))
-      ; (pos (getRandomPosition iniciEntrada))
-      ; (newLaberint (setMatrixValue laberintAmbParetsExternes entrada pos)) ;Establir una posició random com entrada
-      ; set sortida --> posició de les més llunyanes a posEntrada
-      ; (laberint 
-      ;   (setMatrixValue 
-      ;     newLaberint
-      ;     sortida
-      ;     (getCasellesMesLlunaya 
-      ;       pos
-      ;       (obtenirCaminsAccessibles 
-      ;         newLaberint
-      ;         (constructLlistaCamins newLaberint)
-      ;       )
-      ;     )
-      ;   )
-      ; )
+
+      (camins (constructLlistaCamins laberintAmbParetsExternes))
+      (caminsAccessibles 
+        (obtenirCaminsAccessibles laberintAmbParetsExternes camins)
+      )
+      (posEntrada (getPrimerODarrer caminsAccessibles))
+
+      (laberintAmbEntrada 
+        (setMatrixValue laberintAmbParetsExternes entrada posEntrada)
+      ) ;Establir una posició random com entrada
+      ;set sortida --> posició de les més llunyanes a posEntrada
+      (laberintComplet 
+        (setMatrixValue 
+          laberintAmbEntrada
+          sortida
+          (getCasellaMesLlunyana posEntrada caminsAccessibles)
+        )
+      )
     )
+    (format t "camins = ~a %" camins)
+    (format t "caminsAccessibles = ~a %" caminsAccessibles)
     ; (encontrar-par-maxima-distancia laberint)
-    (writeToFile laberintAmbParetsExternes OutputFileName)
+    (writeToFile laberintComplet OutputFileName)
   )
 )
 
 (defun obtenirCaminsAccessibles (laberint llistaCamins &optional (i 0)) 
   (cond 
-    ((= i (- (length llistaCamins) 1)) nil)
+    ((>= i (length llistaCamins)) nil)
     (t
      (let* 
-       ((camiActual (getElementI i llistaCamins)) 
+       ((camiActual (nth i llistaCamins)) 
          (casellesAdjacents (casellesAdjacents laberint camiActual))
        )
        (cond 
-         ((not (some (lambda (pos) (memberL pos llistaCamins )) casellesAdjacents))
-          (obtenirCaminsAccessibles laberint llistaCamins (+ i 1))
-         )
-         (t
+         ((>=  (veinatsCamins casellesAdjacents llistaCamins) 2)
           (cons camiActual 
                 (obtenirCaminsAccessibles laberint llistaCamins (+ i 1))
           )
+         )
+
+         (t (obtenirCaminsAccessibles laberint llistaCamins (+ i 1))
          )
        )
      )
@@ -574,6 +605,15 @@
   )
 )
 
+(defun veinatsCamins (veinats llistaCamins) 
+  (cond 
+    ((null veinats) 0)
+    ((memberL (car veinats) llistaCamins)
+     (+ 1 (veinatsCamins (cdr veinats) llistaCamins))
+    )
+    (t (veinatsCamins (cdr veinats) llistaCamins))
+  )
+)
 
 (defun-tco 
   divide-recursiu
@@ -596,7 +636,7 @@
         (dx (cond (horizontal 1) (t 0)))
         (dy (cond (horizontal 0) (t 1)))
         (longitud (cond (horizontal cols) (t filas)))
-       
+
 
         ; Dibuixarem les parets de
         (lab (draw-wall laberint wx wy px py dx dy longitud))
@@ -627,23 +667,49 @@
 ; ; posicio del cami (px, py)
 ; ; fi de la linea (dx, dy)
 ; ; longitud: nombre de caselles a omplir
+; (defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0)) 
+;   (cond 
+;     ((= i longitud) laberint)
+;     (t
+;      (let* 
+;        ((cx (+ wx (* i dx))) 
+;          (cy (+ wy (* i dy)))
+;          (newLaberint 
+;            (cond 
+;              ((and (= cx px) (= cy py))
+;               (setMatrixValue laberint cami (list cy cx))
+;              )
+;              (t laberint)
+;            )
+;          )
+;        )
+;        (draw-wall newLaberint wx wy px py dx dy longitud (+ i 1))
+;      )
+;     )
+;   )
+; )
+
+
 (defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0)) 
   (cond 
-    ((= i longitud) laberint)
+    ((= i longitud)
+     laberint
+    )
     (t
      (let* 
        ((cx (+ wx (* i dx))) 
          (cy (+ wy (* i dy)))
-         (newLaberint 
+         ;; si (cx,cy) es la puerta, NO dibujamos pared:
+         (nuevo-lab 
            (cond 
              ((and (= cx px) (= cy py))
-              (setMatrixValue laberint paret (list cy cx))
+              laberint
              )
-             (t laberint)
+             (t (setMatrixValue laberint cami (list cy cx)))
            )
          )
        )
-       (draw-wall newLaberint wx wy px py dx dy longitud (+ i 1))
+       (draw-wall nuevo-lab wx wy px py dx dy longitud (1+ i))
      )
     )
   )
