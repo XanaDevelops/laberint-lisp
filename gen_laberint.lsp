@@ -523,31 +523,31 @@
 
 (defun divisioRecursiva () 
   (let* 
-    ((laberint (create-matrix FILES COLUMNES paret)) 
+    ((laberint (create-matrix FILES COLUMNES cami)) 
       (orient-inicial (triaOrientacio COLUMNES FILES))
       (newLaberint 
         (divide-recursiu laberint FILES COLUMNES orient-inicial 0 0)
       )
       (laberintAmbParetsExternes (setEdgesParet newLaberint))
-      (pos (getRandomPosition iniciEntrada))
-      (newLaberint (setMatrixValue laberintAmbParetsExternes entrada pos)) ;Establir una posició random com entrada
+      ; (pos (getRandomPosition iniciEntrada))
+      ; (newLaberint (setMatrixValue laberintAmbParetsExternes entrada pos)) ;Establir una posició random com entrada
       ; set sortida --> posició de les més llunyanes a posEntrada
-      (laberint 
-        (setMatrixValue 
-          newLaberint
-          sortida
-          (getCasellesMesLlunaya 
-            pos
-            (obtenirCaminsAccessibles 
-              newLaberint
-              (constructLlistaCamins newLaberint)
-            )
-          )
-        )
-      )
+      ; (laberint 
+      ;   (setMatrixValue 
+      ;     newLaberint
+      ;     sortida
+      ;     (getCasellesMesLlunaya 
+      ;       pos
+      ;       (obtenirCaminsAccessibles 
+      ;         newLaberint
+      ;         (constructLlistaCamins newLaberint)
+      ;       )
+      ;     )
+      ;   )
+      ; )
     )
-    (encontrar-par-maxima-distancia laberint)
-    (writeToFile laberint OutputFileName)
+    ; (encontrar-par-maxima-distancia laberint)
+    (writeToFile laberintAmbParetsExternes OutputFileName)
   )
 )
 
@@ -596,8 +596,9 @@
         (dx (cond (horizontal 1) (t 0)))
         (dy (cond (horizontal 0) (t 1)))
         (longitud (cond (horizontal cols) (t filas)))
+       
 
-        ; Dibuixarem les partes de
+        ; Dibuixarem les parets de
         (lab (draw-wall laberint wx wy px py dx dy longitud))
 
         ;; Subregió 1
@@ -636,7 +637,7 @@
          (newLaberint 
            (cond 
              ((and (= cx px) (= cy py))
-              (setMatrixValue laberint cami (list cy cx))
+              (setMatrixValue laberint paret (list cy cx))
              )
              (t laberint)
            )
