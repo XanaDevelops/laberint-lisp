@@ -76,7 +76,7 @@
                         (cond ((eq input 'up) (1+ offsety)) ((eq input 'down) (1- offsety)) (t offsety)))
     )
 )
-(draw-maze "laberints_exemple/30x40_1.txt")
+(draw-maze "laberint.txt")
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
 ;(draw-tile "rickroll" 250 250)

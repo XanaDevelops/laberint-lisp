@@ -718,9 +718,14 @@
       (laberint1 
         (randomDivision '(0 0) (list (- FILES 1) (- COLUMNES 1)) laberint)
       )
+      (laberintAmbParetsExternes (setEdgesParet laberint1))
+      (laberintAmbEntrada (setMatrixValue laberintAmbParetsExternes  entrada '(1 1)))
+      (laberintAmbSortida (setMatrixValue laberintAmbEntrada sortida '(23 23)))
+
+     
     )
 
-    (writeToFile laberint1 OutputFileName)
+    (writeToFile laberintAmbSortida OutputFileName)
   )
 )  
   
@@ -729,11 +734,11 @@
 
 (defun randomDivision (posInici posFi laberint) 
   (let* 
-    ((filas (- (car posFi) (car posInici))) 
-      (columnas (- (cadr posFi) (cadr posInici)))
+    ((filas (- (getX posFi) (getX posInici))) 
+      (columnas (- (getY posFi) (getY posInici)))
     )
     (cond 
-      ((or (< filas 2) (< columnas 2)) laberint)
+      ((or (< filas 4) (< columnas 4)) laberint)
 
       (t
        ; posicio random per dibuixar les linees perpendiculars
