@@ -719,13 +719,13 @@
         (randomDivision '(0 0) (list (- FILES 1) (- COLUMNES 1)) laberint)
       )
       (laberintAmbParetsExternes (setEdgesParet laberint1))
-      (laberintAmbEntrada (setMatrixValue laberintAmbParetsExternes  entrada '(1 1)))
-      (laberintAmbSortida (setMatrixValue laberintAmbEntrada sortida '(23 23)))
+      ; (laberintAmbEntrada (setMatrixValue laberintAmbParetsExternes  entrada '(1 1)))
+      ; (laberintAmbSortida (setMatrixValue laberintAmbEntrada sortida '(23 23)))
 
      
     )
 
-    (writeToFile laberintAmbSortida OutputFileName)
+    (writeToFile laberintAmbParetsExternes OutputFileName)
   )
 )  
   
