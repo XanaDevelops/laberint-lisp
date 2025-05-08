@@ -116,7 +116,6 @@
 )
 
 
-; --------------- 2 ways to remove an element by his  index------------
 ; removes list (index)
 (defun remove_Elem_ByIndex (index l &optional (current 0)) 
   (cond 

@@ -11,8 +11,8 @@
 (setq VERTICAL 0)
 
 
-(setq FILES (- 50 2)) ; 2 de files extra de parets que s'afegeixen
-(setq COLUMNES (- 50 2))
+(setq FILES (- 20 2)) ; 2 de files extra de parets que s'afegeixen
+(setq COLUMNES (- 30 2))
 (setq iniciEntrada (list (list 1 1) (list FILES 1)))
 
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))

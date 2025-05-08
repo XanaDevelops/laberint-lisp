@@ -688,29 +688,7 @@
 
 
 
-; tria un punt arbitrari dins el rectangle de punt inicial posInici, i punt final posFi i que no sigui paret
-(defun chooseRandomFrom (posInici posFi laberint) 
 
-  (let 
-    ((posRandom 
-       (list (randomInterval (getX posInici) (getX posFi)) 
-             (randomInterval (getY posInici) (getY posFi))
-       )
-     ) 
-    )
-
-
-    (cond 
-      ((equal 
-         paret
-         (getIJLaberint posRandom laberint)
-       )
-       (chooseRandomFrom posInici posFi laberint)
-      )
-      (t posRandom)
-    )
-  )
-)
 
 (defun RecursiveDivision () 
   (let* 
@@ -718,34 +696,104 @@
       (laberint1 
         (randomDivision '(0 0) (list (- FILES 1) (- COLUMNES 1)) laberint)
       )
+    
       (laberintAmbParetsExternes (setEdgesParet laberint1))
-      ; (laberintAmbEntrada (setMatrixValue laberintAmbParetsExternes  entrada '(1 1)))
-      ; (laberintAmbSortida (setMatrixValue laberintAmbEntrada sortida '(23 23)))
 
-     
+
+      (camins (constructLlistaCamins laberintAmbParetsExternes))
+      (caminsAccessibles
+        (obtenirCaminsAccessibles laberintAmbParetsExternes camins)
+      )
+      (posEntrada (getPrimerODarrer caminsAccessibles))
+
+      (laberintAmbEntrada
+        (setMatrixValue laberintAmbParetsExternes entrada posEntrada)
+      ) ;Establir una posició random com entrada
+      ;set sortida --> posició de les més llunyanes a posEntrada
+      (laberintComplet
+        (setMatrixValue
+          laberintAmbEntrada
+          sortida
+          (getCasellaMesLlunyana posEntrada caminsAccessibles)
+        )
+      )
     )
-
-    (writeToFile laberintAmbParetsExternes OutputFileName)
+    
+    (writeToFile laberintComplet OutputFileName)
   )
 )  
   
       
 
 
-(defun randomDivision (posInici posFi laberint) 
+(defun chooseRandomFrom (posInici posFi laberint) 
   (let* 
-    ((filas (- (getX posFi) (getX posInici))) 
-      (columnas (- (getY posFi) (getY posInici)))
+    ((posRandom 
+       (list (randomInterval (getX posInici) (getX posFi)) 
+             (randomInterval (getY posInici)  (getY posFi))
+       )
+     ) 
     )
-    (cond 
-      ((or (< filas 4) (< columnas 4)) laberint)
+    posRandom
+  )
+)
+  
 
-      (t
-       ; posicio random per dibuixar les linees perpendiculars
-       (let*
-         ((posRandom (chooseRandomFrom posInici posFi laberint)) 
-           (newLaberint (dibuixarParets posRandom posInici posFi laberint))
-         
+; (defun randomDivision (posInici posFi laberint) 
+
+;   (cond 
+;     ((or (< (- (getX posFi) (getX posInici)) 4) 
+;          (< (- (getY posFi) (getY posInici)) 4)
+;      )
+;      laberint
+;     )
+;     (t
+;      (let* 
+;        ((posRandom (chooseRandomFrom posInici posFi laberint)) 
+;          (r (getX posRandom))
+;          (c (getY posRandom))
+;          (laberintConPared (dibuixarParets posRandom posInici posFi laberint))
+
+;          (top-left-start posInici)
+;          (top-left-end (list (- r 1) (- c 1)))
+
+;          (top-right-start (list (getX posInici) (+ c 1)))
+;          (top-right-end (list (- r 1) (getY posFi)))
+
+;          (bottom-left-start (list (+ r 1) (getY posInici)))
+;          (bottom-left-end (list (getX posFi) (- c 1)))
+
+;          (bottom-right-start (list (+ r 1) (+ c 1)))
+;          (bottom-right-end posFi)
+;        )
+;        (let 
+;          ((lab1 (randomDivision top-left-start top-left-end laberintConPared)))
+;          (let 
+;            ((lab2 (randomDivision top-right-start top-right-end lab1)))
+;            (let 
+;              ((lab3 (randomDivision bottom-left-start bottom-left-end lab2)))
+;              (randomDivision bottom-right-start bottom-right-end lab3)
+;            )
+;          )
+;        )
+;      )
+;     )
+;   )
+; )
+
+(defun randomDivision (posInici posFi laberint) 
+
+  (cond 
+    ((or (< (- (getX posFi) (getX posInici)) 3) 
+         (< (- (getY posFi) (getY posInici)) 3)
+     )
+     laberint
+    )
+    (t ; posicio random per dibuixar les linees perpendiculars
+     (let* 
+       ((posRandom (chooseRandomFrom posInici posFi laberint)) 
+         (newLaberint (dibuixarParets posRandom posInici posFi laberint))
+
          ; crides recursives
          (newLaberint1 (randomDivision posInici posRandom newLaberint))
          (newLaberint2 (randomDivision posRandom posFi newLaberint1))
@@ -756,33 +804,28 @@
              newLaberint2
            )
          )
-         (newLaberint4 
-           (randomDivision 
-             (list (getX posRandom) (getY posInici))
-             (list (getX posFi) (getY posRandom))
-             newLaberint3
-           )
-         )
        )
-         newLaberint4
-      )
+
+       (randomDivision 
+         (list (getX posRandom) (getY posInici))
+         (list (getX posFi) (getY posRandom))
+         newLaberint3
+       )
+     )
     )
   )
 )
-)
 
+
+     
 (defun dibuixaLineaVerticalParets (posInicial posFinal laberint) 
   (cond 
     ((equal posInicial posFinal)
-     (setMatrixValue laberint paret posInicial)
+     (setMatrixValue laberint cami posInicial)
     )
     (t
-     (let* 
-       ((newLaberint 
-          (setMatrixValue laberint paret posInicial)
-        ) 
-       )
-
+     (let 
+       ((newLaberint (setMatrixValue laberint cami posInicial)))
        (dibuixaLineaVerticalParets 
          (list (car posInicial) (+ 1 (cadr posInicial)))
          posFinal
@@ -792,20 +835,15 @@
     )
   )
 )
-
-
+      
 (defun dibuixaLineaHorizontalParets (posInicial posFinal laberint) 
   (cond 
     ((equal posInicial posFinal)
      (setMatrixValue laberint paret posInicial)
     )
     (t
-     (let* 
-       ((newLaberint 
-          (setMatrixValue laberint paret posInicial)
-        ) 
-       )
-
+     (let 
+       ((newLaberint (setMatrixValue laberint paret posInicial)))
        (dibuixaLineaHorizontalParets 
          (list (+ 1 (car posInicial)) (cadr posInicial))
          posFinal
@@ -815,32 +853,45 @@
     )
   )
 )
- ;dibuixa dues lineas perpendiculas de parts al punt randomPos.
-; Obre 3 camins diferents per crear un laberint connex
+
+
+
 (defun dibuixarParets (randomPos posInici posFi laberint) 
-
- (let* ((lab1 (dibuixaLineaVerticalParets 
-               (list (car randomPos) (cadr posInici))
-               (list (car randomPos) (cadr posFi))
-               laberint))
-       (lab2 (dibuixaLineaHorizontalParets 
-               (list (car posInici) (cadr randomPos))
-               (list (car posFi) (cadr randomPos))
-               lab1))
-       (puntsCandidats (triaPunts posInici randomPos posFi))
-       (shiffledPunts (modernFisher-Yates  puntsCandidats)) 
-       (shiffledPunts1 (remove_Elem_ByIndex (random (length shiffledPunts)) shiffledPunts))
-       (laberintFinal (obrirCamins shiffledPunts1 lab2)))
-  laberintFinal)
-
+  (let* 
+    ((lab1 
+       (dibuixaLineaVerticalParets 
+         (list (car randomPos) (cadr posInici))
+         (list (car randomPos) (cadr posFi))
+         laberint
+       )
+     ) 
+      (lab2 
+        (dibuixaLineaHorizontalParets 
+          (list (getX posInici) (cadr randomPos))
+          (list (getX posFi) (cadr randomPos))
+          lab1
+        )
+      )
+      (puntsCandidats (triaPunts posInici randomPos posFi))
+      (puntsFinals 
+        (remove_Elem_ByIndex (random (length puntsCandidats)) puntsCandidats)
+      )
+    )
+    (obrirCamins puntsFinals lab2)
+  )
 )
 
 (defun obrirCamins (puntsCandidats laberint) 
   (cond 
-    ((null puntsCandidats) laberint)
+    ((null puntsCandidats)
+     laberint
+    )
     (t
      (let 
-       ((laberintModificat (setMatrixValue laberint cami (car puntsCandidats))))
+       ((laberintModificat 
+          (setMatrixValue laberint cami (car puntsCandidats))
+        ) 
+       )
        (obrirCamins (cdr puntsCandidats) laberintModificat)
      )
     )
@@ -850,36 +901,37 @@
 (defun triaPunts (posInici posRandom posFi) 
   (let* 
     ((punt1 
-       (list (getX posRandom) (randomInterval (getY posInici) (getY posRandom))) ; dalt
-     ) 
+       (list (getX posRandom) 
+             (randomInterval (getY posInici) (getY posRandom))
+       )
+     )  ; dalt
       (punt2 
-
-        (list (getX posRandom) (randomInterval (getY posRandom) (getY posFi)))
-      ) ; baix
+        (list (getX posRandom) 
+              (randomInterval (getY posRandom) (getY posFi))
+        )
+      ) ; baiz
       (punt3 
-        (list (randomInterval (getX posInici) (getX posRandom)) (getY posRandom))
+        (list (randomInterval (getX posInici) (getX posRandom)) 
+              (getY posRandom)
+        )
       ) ; esquerra
       (punt4 
-        (list (randomInterval (getX posRandom) (getX posFi)) (getY posRandom))
-      ) ; dreta
-    )
+        (list (randomInterval (getX posRandom) (getX posFi)) 
+              (getY posRandom)
+        )
+      )
+    ) ; dreta
     (list punt1 punt2 punt3 punt4)
   )
 )
-; n<m. n i m inclosos
-(defun randomInterval (n m) 
 
-  (+ n (random (+ 1 (- m n))))
-)
+      
+(defun randomInterior (n m)
+  (+ (1+ n) (random (max 1 (- m n 1)))))
 
-(defun getX (pos) 
-  (car pos)
-)
 
-(defun getY (pos) 
-  (cadr pos)
-)
-
+(defun getX (pos) (car pos))
+(defun getY (pos) (cadr pos))
 (defun prova () 
 
   (let* 
@@ -893,28 +945,28 @@
 
 
 
-; ; inici de la linea (wx, wy)
-; ; posicio del cami (px, py)
-; ; fi de la linea (dx, dy)
-; ; longitud: nombre de caselles a omplir
-; (defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0)) 
-;   (cond 
-;     ((= i longitud) laberint)
-;     (t
-;      (let* 
-;        ((cx (+ wx (* i dx))) 
-;          (cy (+ wy (* i dy)))
-;          (newLaberint 
-;            (cond 
-;              ((and (= cx px) (= cy py))
-;               (setMatrixValue laberint cami (list cy cx))
-;              )
-;              (t laberint)
-;            )
-;          )
-;        )
-;        (draw-wall newLaberint wx wy px py dx dy longitud (+ i 1))
-;      )
-;     )
-;   )
-; )
+       ; ; inici de la linea (wx, wy)
+       ; ; posicio del cami (px, py)
+       ; ; fi de la linea (dx, dy)
+       ; ; longitud: nombre de caselles a omplir
+       ; (defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0))
+       ;   (cond
+       ;     ((= i longitud) laberint)
+       ;     (t
+       ;      (let*
+       ;        ((cx (+ wx (* i dx)))
+       ;          (cy (+ wy (* i dy)))
+       ;          (newLaberint
+       ;            (cond
+       ;              ((and (= cx px) (= cy py))
+       ;               (setMatrixValue laberint cami (list cy cx))
+       ;              )
+       ;              (t laberint)
+       ;            )
+       ;          )
+       ;        )
+       ;        (draw-wall newLaberint wx wy px py dx dy longitud (+ i 1))
+       ;      )
+       ;     )
+       ;   )
+       ; )
