@@ -529,4 +529,28 @@ t
  posEntrada (1 1)%  Entering: WRITETOFILE, Argument list: (((paret paret paret paret paret paret paret paret paret paret) (paret entrada cami paret cami cami cami cami cami paret) (paret cami cami cami cami cami cami cami cami paret) (paret cami cami paret cami paret cami cami cami paret) (paret cami cami paret cami cami cami cami cami paret) (paret cami cami cami cami paret cami paret cami paret) (paret cami cami paret cami paret cami paret cami paret) (paret cami cami paret cami paret cami cami cami paret) (paret cami cami paret cami paret cami paret cami paret) (paret cami cami paret cami cami cami paret cami paret) (paret cami cami paret cami paret cami paret cami paret) (paret cami cami paret cami paret cami paret cami paret) (paret cami cami paret cami paret cami paret cami paret) (paret cami cami paret cami paret cami paret cami paret) (paret cami cami cami cami paret cami paret cami paret) (paret cami cami paret cami paret cami paret cami paret) (paret cami cami paret cami paret cami cami cami paret) (paret cami cami paret cami paret cami paret sortida paret) (paret cami cami paret cami paret cami paret cami paret) (paret paret paret paret paret paret paret paret paret paret)) "laberintGenerat.txt")
   Exiting: WRITETOFILE, Value: t
 t
-4> 
+4> (putprop kib 10 puntuacio)
+error: unbound variable - kib
+if continued: try evaluating symbol again
+5> (putprop 'kib 10 'puntuacio)
+10
+5> (putprop 'kib 4 'dim)
+4
+5> (get 'kib)
+error: too few arguments
+6> (get 'kib 'puntacio)
+nil
+6> (get 'kib 'puntuacio)
+10
+6> (put 'kib 15 'puntuacio)
+error: unbound function - put
+if continued: try evaluating symbol again
+7> (putprop 'kib 15 'puntuacio)
+15
+7> (get 'kib 'puntuacio)
+15
+7> (cons '(1 0) '((2 2) (3 3)))
+((1 0) (2 2) (3 3))
+7> (get 'kib 'puntuacio)
+15
+7> 

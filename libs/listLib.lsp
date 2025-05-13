@@ -139,12 +139,12 @@
 
 
 ; sorts the list l ascendingly
-(defun ordena (l) 
-  (cond 
-    ((null l) nil)
-    (t (cons (minim l) (ordena (esborra (minim l) l))))
-  )
-)
+; (defun ordena (l) 
+;   (cond 
+;     ((null l) nil)
+;     (t (cons (minim l) (ordena (esborra (minim l) l))))
+;   )
+; )
 
 
 (defun aplana (llista) 
@@ -259,18 +259,18 @@
 )
 
 ;returns index of the element e
-(defun posicio (e llista) 
-  (cond 
-    ((null llista) (- 1))
-    ((equal e (car llista)) 1)
-    (t
-     (let 
-       ((res (posicio e (cdr llista))))
-       (if (= res (- 1)) (- 1) (+ res 1))
-     )
-    )
-  )
-)
+; (defun posicio (e llista) 
+;   (cond 
+;     ((null llista) (- 1))
+;     ((equal e (car llista)) 1)
+;     (t
+;      (let 
+;        ((res (posicio e (cdr llista))))
+;        (if (= res (- 1)) (- 1) (+ res 1))
+;      )
+;     )
+;   )
+; )
 
 
 
@@ -461,3 +461,5 @@
     (t (maxim (cons (car llista) (cddr llista)))) ; llista(i)>llista(i+1), we "remove" llista(i+1)
   )
 )
+
+

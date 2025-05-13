@@ -21,5 +21,7 @@
 (setq Ccami #\.)
 (setq Centrada #\e)
 (setq Csortida #\s)
-(setq OutputFileName "laberintGenerat.txt")
+(setq laberintOutputFile "laberintGenerat.txt")
+(setq estadistiquesFile "estadistiques.txt")
+(setq ID 0)
 ; (setq salt newline)
