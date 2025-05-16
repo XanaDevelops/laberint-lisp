@@ -9,8 +9,6 @@
 
 (setq mazepos '(64 320))
 
-(setq player-speed 2)
-
 (load 'fitxer-io)
 (load 'graphfx)
 (load 'user-input)
@@ -202,9 +200,11 @@
         (putprop maze (* -240 (floor x 240)) 'x)
         (putprop maze (* 240 (floor y -240)) 'y)
         (putprop maze maze-data 'data)
+        (putprop maze (find-in-maze (get maze 'data) sortida) 'sortida)
+        ;player
         (putprop player x 'x)
         (putprop player y 'y)
-        (putprop maze (find-in-maze (get maze 'data) sortida) 'sortida)
+        (putprop player 2 'speed)
         (game-loop name maze player)
         )
     )
@@ -245,14 +245,6 @@
 
     ; llegeix entrada i calcula nova posició, comproba colisions
     (let* ((input (user-input)) (px (getx player)) (py (gety player))
-                                (newpx (cond    ((and (eq input 'right) (can-move-h (get maze 'data) (+ px TILESIZE) py)) (+ px player-speed))
-                                                ((and (eq input 'left) (can-move-h (get maze 'data) (- px player-speed) py)) (- px player-speed))
-                                                (t px))
-                                )
-                                (newpy (cond    ((and (eq input 'up) (can-move-v (get maze 'data) px (- py (- player-speed)))) (+ py player-speed))
-                                                ((and (eq input 'down) (can-move-v (get maze 'data) px (+ py -17))) (- py player-speed))
-                                                (t py))
-                                )
             )
         (cond
         ; sortir del joc
@@ -266,14 +258,20 @@
         (t
 
         ;borra tile del jugador
-        (cls-player (getx player) (gety player) maze)
+        (cls-player px py maze)
 
         ; calcula nova posició del laberint, depenent de a quina direcció es vol anar i la posició del jugador respecte la pantala
         ; fa scroll o no
-        (let* ((r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
+        (let* (
+            (newpcoords (new-player-pos player maze input))
+            (newpx (car newpcoords)) (newpy (cadr newpcoords))
+            
+            (r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
               (u (and (eq input 'up) (> (+ newpy (gety maze)) -16))) (d (and (eq input 'down) (< (+ newpy (gety maze)) -240)))
               (newmx (cond ((eq r t) (- (getx maze) 240)) ((eq l t) (+ (getx maze) 240)) (t (getx maze))))
               (newmy (cond ((eq u t) (- (gety maze) 240)) ((eq d t) (+ (gety maze) 240))(t (gety maze))))
+
+              
             )
             ; nou estat de la partida
             (game-loop name 
@@ -289,6 +287,22 @@
     )
     )
     )
+    )
+)
+; Calcula la nova posició del jugador
+; retorna (newx, newy)
+(defun new-player-pos (player maze input)
+    (let* ((px (getx player)) (py (gety player)) (ps (get player 'speed)))
+        (list
+        ;new x 
+        (cond ((and (eq input 'right) (can-move-h (get maze 'data) (+ px TILESIZE) py)) (+ px ps))
+              ((and (eq input 'left) (can-move-h (get maze 'data) (- px ps) py)) (- px ps))
+              (t px))
+        ;new Y
+        (cond ((and (eq input 'up) (can-move-v (get maze 'data) px (- py (- ps)))) (+ py ps))
+              ((and (eq input 'down) (can-move-v (get maze 'data) px (+ py -17))) (- py ps))
+              (t py))
+        )
     )
 )
 
