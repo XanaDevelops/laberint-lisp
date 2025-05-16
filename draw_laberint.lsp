@@ -266,19 +266,18 @@
             (newpcoords (new-player-pos player maze input))
             (newpx (car newpcoords)) (newpy (cadr newpcoords))
             
-            (r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
-              (u (and (eq input 'up) (> (+ newpy (gety maze)) -16))) (d (and (eq input 'down) (< (+ newpy (gety maze)) -240)))
-              (newmx (cond ((eq r t) (- (getx maze) 240)) ((eq l t) (+ (getx maze) 240)) (t (getx maze))))
-              (newmy (cond ((eq u t) (- (gety maze) 240)) ((eq d t) (+ (gety maze) 240))(t (gety maze))))
+            (newmazecoords (new-maze-pos newpx newpy maze input))
+              (newmx (car newmazecoords))
+              (newmy (cadr newmazecoords))
+              (do-repaint (caddr newmazecoords))
 
-              
             )
             ; nou estat de la partida
             (game-loop name 
                             (update-prop (update-prop maze 'x newmx) 'y newmy)
                             (update-prop (update-prop player 'x newpx) 'y newpy)
                             (1+ steps)
-                            (cond ((or r l u d) t) (t nil))
+                            do-repaint
 
             )
         )
@@ -318,6 +317,20 @@
     )
 )
 
+; calcula la nova posició del laberint
+; retorna (newmx newmy repaint)
+(defun new-maze-pos(newpx newpy maze input)
+(let* 
+    (
+        (r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
+        (u (and (eq input 'up) (> (+ newpy (gety maze)) -16))) (d (and (eq input 'down) (< (+ newpy (gety maze)) -240)))
+    )
+    (list (cond ((eq r t) (- (getx maze) 240)) ((eq l t) (+ (getx maze) 240)) (t (getx maze)))
+          (cond ((eq u t) (- (gety maze) 240)) ((eq d t) (+ (gety maze) 240))(t (gety maze)))
+          (cond ((or r l u d) t) (t nil))
+    )
+)
+)
 (cls)
 ;si peta algo descomentar
 ;(trace game-loop)
