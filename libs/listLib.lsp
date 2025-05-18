@@ -84,14 +84,14 @@
 
 
 ; returns l(index)
-(defun getElementI (index l &optional (tmp 0)) 
+(defun obtenir-element-I (index l &optional (tmp 0)) 
 
   (cond 
     ((null l) nil)
     (t
      (cond 
        ((= tmp index) (car l))
-       (t (getElementI index (cdr l) (+ 1 tmp)))
+       (t (obtenir-element-I index (cdr l) (+ 1 tmp)))
      )
     )
   )
@@ -281,7 +281,7 @@
     ((null (cdr llista)) (car llista))
     (t)
   )
-  (cons (getElementI (- (lengthL llista) 1) llista) (rdc llista))
+  (cons (obtenir-element-I (- (lengthL llista) 1) llista) (rdc llista))
 )
 
 (defun right-shift-list (lst) 
@@ -339,7 +339,7 @@
     ((null indices) nil)
     ; Get the element at the 1-based index (subtract 1 for 0-based lists).
     (t
-     (cons (getElementI (- (car indices) 1) llista) (index (cdr indices) llista))
+     (cons (obtenir-element-I (- (car indices) 1) llista) (index (cdr indices) llista))
     )
   )
 )
@@ -445,10 +445,10 @@
 
 
 ; Create a list with n repetitions of the element e
-(defun replicate (n e) 
+(defun replicar (n e) 
   (cond 
     ((= 0 n) nil)
-    (t (cons e (replicate (- n 1) e)))
+    (t (cons e (replicar (- n 1) e)))
   )
 )
 
