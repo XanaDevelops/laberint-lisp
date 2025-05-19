@@ -87,7 +87,7 @@
       (laberint (dfs-tail adjacents pos laberint))
     )
     
-    (completar-laberint laberint pos nom-fitxer)
+    (completar-laberint laberint  nom-fitxer pos )
   )
 )
 
@@ -117,7 +117,7 @@
      ; crida al metòde recursiu de PRIM
       (nou-laberint (PRIM-recursiu paretsL laberint1))
     )
-    (completar-laberint nou-laberint nom-fitxer)
+    (completar-laberint nou-laberint nom-fitxer )
   )
 )
 
@@ -134,7 +134,7 @@
 ;;
 ;; =============================================================================
 
-(defun completar-laberint (laberint &optional (posEntr) nom-fitxer) 
+(defun completar-laberint (laberint nom-fitxer &optional (posEntr) ) 
   (let* 
     ((laberint-amb-parets-externes (establir-vores-AParet laberint)) 
       (camins (construir-llista-camins laberint-amb-parets-externes))
