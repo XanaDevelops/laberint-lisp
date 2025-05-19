@@ -209,10 +209,10 @@
   )
 )
 
-(defun setIValue (n l e) 
+(defun establir-I-valor (n l e) 
   (cond 
     ((= n 0) (cons e (cdr l)))
-    (t (cons (car l) (setIValue (- n 1) (cdr l) e)))
+    (t (cons (car l) (establir-I-valor (- n 1) (cdr l) e)))
   )
 )
 

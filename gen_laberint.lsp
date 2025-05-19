@@ -50,17 +50,7 @@
     (t (divisio-recursiva nom-fitxer))
   )
 )
-;; =============================================================================
-;; Funció: ''
-;;
-;;             
-;;            
-;;
-;; Paràmetres:
-;;
-;; Retorn:
-;;
-;; =============================================================================
+
 
 ;; =============================================================================
 ;; Funció: 'algorisme-DFS'
@@ -76,18 +66,28 @@
 (defun algorisme-DFS (nom-fitxer) 
   (let* 
     ;; inicialitzar el laberint amb parets
-    ((laberint (crea-matriu FILES COLUMNES paret))
+    ((laberint-inicial (crea-matriu FILES COLUMNES paret))
+
     ;; triar posició aleatoria per la casella d'entrada     
       (pos (obtenir-pos-random-Llista iniciEntrada))
+
     ;; Establir l'entrada del laberint
-      (laberint (establir-valor-matriu laberint entrada pos)) 
+      (laberint-amb-entrada (establir-valor-matriu laberint-inicial entrada pos)) 
+
     ;; remanar la llista d'adjaçents 
-      (adjacents (modernFisher-Yates (caselles-Adjacents laberint pos)))
+      (adjacents (modernFisher-Yates (caselles-Adjacents laberint-amb-entrada pos)))
      
-      (laberint (dfs-tail adjacents pos laberint))
+      (laberint-generat (dfs-tail adjacents pos laberint-amb-entrada))
     )
-    
-    (completar-laberint laberint  nom-fitxer pos )
+    (format t "laberint inicial ~a~%" laberint-inicial)
+    (format t "pos ~a~%" pos)
+
+    (format t "laberint-amb-entrada ~a~%" laberint-amb-entrada)
+    (format t "adjacents ~a~%" adjacents)
+
+    (format t "laberint ~a~%" laberint-generat)
+
+    (completar-laberint laberint-generat nom-fitxer pos)
   )
 )
 
@@ -134,7 +134,7 @@
 ;;
 ;; =============================================================================
 
-(defun completar-laberint (laberint nom-fitxer &optional (posEntr) ) 
+(defun completar-laberint (laberint nom-fitxer &optional posEntr) 
   (let* 
     ((laberint-amb-parets-externes (establir-vores-AParet laberint)) 
       (camins (construir-llista-camins laberint-amb-parets-externes))
@@ -471,10 +471,10 @@
   (let* 
     ((primer-valor (obtenir-element-I primer-index l)) 
       (segon-valor (obtenir-element-I segon-index l))
-      (nova-l (establer-elemI primer-index l segon-valor))
+      (nova-l (establir-I-valor primer-index l segon-valor))
     )
 
-    (establer-elemI segon-index nova-l primer-valor)
+    (establir-I-valor segon-index nova-l primer-valor)
   )
 )
 ;; =============================================================================
@@ -593,7 +593,7 @@
   (cond 
     ((and 
        (equal paret (pos-IJ-laberint posActual laberint))
-       (unicCami posActual laberint)
+       (unic-cami posActual laberint)
      )
      t
     )
@@ -615,7 +615,7 @@
 ;;  - `t` si té un únic camí/entrada adjacent.
 ;;  - `nil` en cas contrari.
 ;; =============================================================================
-(defun unicCami (pos laberint) 
+(defun unic-cami (pos laberint) 
   (let 
     ((adjacents 
        (caselles-Adjacents laberint pos)
@@ -623,8 +623,8 @@
     )
     (cond 
       ((= 1 
-          (+ (repetitionsX cami (getValors adjacents laberint)) 
-             (repetitionsX entrada (getValors adjacents laberint))
+          (+ (repetitionsX cami (obte-valors adjacents laberint)) 
+             (repetitionsX entrada (obte-valors adjacents laberint))
           )
        )
        t
@@ -646,10 +646,10 @@
 ;;  - Llista de valors associats a cada posició dins del laberint.
 ;; =============================================================================
   
-(defun getValors (pos laberint) 
+(defun obte-valors (pos laberint) 
   (cond 
     ((null pos) nil)
-    (t (cons (pos-IJ-laberint (car pos) laberint) (getValors (cdr pos) laberint)))
+    (t (cons (pos-IJ-laberint (car pos) laberint) (obte-valors (cdr pos) laberint)))
   )
 )
 

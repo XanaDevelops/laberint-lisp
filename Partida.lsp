@@ -1,9 +1,29 @@
 (load "libs/listLib.lsp")
 (load "VARSGLOBALS.lsp")
 ; guarda en el fixter estadistiques.txt la jugada recent
-
+;; =============================================================================
+;; Estructura: 'jugador'
+;; Defineix una estructura per representar un jugador dins el joc.
+;;
+;; Camps:
+;;   - nom: Nom del jugador.
+;;   - passos: Nombre de passos realitzats pel jugador.
+;;   - f: Nombre de files del laberint.
+;;   - c: Nombre de columnes del laberint.
+;; =============================================================================
 (defstruct jugador nom passos f c)
 
+;; =============================================================================
+;; Funció: 'equal-Jugador'
+;; Compara si dos jugadors són iguals basant-se en els seus atributs.
+;; Dos jugadors són iguals si tenen els mateixos atributs(tots).
+;; Paràmetres:
+;;   - j1: Primer jugador.
+;;   - j2: Segon jugador.
+;;
+;; Retorn:
+;;   - T si són iguals, NIL en cas contrari.
+;; =============================================================================
 (defun equal-Jugador (j1 j2) 
   (and (equal (jugador-nom j1) (jugador-nom j2)) 
        (equal (jugador-passos j1) (jugador-passos j2))
@@ -12,14 +32,14 @@
   )
 )
 
-(defun prova () 
-
-  (let 
-    ((jug (make-jugador :nom "johan" :passos 7 :f 20 :c 10)))
-    ; (guardarJugador jug)
-    (getClassificacio jug)
-  )
-)
+;; =============================================================================
+;; Funció: 'guardarJugador'
+;; Guarda la informació d'un jugador, en forma d'expressió, al fitxer d'estadístiques.
+;;
+;; Paràmetres:
+;;   - jug: Estructura del jugador a desar.
+;;
+;; =============================================================================
 (defun guardarJugador (jug) 
   (let 
     ((stream 
@@ -35,6 +55,16 @@
   )
 )
 
+;; =============================================================================
+;; Funció: 'getLlistaClassificacions'
+;; Obté la llista de classificacions per un jugador donat.
+;;
+;; Paràmetres:
+;;   - jug: Jugador del qual es volen obtenir les estadístiques.
+;;
+;; Retorn:
+;;   - Llista de jugadors amb la mateixa mida de laberint.
+;; =============================================================================
 (defun getLlistaClassificacions (jug) 
   ; llegir el fitxer d'estadistiques
   (let* 
@@ -46,6 +76,18 @@
   )
 )
 
+;; =============================================================================
+;; Funció: 'getLlistaLab'
+;; Filtra els jugadors del fitxer d'estadístiques segons la mida del laberint.
+;;
+;; Paràmetres:
+;;   - jug: Jugador de referència.
+;;   - stream: Flux de lectura del fitxer.
+;;   - llista(opcional): Llista acumuladora.
+;;
+;; Retorn:
+;;   - Llista de jugadors que han jugat en laberints de la mateixa mida.
+;; =============================================================================
 (defun getLlistaLab (jug stream &optional (llista '())) 
   (let 
     ((jugadorActual (read stream nil nil)))
@@ -61,6 +103,19 @@
     )
   )
 )
+
+;; =============================================================================
+;; Funció: 'getClassificacio'
+;; Obté la classificació i el nombre total de jugadors en el mateix laberint.
+;; La classficació d'un jugador s'obté sobre la llista de jugadors que han jugat
+;; a un laberint de igual dimensió.
+;; Paràmetres:
+;;   - jug: Jugador del qual es vol obtenir la classificació.
+;;
+;; Retorn:
+;;   - Llista amb la classificació de 'jug' i la mida de la llista de jugadors competidors.
+;;      
+;; =============================================================================
 ; retorna la parella (classificació nº de jugadors) 
 (defun getClassificacio (jug) 
 
@@ -74,6 +129,19 @@
     (list (+ 1 (getPosJugador jug llistaOrdenada)) (length llistaOrdenada))
   )
 )
+
+;; =============================================================================
+;; Funció: 'getPosJugador'
+;; Troba la posició d'un jugador en la classificació ordenada.
+;;
+;; Paràmetres:
+;;   - jug: Jugador a cercar.
+;;   - llista: Llista de jugadors ordenada.
+;;   - index(opcional): Índex actual.
+;;
+;; Retorn:
+;;   - Posició del jugador en la classificació, o -1 si no es troba.
+;; =============================================================================
 (defun getPosJugador (jug llista &optional (index 0)) 
   (cond 
     ((null llista) (- 1))
@@ -84,6 +152,16 @@
   )
 ) 
 
+;; =============================================================================
+;; Funció: 'ordena'
+;; Ordena la llista de jugadors, de forma ascendent, en funció dels passos realitzats.
+;;
+;; Paràmetres:
+;;   - l: Llista de jugadors a ordenar.
+;;
+;; Retorn:
+;;   - Llista ordenada per nombre de passos.
+;; =============================================================================
 (defun ordena (l) 
   (cond 
     ((null l) nil)
@@ -91,6 +169,16 @@
   )
 )
 
+;; =============================================================================
+;; Funció: 'minim'
+;; Cerca el jugador amb menys passos de la llista.
+;;
+;; Paràmetres:
+;;   - l: Llista de jugadors.
+;;
+;; Retorn:
+;;   - Jugador amb menor nombre de passos.
+;; =============================================================================
 (defun minim (l) 
   (cond 
     ((null (cdr l)) (car l))
@@ -106,4 +194,3 @@
   )
 )
 
-(defun posi)
