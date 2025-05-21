@@ -197,14 +197,14 @@
     ((null (get maze 'data))
         ; en la primera cridada inicialitza els valors per defecte
         (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) TILESIZE)) (y (* (cadr start-pos) (* -1 TILESIZE))))
-        (putprop maze (* -240 (floor x 240)) 'x)
-        (putprop maze (* 240 (floor y -240)) 'y)
+        (putprop maze (* (- SCREENPIXEL-M1) (floor x SCREENPIXEL-M1)) 'x)
+        (putprop maze (* SCREENPIXEL-M1 (floor y (- SCREENPIXEL-M1))) 'y)
         (putprop maze maze-data 'data)
         (putprop maze (find-in-maze (get maze 'data) sortida) 'sortida)
         ;player
         (putprop player x 'x)
         (putprop player y 'y)
-        (putprop player 2 'speed)
+        (putprop player 4 'speed) ; que sigui par
         (game-loop name maze player)
         )
     )
@@ -244,8 +244,7 @@
     ; DEBUG
 
     ; llegeix entrada i calcula nova posició, comproba colisions
-    (let* ((input (user-input)) (px (getx player)) (py (gety player))
-            )
+    (let* ((input (user-input)) (px (getx player)) (py (gety player)))
         (cond
         ; sortir del joc
         ((eq input 'esq)
@@ -264,7 +263,7 @@
         ; fa scroll o no
         (let* (
             (newpcoords (new-player-pos player maze input))
-            (newpx (car newpcoords)) (newpy (cadr newpcoords))
+             (newpx (car newpcoords)) (newpy (cadr newpcoords))
             
             (newmazecoords (new-maze-pos newpx newpy maze input))
               (newmx (car newmazecoords))
@@ -274,10 +273,10 @@
             )
             ; nou estat de la partida
             (game-loop name 
-                            (update-prop (update-prop maze 'x newmx) 'y newmy)
-                            (update-prop (update-prop player 'x newpx) 'y newpy)
-                            (1+ steps)
-                            do-repaint
+                (update-prop (update-prop maze 'x newmx) 'y newmy)
+                (update-prop (update-prop player 'x newpx) 'y newpy)
+                (1+ steps)
+                do-repaint
 
             )
         )
@@ -299,20 +298,20 @@
               (t px))
         ;new Y
         (cond ((and (eq input 'up) (can-move-v (get maze 'data) px (- py (- ps)))) (+ py ps))
-              ((and (eq input 'down) (can-move-v (get maze 'data) px (+ py -17))) (- py ps))
+              ((and (eq input 'down) (can-move-v (get maze 'data) px (+ py (- (1+ TILESIZE))))) (- py ps))
               (t py))
         )
     )
 )
 
 (defun can-move-h (maze x y)
-    (let ((xtile (floor x TILESIZE)) (ytile (floor (- y) TILESIZE)) (ytile2 (floor (+ (- y) 15) TILESIZE)))
+    (let ((xtile (floor x TILESIZE)) (ytile (floor (- y) TILESIZE)) (ytile2 (floor (+ (- y) (1- TILESIZE)) TILESIZE)))
         (not (or (eq (get-in-maze maze xtile ytile) paret) (eq (get-in-maze maze xtile ytile2) paret)))
     )
 )
 
 (defun can-move-v (maze x y)
-    (let ((xtile (floor x TILESIZE)) (xtile2 (floor (+ x 15) TILESIZE)) (ytile (floor (- y) TILESIZE)))
+    (let ((xtile (floor x TILESIZE)) (xtile2 (floor (+ x (1- TILESIZE)) TILESIZE)) (ytile (floor (- y) TILESIZE)))
         (not (or (eq (get-in-maze maze xtile ytile) paret) (eq (get-in-maze maze xtile2 ytile) paret)))
     )
 )
@@ -322,11 +321,11 @@
 (defun new-maze-pos(newpx newpy maze input)
 (let* 
     (
-        (r (and (eq input 'right) (> (+ newpx (getx maze)) 240))) (l (and (eq input 'left) (< (+ newpx (getx maze)) 16)))
-        (u (and (eq input 'up) (> (+ newpy (gety maze)) -16))) (d (and (eq input 'down) (< (+ newpy (gety maze)) -240)))
+        (r (and (eq input 'right) (> (+ newpx (getx maze)) SCREENPIXEL-M1))) (l (and (eq input 'left) (< (+ newpx (getx maze)) TILESIZE)))
+        (u (and (eq input 'up) (> (+ newpy (gety maze)) (- TILESIZE)))) (d (and (eq input 'down) (< (+ newpy (gety maze)) (- SCREENPIXEL-M1))))
     )
-    (list (cond ((eq r t) (- (getx maze) 240)) ((eq l t) (+ (getx maze) 240)) (t (getx maze)))
-          (cond ((eq u t) (- (gety maze) 240)) ((eq d t) (+ (gety maze) 240))(t (gety maze)))
+    (list (cond ((eq r t) (- (getx maze) SCREENPIXEL-M1)) ((eq l t) (+ (getx maze) SCREENPIXEL-M1)) (t (getx maze)))
+          (cond ((eq u t) (- (gety maze) SCREENPIXEL-M1)) ((eq d t) (+ (gety maze) SCREENPIXEL-M1))(t (gety maze)))
           (cond ((or r l u d) t) (t nil))
     )
 )
