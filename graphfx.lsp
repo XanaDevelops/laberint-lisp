@@ -1,5 +1,3 @@
-
-
 (setq TILESIZE 16)
 (setq TILE_W 16)
 (setq TILE_H 16)
