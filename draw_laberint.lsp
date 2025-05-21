@@ -7,6 +7,8 @@
 (setq sortida #\s)
 (setq newline #\NewLine)
 
+(setq key_per_maze 3)
+
 (setq mazepos '(64 320))
 
 (load 'fitxer-io)
@@ -192,7 +194,7 @@
 )
 
 ;loop principal del joc
-(defun-tco game-loop(name &optional (maze 'maze) (player 'player) (steps 0) (repaint t))
+(defun-tco game-loop(name &optional (maze 'maze) (player 'player) (steps 0) (repaint t) (extra 'extra))
     (cond
     ((null (get maze 'data))
         ; en la primera cridada inicialitza els valors per defecte
@@ -207,8 +209,10 @@
         (putprop player 4 'speed) ; que sigui par
         (putprop player (floor x TILESIZE) 'tilex)
         (putprop player (floor (- y) TILESIZE) 'tiley)
+        ;extra
+        (putprop extra (gen-keys maze-data) 'keys)
 
-        (game-loop name maze player)
+        (game-loop name maze player 0 t extra)
         )
     )
     (t 
@@ -224,7 +228,11 @@
 
     ; dibuixa el jugador    
     (draw-tile "luigi" pdrawx pdrawy)
-    
+
+    ;dibuixa extres
+    ; claus
+    (draw-keys (get extra 'keys) maze)
+
     ; DEBUG
     (color 0 0 0 255 255 255)
     (goto-xy 0 0)
@@ -236,8 +244,11 @@
     (princ "        \n")
     (princ "        \n")
     (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
     (goto-xy 0 0)
     (print (symbol-plist player))
+    (print (symbol-plist extra))
     (print pdrawx)
     (print pdrawy)
     (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
@@ -283,13 +294,63 @@
                 (update-prop (update-prop maze 'x newmx) 'y newmy)
                 (update-prop (update-prop (update-prop (update-prop player 'x newpx) 'y newpy) 'tilex newtilex) 'tiley newtiley)
                 (+ steps addsteps)
-                do-repaint
+                do-repaint 
+                extra
             )
         )
         )
         )
     )
     )
+    )
+    )
+)
+
+(defun tile-to-draw(xt yt maze)
+    (list 
+        (+ (* xt TILESIZE) (car mazepos) (getx maze))
+        (+ (* (- yt) TILESIZE) (car mazepos) (gety maze))
+    )
+)
+
+;genera les posicions de les claus
+;retorna :((x1, y1), (x2, y2), ...)
+(defun gen-keys(maze &optional (n 0) (keys '()))
+    ;ja es un suplici un laberint de 50x50, un de 100x100...
+    (let* ((x (random 100)) (y (random 100))
+            (tile (get-in-maze maze x y))
+        )
+        (cond 
+            ((eq tile cami)
+                (cond 
+                    ((< n key_per_maze)
+                        (gen-keys maze (1+ n) (cons (list x y) keys))
+                    )
+                    (t
+                        keys
+                    )
+                )
+            )
+            (t 
+                (gen-keys maze n keys)
+            )
+        )
+    )
+)
+
+;dibuixa les claus
+(defun draw-keys(key-coords maze)
+    (cond 
+    ((null key-coords)
+        t
+    )
+    (t
+        (let* ((coords (car key-coords)) (xt (car coords)) (yt (cadr coords))
+                (draw-coords (tile-to-draw xt yt maze)) (drawx (car draw-coords)) (drawy (cadr draw-coords))
+            )
+            (draw-tile "llave" drawx drawy)
+            (draw-keys (cdr key-coords) maze)
+        )
     )
     )
 )
@@ -354,9 +415,12 @@
 ;(trace update-prop)
 ;(trace find-in-maze)
 ;(trace paint-maze)
+;(trace tile-to-draw)
+;(trace draw-keys)
+;(trace draw-tile)
 
 ;(print (game-loop "test.txt"))
-(print (game-loop "laberints_exemple/40x30_2.txt"))
+(print (game-loop "laberints_exemple/25x25_2.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
