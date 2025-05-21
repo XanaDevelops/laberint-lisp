@@ -205,6 +205,9 @@
         (putprop player x 'x)
         (putprop player y 'y)
         (putprop player 4 'speed) ; que sigui par
+        (putprop player (floor x TILESIZE) 'tilex)
+        (putprop player (floor (- y) TILESIZE) 'tiley)
+
         (game-loop name maze player)
         )
     )
@@ -241,6 +244,7 @@
     (print (get maze 'sortida))
     (print (getx maze))
     (print (gety maze))
+    (print steps)
     ; DEBUG
 
     ; llegeix entrada i calcula nova posició, comproba colisions
@@ -269,15 +273,17 @@
               (newmx (car newmazecoords))
               (newmy (cadr newmazecoords))
               (do-repaint (caddr newmazecoords))
-
+            (newtileplayer (update-steps player))
+              (newtilex (car newtileplayer))
+              (newtiley (cadr newtileplayer))
+              (addsteps (caddr newtileplayer))
             )
             ; nou estat de la partida
             (game-loop name 
                 (update-prop (update-prop maze 'x newmx) 'y newmy)
-                (update-prop (update-prop player 'x newpx) 'y newpy)
-                (1+ steps)
+                (update-prop (update-prop (update-prop (update-prop player 'x newpx) 'y newpy) 'tilex newtilex) 'tiley newtiley)
+                (+ steps addsteps)
                 do-repaint
-
             )
         )
         )
@@ -287,6 +293,18 @@
     )
     )
 )
+
+;Calcula si s'ha d'augmentar els steps
+;retorna (newTileX, newTileY 0/1)
+(defun update-steps (player)
+    (let* ((px (getx player)) (py (gety player))
+            (xtile (floor px TILESIZE)) (ytile (floor (- py) TILESIZE))
+            (oxtile (get player 'tilex)) (oytile (get player 'tiley))
+          )
+        (list xtile ytile (cond ((and (eq xtile oxtile) (eq ytile oytile)) 0) (t 1)))
+    )
+)
+
 ; Calcula la nova posició del jugador
 ; retorna (newx, newy)
 (defun new-player-pos (player maze input)
