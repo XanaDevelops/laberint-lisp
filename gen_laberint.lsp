@@ -66,28 +66,25 @@
 (defun algorisme-DFS (nom-fitxer) 
   (let* 
     ;; inicialitzar el laberint amb parets
-    ((laberint-inicial (crea-matriu FILES COLUMNES paret))
+    ((laberint-inicial (crea-matriu FILES COLUMNES paret)) 
 
-    ;; triar posició aleatoria per la casella d'entrada     
+      ;; triar posició aleatoria per la casella d'entrada
       (pos (obtenir-pos-random-Llista iniciEntrada))
 
-    ;; Establir l'entrada del laberint
-      (laberint-amb-entrada (establir-valor-matriu laberint-inicial entrada pos)) 
+      ;; Establir l'entrada del laberint
+      (laberint-amb-entrada (establir-valor-matriu laberint-inicial entrada pos))
 
-    ;; remanar la llista d'adjaçents 
-      (adjacents (modernFisher-Yates (caselles-Adjacents laberint-amb-entrada pos)))
-     
+      ;; remanar la llista d'adjaçents
+      (adjacents 
+        (modernFisher-Yates (caselles-Adjacents laberint-amb-entrada pos))
+      )
+
       (laberint-generat (dfs-tail adjacents pos laberint-amb-entrada))
     )
-    (format t "laberint inicial ~a~%" laberint-inicial)
-    (format t "pos ~a~%" pos)
 
-    (format t "laberint-amb-entrada ~a~%" laberint-amb-entrada)
-    (format t "adjacents ~a~%" adjacents)
-
-    (format t "laberint ~a~%" laberint-generat)
 
     (completar-laberint laberint-generat nom-fitxer pos)
+    ; (escriu-fitxer laberint-generat nom-fitxer)
   )
 )
 
@@ -114,10 +111,11 @@
       (laberint1 (establir-valor-matriu laberint cami pos))
       ; afegir els parets de la casella
       (paretsL (obtenir-llista-adjacentsX pos laberint1 paret))
-     ; crida al metòde recursiu de PRIM
+      ; crida al metòde recursiu de PRIM
       (nou-laberint (PRIM-recursiu paretsL laberint1))
     )
-    (completar-laberint nou-laberint nom-fitxer )
+    ; (completar-laberint nou-laberint nom-fitxer )
+    (escriu-fitxer nou-laberint nom-fitxer)
   )
 )
 
@@ -141,29 +139,33 @@
       (camins-accessibles 
         (obtenir-Camins-Accessibles laberint-amb-parets-externes camins)
       )
-      ;Establir una posició random com entrada
-      (pos-entrada 
-        (cond ((null posEntr) (obtenir-Primir-ODarrer camins-accessibles)) (t posEntr))
-      )
+    ;   ;Establir una posició random com entrada
+    ;   (pos-entrada 
+    ;     (cond 
+    ;       ((null posEntr) (obtenir-Primir-ODarrer camins-accessibles))
+    ;       (t posEntr)
+    ;     )
+    ;   )
 
-      (laberint-amb-entrada 
-        (cond 
-          ((null posEntr)
-           (establir-valor-matriu laberint-amb-parets-externes entrada pos-entrada)
-          )
-          (t laberint-amb-parets-externes)
-        )
-      )
-      ;set sortida --> posició de les més llunyanes a posEntrada
-      (laberint-complet 
-        (establir-valor-matriu 
-          laberint-amb-entrada
-          sortida
-          (obtenir-casella-mes-llunyana pos-entrada camins-accessibles)
-        )
-      )
-    )
-    (escriu-fitxer laberint-complet nom-fitxer)
+    ;   (laberint-amb-entrada 
+    ;     (cond 
+    ;       ((null posEntr)
+    ;        (establir-valor-matriu laberint-amb-parets-externes entrada pos-entrada)
+    ;       )
+    ;       (t laberint-amb-parets-externes)
+    ;     )
+    ;   )
+    ;   ;set sortida --> posició de les més llunyanes a posEntrada
+    ;   (laberint-complet 
+    ;     (establir-valor-matriu 
+    ;       laberint-amb-entrada
+    ;       sortida
+    ;       (obtenir-casella-mes-llunyana pos-entrada camins-accessibles)
+    ;     )
+    ;   )
+     )
+    ; (format t "camins ~a~%" camins)
+    (escriu-fitxer laberint-amb-parets-externes nom-fitxer)
   )
 )
 
@@ -179,14 +181,20 @@
 
 (defun divisio-recursiva (nom-fitxer) 
   (let* 
-   ;; inicialitzar el laberint a 'cami' 
+    ;; inicialitzar el laberint a 'cami'
     ((laberint (crea-matriu FILES COLUMNES cami)) 
-    ; crida al mètode recursiu auxiliar 
+      ; crida al mètode recursiu auxiliar
       (laberint1 
-        (divisio-recursiva-auxiliar '(0 0) (list (- FILES 1) (- COLUMNES 1)) laberint)
+        (divisio-recursiva-auxiliar 
+          '(0 0)
+          (list (- FILES 1) (- COLUMNES 1))
+          laberint
+        )
       )
     )
-    (completar-laberint laberint1 nom-fitxer)
+    (escriu-fitxer laberint1 nom-fitxer)
+
+    ; (completar-laberint laberint1 nom-fitxer)
   )
 )
 
@@ -356,30 +364,49 @@
 ;; Retorn:
 ;;   - Llista de posicions (i, j) de camins del laberint.
 ;; =============================================================================
-(defun construir-llista-camins (laberint &optional (i 0) (j 0)) 
+
+  
+(defun-tco 
+  construir-llista-camins
+  (laberint &optional (i 0) (j 0) (llista-camins '()))
   (cond 
-    ; case base. Final del laberint
-    ((or (equal i nil) (equal j nil)) nil)
-    ; posició actual és un cami --> s'afegeix a la llista
-    ((equal cami (pos-IJ-laberint (list i j) laberint))
-     (cons (list i j) 
-           (construir-llista-camins 
-             laberint
-             (car (seguent-IJ i j))
-             (cadr (seguent-IJ i j))
-           )
-     )
+    ((or (null i) (null j))
+     llista-camins
+     
     )
-    ; la posició actual té un valor distint a camí --> avançar sense afegir-la
     (t
-     (construir-llista-camins 
-       laberint
-       (car (seguent-IJ i j))
-       (cadr (seguent-IJ i j))
+     (let* 
+       ((next-pos (seguent-IJ i j laberint))
+        (rows (length laberint))
+        (cols (length (car laberint)))
+        )
+       (cond 
+         ((or (>= i rows) (>= j cols) (null next-pos))
+          llista-camins
+         )
+         ((equal cami (pos-IJ-laberint (list i j) laberint))
+          (construir-llista-camins 
+            laberint
+            (car next-pos)
+            (cadr next-pos)
+            (cons (list i j) llista-camins)
+          )
+         )
+         (t
+          (construir-llista-camins 
+            laberint
+            (car next-pos)
+            (cadr next-pos)
+            llista-camins
+          )
+         )
+       )
      )
     )
   )
 )
+
+
 
 ;; =============================================================================
 ;; Funció: 'seguent-IJ'
@@ -395,16 +422,28 @@
 ;;  - Llista amb la nova posició (i, j) si és vàlida.
 ;;  - `nil` si la posició proporcionada no és vàlida.
 ;; =============================================================================
-(defun seguent-IJ (i j) 
-  (cond 
-    ; darrera columna i es pot avançar a la següent fila
-    ((and (= j (- (+ COLUMNES 2) 1)) (< i (- (+ 2 FILES) 1))) (list (+ i 1) 0))
-    ; columna no final
-    ((< j (- (+ 2 COLUMNES) 1)) (list i (+ j 1)))
+; (defun seguent-IJ (i j) 
+;   (cond 
+;     ; darrera columna i es pot avançar a la següent fila
+;     ((and (= j  (+ COLUMNES 1 )) (< i (+  FILES 1))) (list (+ i 1) 0))
+;     ; columna no final
+;     ((< j  (+ 1 COLUMNES) ) (list i (+ j 1)))
 
-    (t nil) ; posició erronea
-  )
-)
+;      (t nil) ; posició erronea
+;   )
+; )
+
+(defun seguent-IJ (i j laberint)
+  (let* ((rows (length laberint))
+         (cols (cond ((= rows 0) 0)
+                     (t (length (car laberint))))))
+    (cond
+      ((or (>= i rows) (>= j cols)) nil)
+      ((and (= j (- cols 1)) (< i (- rows 1)))
+       (list (+ i 1) 0))
+      ((and (= j (- cols 1)) (>= i (- rows 1))) nil)
+      (t (list i (+ j 1))))))
+
 
 
 ;; =============================================================================
@@ -541,7 +580,7 @@
     (t
      (let* 
        ((next (car adjacents))  ; triar veïnat adjaçent aleatori
-         (other (cdr adjacents)) ;  resta de veïnats adjaçents
+         (other (cdr adjacents)) ;  la resta de veïnats adjaçents
        )
        (cond 
          ((paretIUnicCami next laberint) ; és casella paret i té un únic camí adjaçent?
@@ -649,7 +688,9 @@
 (defun obte-valors (pos laberint) 
   (cond 
     ((null pos) nil)
-    (t (cons (pos-IJ-laberint (car pos) laberint) (obte-valors (cdr pos) laberint)))
+    (t
+     (cons (pos-IJ-laberint (car pos) laberint) (obte-valors (cdr pos) laberint))
+    )
   )
 )
 
@@ -822,7 +863,9 @@
           (let* 
             ((nou-laberint (establir-valor-matriu laberint cami paret-aleatoria)) 
               ; Obtenir les parets adjaçents de paret-aleatoria
-              (noves-parets (obtenir-llista-adjacentsX paret-aleatoria nou-laberint paret))
+              (noves-parets 
+                (obtenir-llista-adjacentsX paret-aleatoria nou-laberint paret)
+              )
               ; Eliminar paret-aleatoria de la llista de parets, i s'afegeixen les noves parets a la
               ; llista
               (parets2 (append (esborra-tot paret-aleatoria parets) noves-parets))
@@ -1025,8 +1068,12 @@
          (nou-laberint (dibuixar-parets pos-aleatoria posInici posFi laberint))
 
          ; crides recursives
-         (newLaberint1 (divisio-recursiva-auxiliar posInici pos-aleatoria nou-laberint))
-         (newLaberint2 (divisio-recursiva-auxiliar pos-aleatoria posFi newLaberint1))
+         (newLaberint1 
+           (divisio-recursiva-auxiliar posInici pos-aleatoria nou-laberint)
+         )
+         (newLaberint2 
+           (divisio-recursiva-auxiliar pos-aleatoria posFi newLaberint1)
+         )
          (newLaberint3 
            (divisio-recursiva-auxiliar 
              (list (elemX posInici) (elemY pos-aleatoria))
