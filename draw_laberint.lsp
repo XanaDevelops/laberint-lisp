@@ -420,7 +420,8 @@
 ;(trace draw-tile)
 
 ;(print (game-loop "test.txt"))
-(print (game-loop "laberints_exemple/25x25_2.txt"))
+(setq *random-state* (make-random-state t))
+(print (game-loop "laberints_exemple/10x10_massapetit_1.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
