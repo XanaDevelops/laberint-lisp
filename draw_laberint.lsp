@@ -234,7 +234,7 @@
     (draw-keys (get extra 'keys) maze)
 
     ; DEBUG
-    (color 0 0 0 255 255 255)
+    (color 255 255 255 0 0 0)
     (goto-xy 0 0)
     (princ "              \n")
     (princ "        \n")
@@ -421,6 +421,7 @@
 
 ;(print (game-loop "test.txt"))
 (setq *random-state* (make-random-state t))
+(color 255 255 255 0 0 0)
 (print (game-loop "laberints_exemple/10x10_massapetit_1.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
