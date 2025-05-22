@@ -28,4 +28,47 @@ t
 ; loading "VARSGLOBALS.lsp"
 (genera "laberint.txt")
 error: argument stack overflow
+10> ; loading "tco.lsp"
+; loading "libs/listLib.lsp"
+; loading "VARSGLOBALS.lsp"
+; loading "fitxer-io.lsp"
+; loading "VARSGLOBALS.lsp"
+(genera "laberint.txt")
+t
+10> ; loading "tco.lsp"
+; loading "libs/listLib.lsp"
+; loading "VARSGLOBALS.lsp"
+; loading "fitxer-io.lsp"
+; loading "VARSGLOBALS.lsp"
+(genera "laberint.txt")
+t
+10> (genera "laberint.txt")
+t
+10> (genera "laberint.txt")
+t
+10> (genera "laberint.txt")
+t
+10> (genera "laberint.txt")
+t
+10> ; loading "tco.lsp"
+; loading "libs/listLib.lsp"
+; loading "VARSGLOBALS.lsp"
+; loading "fitxer-io.lsp"
+; loading "VARSGLOBALS.lsp"
+(genera "laberint.txt")
+t
+10> ; loading "tco.lsp"
+; loading "libs/listLib.lsp"
+; loading "VARSGLOBALS.lsp"
+; loading "fitxer-io.lsp"
+; loading "VARSGLOBALS.lsp"
+(genera "laberint.txt")
+t
+10> ; loading "tco.lsp"
+; loading "libs/listLib.lsp"
+; loading "VARSGLOBALS.lsp"
+; loading "fitxer-io.lsp"
+; loading "VARSGLOBALS.lsp"
+(genera "laberint.txt")
+t
 10> 

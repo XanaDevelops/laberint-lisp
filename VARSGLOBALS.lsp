@@ -6,7 +6,7 @@
 (setq DFS 'DFS)
 (setq PRIM 'PRIM)
 (setq RDV 'RDV) ; recursive division
-(setq algorisme-generacio DFS)
+(setq algorisme-generacio RDV)
 (setq HORIZONTAL 1)
 (setq VERTICAL 0)
 

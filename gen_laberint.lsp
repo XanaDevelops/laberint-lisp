@@ -114,8 +114,8 @@
       ; crida al metòde recursiu de PRIM
       (nou-laberint (PRIM-recursiu paretsL laberint1))
     )
-    ; (completar-laberint nou-laberint nom-fitxer )
-    (escriu-fitxer nou-laberint nom-fitxer)
+     (completar-laberint nou-laberint nom-fitxer )
+    ; (escriu-fitxer nou-laberint nom-fitxer)
   )
 )
 
@@ -139,33 +139,35 @@
       (camins-accessibles 
         (obtenir-Camins-Accessibles laberint-amb-parets-externes camins)
       )
-    ;   ;Establir una posició random com entrada
-    ;   (pos-entrada 
-    ;     (cond 
-    ;       ((null posEntr) (obtenir-Primir-ODarrer camins-accessibles))
-    ;       (t posEntr)
-    ;     )
-    ;   )
+      ;Establir una posició random com entrada
+      (pos-entrada 
+        (cond 
+          ((null posEntr)  (obtenir-Primir-ODarrer camins-accessibles))
+          (t posEntr)
+        )
+        )
+     
 
-    ;   (laberint-amb-entrada 
-    ;     (cond 
-    ;       ((null posEntr)
-    ;        (establir-valor-matriu laberint-amb-parets-externes entrada pos-entrada)
-    ;       )
-    ;       (t laberint-amb-parets-externes)
-    ;     )
-    ;   )
-    ;   ;set sortida --> posició de les més llunyanes a posEntrada
-    ;   (laberint-complet 
-    ;     (establir-valor-matriu 
-    ;       laberint-amb-entrada
-    ;       sortida
-    ;       (obtenir-casella-mes-llunyana pos-entrada camins-accessibles)
-    ;     )
-    ;   )
+      (laberint-amb-entrada  
+        (cond 
+          ((null posEntr)
+           (establir-valor-matriu laberint-amb-parets-externes entrada pos-entrada)
+          )
+          ; ja està establerta la posició d'entrada
+          (t laberint-amb-parets-externes)
+        )
+      )
+      ;set sortida --> posició de les més llunyanes a posEntrada
+      (laberint-complet 
+        (establir-valor-matriu 
+          laberint-amb-entrada
+          sortida
+          (obtenir-casella-mes-llunyana pos-entrada camins-accessibles)
+        )
+      )
      )
-    ; (format t "camins ~a~%" camins)
-    (escriu-fitxer laberint-amb-parets-externes nom-fitxer)
+  
+    (escriu-fitxer laberint-complet nom-fitxer)
   )
 )
 
@@ -192,9 +194,9 @@
         )
       )
     )
-    (escriu-fitxer laberint1 nom-fitxer)
+    ; (escriu-fitxer laberint1 nom-fitxer)
 
-    ; (completar-laberint laberint1 nom-fitxer)
+     (completar-laberint laberint1 nom-fitxer)
   )
 )
 
@@ -955,9 +957,9 @@
 ;; Retorn:
 ;;  - Llista amb els camins accessibles (amb almenys dos camins veïns).
 ;; =============================================================================
-(defun obtenir-Camins-Accessibles (laberint llista-camins &optional (i 0)) 
+(defun-tco obtenir-Camins-Accessibles (laberint llista-camins &optional (i 0) (camins-accessibles '())) 
   (cond 
-    ((>= i (length llista-camins)) nil)
+    ((>= i (length llista-camins)) camins-accessibles)
     (t
      (let* 
        ((cami-actual (nth i llista-camins)) 
@@ -965,12 +967,15 @@
        )
        (cond 
          ((>= (camins-veinats caselles-Adjacents llista-camins) 2)
-          (cons cami-actual 
-                (obtenir-Camins-Accessibles laberint llista-camins (+ i 1))
+          (let ((camins-accessibles-actualitzada (cons cami-actual camins-accessibles)))
+             (obtenir-Camins-Accessibles laberint llista-camins (+ i 1) camins-accessibles-actualitzada )
           )
+          ; (cons cami-actual 
+          ;       (obtenir-Camins-Accessibles laberint llista-camins (+ i 1))
+          ; )
          )
 
-         (t (obtenir-Camins-Accessibles laberint llista-camins (+ i 1)))
+         (t (obtenir-Camins-Accessibles laberint llista-camins (+ i 1) camins-accessibles))
        )
      )
     )
@@ -1058,7 +1063,7 @@
 
   (cond 
     ((or (< (- (elemX posFi) (elemX posInici)) 3) 
-         (< (- (elemY posFi) (elemY posInici)) 3)
+         (< (- (elemY posFi) (elemY posInici)) 3 )
      )
      laberint
     )
@@ -1068,30 +1073,50 @@
          (nou-laberint (dibuixar-parets pos-aleatoria posInici posFi laberint))
 
          ; crides recursives
-         (newLaberint1 
+         (lab1 
            (divisio-recursiva-auxiliar posInici pos-aleatoria nou-laberint)
          )
-         (newLaberint2 
-           (divisio-recursiva-auxiliar pos-aleatoria posFi newLaberint1)
+         (lab2 
+           (divisio-recursiva-auxiliar pos-aleatoria posFi lab1)
          )
-         (newLaberint3 
+         (lab3 
            (divisio-recursiva-auxiliar 
              (list (elemX posInici) (elemY pos-aleatoria))
              (list (elemX pos-aleatoria) (elemY posFi))
-             newLaberint2
+             lab2
            )
          )
-       )
-
-       (divisio-recursiva-auxiliar 
+        (lab4 (divisio-recursiva-auxiliar 
          (list (elemX pos-aleatoria) (elemY posInici))
          (list (elemX posFi) (elemY pos-aleatoria))
-         newLaberint3
+         lab3
+       ))
        )
+       ; juntar els 4 sublaberints
+      ;  (combine-laberints lab1 lab2 lab3 lab4)
+       lab4
+
+       
      )
     )
   )
 )
+
+
+(defun combine-horizontal (labA labB)
+ 
+  (mapcar (lambda (rowA rowB)
+            (append rowA rowB))
+          labA labB))
+
+(defun combine-laberints (lab1 lab2 lab3 lab4)
+  
+  (let ((top-part (combine-horizontal lab1 lab2))
+        (bottom-part (combine-horizontal lab3 lab4)))
+    (append top-part bottom-part)))
+
+
+
 
 ;; =============================================================================
 ;; Funció: 'dibuixar-liniesV-Parets'
