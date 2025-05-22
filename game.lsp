@@ -1,0 +1,154 @@
+(load 'tco)
+
+; constants
+(setq paret #\#)
+(setq cami #\.)
+(setq entrada #\e)
+(setq sortida #\s)
+(setq newline #\NewLine)
+
+(setq key_per_maze 3)
+
+(setq mazepos '(64 320))
+
+(load 'fitxer-io)
+(load 'graphfx)
+(load 'user-input)
+(load 'prop-util)
+(load 'aux-game)
+(load 'draw_laberint)
+(setq dbg nil)
+
+
+;loop principal del joc
+(defun-tco game-loop(name &optional (maze 'maze) (player 'player) (steps 0) (repaint t) (extra 'extra))
+    (cond
+    ((null (get maze 'data))
+        ; en la primera cridada inicialitza els valors per defecte
+        (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) TILESIZE)) (y (* (cadr start-pos) (* -1 TILESIZE))))
+        (putprop maze (* (- SCREENPIXEL-M1) (floor x SCREENPIXEL-M1)) 'x)
+        (putprop maze (* SCREENPIXEL-M1 (floor y (- SCREENPIXEL-M1))) 'y)
+        (putprop maze maze-data 'data)
+        (putprop maze (find-in-maze (get maze 'data) sortida) 'sortida)
+        ;player
+        (putprop player x 'x)
+        (putprop player y 'y)
+        (putprop player 4 'speed) ; que sigui par
+        (putprop player (floor x TILESIZE) 'tilex)
+        (putprop player (floor (- y) TILESIZE) 'tiley)
+        ;extra
+        (putprop extra (gen-keys maze-data) 'keys)
+
+        (game-loop name maze player 0 t extra)
+        )
+    )
+    (t 
+    ; obte les posicions de dibuixat del jugador
+    (let (  (pdrawx (+ (getx player) (car mazepos) (getx maze)))
+            (pdrawy (+ (gety player) (cadr mazepos) (gety maze))))
+    (cond
+    ((or (eq repaint t)) ;principalment al canviar de pantalla
+        (cls)
+        (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
+    )
+    )
+
+    ; dibuixa el jugador    
+    (draw-tile "luigi" pdrawx pdrawy)
+
+    ;dibuixa extres
+    ; claus
+    (draw-keys (get extra 'keys) maze)
+
+    ; DEBUG
+    (color 255 255 255 0 0 0)
+    (goto-xy 0 0)
+    (princ "              \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (princ "        \n")
+    (goto-xy 0 0)
+    (print (symbol-plist player))
+    (print (symbol-plist extra))
+    (print pdrawx)
+    (print pdrawy)
+    (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
+    (print (get maze 'sortida))
+    (print (getx maze))
+    (print (gety maze))
+    (print steps)
+    ; DEBUG
+
+    ; llegeix entrada i calcula nova posició, comproba colisions
+    (let* ((input (user-input)) (px (getx player)) (py (gety player)))
+        (cond
+        ; sortir del joc
+        ((eq input 'esq)
+            steps 
+        )
+        ((check-win maze player)
+            (princ "HAS GUANYAT!!!!!!!!!!!\n") ; missatge provisional
+            steps
+        )
+        (t
+
+        ;borra tile del jugador
+        (cls-player px py maze)
+
+        ; calcula nova posició del laberint, depenent de a quina direcció es vol anar i la posició del jugador respecte la pantala
+        ; fa scroll o no
+        (let* (
+            (newpcoords (new-player-pos player maze input))
+             (newpx (car newpcoords)) (newpy (cadr newpcoords))
+            
+            (newmazecoords (new-maze-pos newpx newpy maze input))
+              (newmx (car newmazecoords))
+              (newmy (cadr newmazecoords))
+              (do-repaint (caddr newmazecoords))
+            (newtileplayer (update-steps player))
+              (newtilex (car newtileplayer))
+              (newtiley (cadr newtileplayer))
+              (addsteps (caddr newtileplayer))
+            )
+            ; nou estat de la partida
+            (game-loop name 
+                (update-prop (update-prop maze 'x newmx) 'y newmy)
+                (update-prop (update-prop (update-prop (update-prop player 'x newpx) 'y newpy) 'tilex newtilex) 'tiley newtiley)
+                (+ steps addsteps)
+                do-repaint 
+                extra
+            )
+        )
+        )
+        )
+    )
+    )
+    )
+    )
+)
+
+
+(cls)
+;si peta algo descomentar
+;(trace game-loop)
+;(trace update-prop)
+;(trace find-in-maze)
+;(trace paint-maze)
+;(trace tile-to-draw)
+;(trace draw-keys)
+;(trace draw-tile)
+
+;(print (game-loop "test.txt"))
+(setq *random-state* (make-random-state t))
+(color 255 255 255 0 0 0)
+(print (game-loop "laberints_exemple/10x10_massapetit_1.txt"))
+(color 0 0 0 255 255 255)
+;(draw-maze "test.txt" 1 1 )
+;(terpri)
+;(draw-tile "rickroll" 250 250)
