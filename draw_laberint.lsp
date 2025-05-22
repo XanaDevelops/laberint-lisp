@@ -309,7 +309,7 @@
 (defun tile-to-draw(xt yt maze)
     (list 
         (+ (* xt TILESIZE) (car mazepos) (getx maze))
-        (+ (* (- yt) TILESIZE) (car mazepos) (gety maze))
+        (+ (* (- yt) TILESIZE) (cadr mazepos) (gety maze))
     )
 )
 
@@ -359,7 +359,7 @@
 ;retorna (newTileX, newTileY 0/1)
 (defun update-steps (player)
     (let* ((px (getx player)) (py (gety player))
-            (xtile (floor px TILESIZE)) (ytile (floor (- py) TILESIZE))
+            (xtile (round px TILESIZE)) (ytile (round (- py) TILESIZE))
             (oxtile (get player 'tilex)) (oytile (get player 'tiley))
           )
         (list xtile ytile (cond ((and (eq xtile oxtile) (eq ytile oytile)) 0) (t 1)))
