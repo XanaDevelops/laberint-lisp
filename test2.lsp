@@ -13,12 +13,12 @@
     
 )
 (defun main()
-(system "pythonw music.py --kill")
+;(system "pythonw music.py --kill")
 (princ "kill\n")
-(system "pythonw music.py --start")
+(system "python music.py --start")
 (princ "start\n")
-(system "pythonw music.py --play 1 true")
+(system "python music.py --play 1 true")
 (hola)
-(system "pythonw music.py --kill")
+(system "python music.py --kill")
 
 )

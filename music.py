@@ -26,6 +26,11 @@ def hide_console():
     if hwnd:
         ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
+
+def detach_console():
+    """Desvincula el proceso de cualquier consola inmediatamente al iniciar."""
+    ctypes.windll.kernel32.FreeConsole()
+
 # Dictionary mapping track IDs to WAV file paths
 TRACKS = {
     1: r'music\\rickroll hq.wav',
@@ -40,7 +45,8 @@ PORT = 666
 
 def start_server(host=HOST, port=PORT):
     """Inicia el servidor silencioso de control de música."""
-    hide_console()
+    #hide_console()
+    detach_console()
     stop_event = threading.Event()
 
     def handle_client(conn):
