@@ -1,8 +1,10 @@
 ;retorna t si ha guanyat, nil si no
-(defun check-win (maze player)
-    (let* ((xpos (getx player)) (ypos (* -1 (gety player))) (xsor (* (car (get maze 'sortida)) TILESIZE)) (ysor (* (cadr (get maze 'sortida)) TILESIZE)))
+(defun check-win (maze player extra)
+    (let* ((xpos (getx player)) (ypos (* -1 (gety player))) (xsor (* (car (get maze 'sortida)) TILESIZE)) (ysor (* (cadr (get maze 'sortida)) TILESIZE))
+            (nkeys (length (get extra 'keys)))
+            )
         (cond
-            ((< (+ (abs (- xpos xsor)) (abs (- ypos ysor)) ) (/ TILESIZE 2))
+            ((and (< (+ (abs (- xpos xsor)) (abs (- ypos ysor)) ) (/ TILESIZE 2)) (eq nkeys 0))
                 t
             )
             (t 
@@ -80,6 +82,30 @@
 )
 
 ; ------ UPDATES ----------
+
+;Actualitza les claus
+; retorna 'extra acutalitzat
+(defun update-keys(player extra &optional (remain-keys (get extra 'keys)) (aux-keys '()))
+    (cond 
+        ((null remain-keys)
+            (update-prop extra 'keys aux-keys)
+        )
+        (t
+            (let* ((key (car remain-keys)) (kx (car key)) (ky (cadr key))
+                    (pt (coord-to-tile (getx player) (gety player) nil)) (px (car pt)) (py (cadr pt))
+                )
+                (cond 
+                    ((and (eq px kx) (eq py ky))
+                        (update-keys player extra (cdr remain-keys) aux-keys)
+                    )
+                    (t 
+                        (update-keys player extra (cdr remain-keys) (cons key aux-keys))
+                    )
+                )
+            )
+        )
+    )
+)
 
 ;Calcula si s'ha d'augmentar els steps
 ;retorna (newTileX, newTileY 0/1)

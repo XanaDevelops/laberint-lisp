@@ -53,6 +53,20 @@
     )
     )
 
+    ;dibuixa la sortida tancada, si escau
+    (cond 
+    ((> (length (get extra 'keys)) 0)
+        (let* ((sx (car (get maze 'sortida))) (sy (cadr (get maze 'sortida)))
+                (sd (tile-to-draw sx sy maze)) (sdx (car sd)) (sdy (cadr sd))
+            )
+            (draw-tile "salida_cerrada" sdx sdy)
+        )
+    )
+    (t 
+        t
+    )
+    )
+
     ; dibuixa el jugador    
     (draw-tile "luigi" pdrawx pdrawy)
 
@@ -63,8 +77,8 @@
     ; DEBUG
     (color 255 255 255 0 0 0)
     (goto-xy 0 0)
-    (princ "              \n")
-    (princ "        \n")
+    (princ "                    \n")
+    (princ "                    \n")
     (princ "        \n")
     (princ "        \n")
     (princ "        \n")
@@ -92,7 +106,7 @@
         ((eq input 'esq)
             steps 
         )
-        ((check-win maze player)
+        ((check-win maze player extra)
             (princ "HAS GUANYAT!!!!!!!!!!!\n") ; missatge provisional
             steps
         )
@@ -122,7 +136,7 @@
                 (update-prop (update-prop (update-prop (update-prop player 'x newpx) 'y newpy) 'tilex newtilex) 'tiley newtiley)
                 (+ steps addsteps)
                 do-repaint 
-                extra
+                (update-keys player extra)
             )
         )
         )
