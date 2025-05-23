@@ -18,11 +18,12 @@
 (load 'aux-game)
 (load 'draw_laberint)
 (load 'draw_border)
+(load 'draw_minimap)
 (setq dbg nil)
 
 
 ;loop principal del joc
-(defun-tco game-loop(name &optional (maze 'maze) (player 'player) (steps 0) (repaint t) (extra 'extra))
+(defun-tco game-loop(name &optional (maze (gensym "maze-")) (player (gensym "player-")) (steps 0) (repaint t) (extra (gensym "extra-")))
     (cond
     ((null (get maze 'data))
         ; en la primera cridada inicialitza els valors per defecte
