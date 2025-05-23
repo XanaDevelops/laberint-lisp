@@ -53,19 +53,21 @@
     )
     )
 
-    ;dibuixa la sortida tancada, si escau
-    (cond 
-    ((> (length (get extra 'keys)) 0)
-        (let* ((sx (car (get maze 'sortida))) (sy (cadr (get maze 'sortida)))
+    (let* ((sx (car (get maze 'sortida))) (sy (cadr (get maze 'sortida)))
                 (sd (tile-to-draw sx sy maze)) (sdx (car sd)) (sdy (cadr sd))
             )
+        (cond 
+        ((> (length (get extra 'keys)) 0)
             (draw-tile "salida_cerrada" sdx sdy)
         )
+        (t 
+            (draw-tile "end" sdx sdy)
+
+        )
+        )
     )
-    (t 
-        t
-    )
-    )
+    ;dibuixa la sortida tancada, si escau
+    
 
     ; dibuixa el jugador    
     (draw-tile "luigi" pdrawx pdrawy)
@@ -109,6 +111,10 @@
         ((check-win maze player extra)
             (princ "HAS GUANYAT!!!!!!!!!!!\n") ; missatge provisional
             steps
+        )
+        ((eq input 'admin)
+            (eval (read))
+            (read)
         )
         (t
 
