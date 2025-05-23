@@ -1,5 +1,3 @@
-; https://github.com/antoni-oliver/defun-tco
-
 ; Defineix la macro `defun-tco`, que transforma una funció recursiva
 ; en forma "tail-call" en una versió iterativa.
 ; Inspirat en https://github.com/Wilfred/tco.el
