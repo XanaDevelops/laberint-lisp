@@ -54,7 +54,8 @@
         (cls)
         (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
         (draw-border (- (car mazepos) 8) (+ (cadr mazepos) 8) (1+ TILE_W) (1+ TILE_H))
-
+        (paint-minimap (get maze 'data) 400 (- (cadr mazepos) 4))
+        (draw-border 388 (+ (cadr mazepos) 8) 13 13)
     )
     )
 
@@ -169,7 +170,7 @@
 ;(trace draw-border)
 ;(print (game-loop "test.txt"))
 (setq *random-state* (make-random-state t)) ;revisar seeds
-(print (game-loop "laberints_exemple/25x25_1.txt"))
+(print (game-loop "laberints_exemple/25x25_2.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
