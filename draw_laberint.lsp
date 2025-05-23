@@ -44,16 +44,16 @@
         ; pinta el tile corresponent
         (let ((elem (car row)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
             (cond
-                ((eq elem paret)
+                ((eq elem Cparet)
                     (paint-paret xtile ytile)
                 )
-                ((eq elem cami)
+                ((eq elem Ccami)
                     (paint-cami xtile ytile)
                 )
-                ((eq elem entrada)
+                ((eq elem Centrada)
                     (draw-tile "start" xtile ytile)
                 )
-                ((eq elem sortida)
+                ((eq elem Csortida)
                     (draw-tile "end" xtile ytile)
                 )
                 ((eq elem newline)
@@ -84,16 +84,16 @@
 ; TODO: canviar a recorrer rec un array
 (defun get-strname (tile)
     (cond
-        ((eq tile entrada)
+        ((eq tile Centrada)
             "start"
         )
-        ((eq tile sortida)
+        ((eq tile Csortida)
             "end"
         )
-        ((eq tile paret)
+        ((eq tile Cparet)
             "wall"
         )
-        ((eq tile cami)
+        ((eq tile Ccami)
             "path2"
         )
         (t

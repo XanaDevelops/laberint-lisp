@@ -1,3 +1,5 @@
+(setq dbg nil)
+
 (setq paret 'paret)
 (setq entrada 'entrada)
 (setq cami 'cami)
@@ -21,7 +23,26 @@
 (setq Ccami #\.)
 (setq Centrada #\e)
 (setq Csortida #\s)
+(setq newline #\NewLine)
+
 (setq laberintOutputFile "laberintGenerat.txt")
 (setq estadistiquesFile "estadistiques.txt")
 (setq ID 0)
-; (setq salt newline)
+
+(setq key_per_maze 3)
+
+(setq mazepos '(64 332))
+
+(setq TILESIZE 16)
+(setq TILE_W 16)
+(setq TILE_H 16)
+(setq SCREENPIXEL-M1 (* TILESIZE (1- TILESIZE)))
+(setq SCREEN_W (+ (car mazepos) (* TILESIZE TILE_W)))
+(setq SCREEN_H (+ (cadr mazepos) (* TILESIZE (- -1 TILE_H))))
+
+(setq MM_TILESIZE 4)
+
+(setq mm-paret 0)
+(setq mm-cami 1)
+(setq mm-recorregut 2)
+(setq mm-player 3)

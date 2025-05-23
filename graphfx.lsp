@@ -1,9 +1,4 @@
-(setq TILESIZE 16)
-(setq TILE_W 16)
-(setq TILE_H 16)
-(setq SCREENPIXEL-M1 (* TILESIZE (1- TILESIZE)))
-(setq SCREEN_W (+ (car mazepos) (* TILESIZE TILE_W)))
-(setq SCREEN_H (+ (cadr mazepos) (* TILESIZE (- -1 TILE_H)))) ;???
+(load 'CONST)
 
 (defun draw-tile (tilename x y)
     (cond

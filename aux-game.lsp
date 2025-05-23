@@ -1,6 +1,9 @@
+(load 'CONST)
+(load 'prop-util)
+
 ;retorna t si ha guanyat, nil si no
 (defun check-win (maze player extra)
-    (let* ((xpos (getx player)) (ypos (* -1 (gety player))) (xsor (* (car (get maze 'sortida)) TILESIZE)) (ysor (* (cadr (get maze 'sortida)) TILESIZE))
+    (let* ((xpos (getx player)) (ypos (* -1 (gety player))) (xsor (* (car (get maze 'pos-sortida)) TILESIZE)) (ysor (* (cadr (get maze 'pos-sortida)) TILESIZE))
             (nkeys (length (get extra 'keys)))
             )
         (cond
@@ -64,7 +67,7 @@
             (tile (get-in-maze maze x y))
         )
         (cond 
-            ((eq tile cami)
+            ((eq tile Ccami)
                 (cond 
                     ((< n key_per_maze)
                         (gen-keys maze (1+ n) (cons (list x y) keys))
@@ -121,13 +124,13 @@
 
 (defun can-move-h (maze x y)
     (let ((xtile (floor x TILESIZE)) (ytile (floor (- y) TILESIZE)) (ytile2 (floor (+ (- y) (1- TILESIZE)) TILESIZE)))
-        (not (or (eq (get-in-maze maze xtile ytile) paret) (eq (get-in-maze maze xtile ytile2) paret)))
+        (not (or (eq (get-in-maze maze xtile ytile) Cparet) (eq (get-in-maze maze xtile ytile2) paret)))
     )
 )
 
 (defun can-move-v (maze x y)
     (let ((xtile (floor x TILESIZE)) (xtile2 (floor (+ x (1- TILESIZE)) TILESIZE)) (ytile (floor (- y) TILESIZE)))
-        (not (or (eq (get-in-maze maze xtile ytile) paret) (eq (get-in-maze maze xtile2 ytile) paret)))
+        (not (or (eq (get-in-maze maze xtile ytile) Cparet) (eq (get-in-maze maze xtile2 ytile) Cparet)))
     )
 )
 

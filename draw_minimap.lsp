@@ -1,9 +1,4 @@
-(setq MM_TILESIZE 4)
-
-(setq mm-paret 0)
-(setq mm-cami 1)
-(setq mm-recorregut 2)
-(setq mm-player 3)
+(load 'CONST)
 
 (defun draw-minimap(x y maze player extra)
 
@@ -28,10 +23,10 @@
         ; pinta el tile corresponent
         (let ((elem (car row)) (xtile (+ (* w MM_TILESIZE) x)) (ytile (+ (* h MM_TILESIZE) y)))
             (cond
-                ((eq elem paret)
+                ((eq elem Cparet)
                     (draw-mm-paret xtile ytile)
                 )
-                ((eq elem cami)
+                ((eq elem Ccami)
                     (draw-mm-cami xtile ytile)
                 )
                 

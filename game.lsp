@@ -1,16 +1,5 @@
+(load 'CONST)
 (load 'tco)
-
-; constants
-(setq paret #\#)
-(setq cami #\.)
-(setq entrada #\e)
-(setq sortida #\s)
-(setq newline #\NewLine)
-
-(setq key_per_maze 3)
-
-(setq mazepos '(64 332))
-
 (load 'fitxer-io)
 (load 'graphfx)
 (load 'user-input)
@@ -19,7 +8,6 @@
 (load 'draw_laberint)
 (load 'draw_border)
 (load 'draw_minimap)
-(setq dbg nil)
 
 
 ;loop principal del joc
@@ -27,11 +15,11 @@
     (cond
     ((null (get maze 'data))
         ; en la primera cridada inicialitza els valors per defecte
-        (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data entrada)) (x (* (car start-pos) TILESIZE)) (y (* (cadr start-pos) (* -1 TILESIZE))))
+        (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data Centrada)) (x (* (car start-pos) TILESIZE)) (y (* (cadr start-pos) (* -1 TILESIZE))))
         (putprop maze (* (- SCREENPIXEL-M1) (floor x SCREENPIXEL-M1)) 'x)
         (putprop maze (* SCREENPIXEL-M1 (floor y (- SCREENPIXEL-M1))) 'y)
         (putprop maze maze-data 'data)
-        (putprop maze (find-in-maze (get maze 'data) sortida) 'sortida)
+        (putprop maze (find-in-maze (get maze 'data) Csortida) 'pos-sortida)
         ;player
         (putprop player x 'x)
         (putprop player y 'y)
@@ -60,7 +48,7 @@
     )
 
     ;dibuixa la sortida tancada, si escau
-    (let* ((sx (car (get maze 'sortida))) (sy (cadr (get maze 'sortida)))
+    (let* ((sx (car (get maze 'pos-sortida))) (sy (cadr (get maze 'pos-sortida)))
                 (sd (tile-to-draw sx sy maze)) (sdx (car sd)) (sdy (cadr sd))
             )
         (cond 
@@ -99,7 +87,7 @@
     (print pdrawx)
     (print pdrawy)
     (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
-    (print (get maze 'sortida))
+    (print (get maze 'pos-sortida))
     (print (getx maze))
     (print (gety maze))
     (print steps)
