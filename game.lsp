@@ -49,6 +49,7 @@
             (pdrawy (+ (gety player) (cadr mazepos) (gety maze))))
     (cond
     ((or (eq repaint t)) ;principalment al canviar de pantalla
+        (color 255 255 255 0 0 0)
         (cls)
         (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
         (draw-border (- (car mazepos) 8) (+ (cadr mazepos) 8) (1+ TILE_W) (1+ TILE_H))
@@ -167,7 +168,6 @@
 ;(trace draw-border)
 ;(print (game-loop "test.txt"))
 (setq *random-state* (make-random-state t)) ;revisar seeds
-(color 255 255 255 0 0 0)
 (print (game-loop "laberints_exemple/25x25_1.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
