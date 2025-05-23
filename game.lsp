@@ -9,7 +9,7 @@
 
 (setq key_per_maze 3)
 
-(setq mazepos '(64 320))
+(setq mazepos '(64 332))
 
 (load 'fitxer-io)
 (load 'graphfx)
@@ -51,7 +51,7 @@
     ((or (eq repaint t)) ;principalment al canviar de pantalla
         (cls)
         (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
-        (draw-border (- (car mazepos) 8) (+ (cadr mazepos) 8) TILE_W TILE_H)
+        (draw-border (- (car mazepos) 8) (+ (cadr mazepos) 8) (1+ TILE_W) (1+ TILE_H))
 
     )
     )
@@ -166,7 +166,7 @@
 ;(trace draw-tile)
 ;(trace draw-border)
 ;(print (game-loop "test.txt"))
-(setq *random-state* (make-random-state t))
+(setq *random-state* (make-random-state t)) ;revisar seeds
 (color 255 255 255 0 0 0)
 (print (game-loop "laberints_exemple/25x25_1.txt"))
 (color 0 0 0 255 255 255)
