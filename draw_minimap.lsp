@@ -1,11 +1,22 @@
 (load 'CONST)
 
 (defun draw-minimap(x y maze player extra)
-
+    
 )
 
-(defun-tco gen-minimap (maze &optional (row (car maze)))
-
+;genera doble array de mm-paret analog a maze
+(defun-tco gen-minimap (maze &optional (row (car maze)) (mmap (gensym "mmaze-")) (mrow (gensym "mrow-")) )
+    (cond 
+        ((and (null maze) (null row))
+            (cons mrow mmap)
+        )
+        ((null row)
+            (gen-minimap (cdr maze) (car maze) (cons mrow mmap))
+        )
+        (t 
+            (gen-minimap maze (cdr row) mmap (cons mm-paret mrow)) 
+        )
+    )
 )
 
 ; pinta el laberint a (x,y) SC

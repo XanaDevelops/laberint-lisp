@@ -28,6 +28,7 @@
         (putprop player (floor (- y) TILESIZE) 'tiley)
         ;extra
         (putprop extra (gen-keys maze-data) 'keys)
+        (putprop extra (gen-minimap (get maze 'data)) 'minimap)
 
         (game-loop name maze player 0 t extra)
         )
@@ -83,7 +84,7 @@
     (princ "      \n")
     (goto-xy 0 0)
     (print (symbol-plist player))
-    (print (symbol-plist extra))
+    (print (get extra 'keys))
     (print pdrawx)
     (print pdrawy)
     (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
