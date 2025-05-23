@@ -17,6 +17,7 @@
 (load 'prop-util)
 (load 'aux-game)
 (load 'draw_laberint)
+(load 'draw_border)
 (setq dbg nil)
 
 
@@ -50,9 +51,12 @@
     ((or (eq repaint t)) ;principalment al canviar de pantalla
         (cls)
         (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
+        (draw-border (- (car mazepos) 8) (+ (cadr mazepos) 8) TILE_W TILE_H)
+
     )
     )
 
+    ;dibuixa la sortida tancada, si escau
     (let* ((sx (car (get maze 'sortida))) (sy (cadr (get maze 'sortida)))
                 (sd (tile-to-draw sx sy maze)) (sdx (car sd)) (sdy (cadr sd))
             )
@@ -62,13 +66,10 @@
         )
         (t 
             (draw-tile "end" sdx sdy)
-
         )
         )
     )
-    ;dibuixa la sortida tancada, si escau
     
-
     ; dibuixa el jugador    
     (draw-tile "luigi" pdrawx pdrawy)
 
@@ -81,14 +82,14 @@
     (goto-xy 0 0)
     (princ "                    \n")
     (princ "                    \n")
-    (princ "        \n")
-    (princ "        \n")
-    (princ "        \n")
-    (princ "        \n")
-    (princ "        \n")
-    (princ "        \n")
-    (princ "        \n")
-    (princ "        \n")
+    (princ "      \n")
+    (princ "      \n")
+    (princ "      \n")
+    (princ "      \n")
+    (princ "      \n")
+    (princ "      \n")
+    (princ "      \n")
+    (princ "      \n")
     (goto-xy 0 0)
     (print (symbol-plist player))
     (print (symbol-plist extra))
@@ -163,11 +164,11 @@
 ;(trace tile-to-draw)
 ;(trace draw-keys)
 ;(trace draw-tile)
-
+;(trace draw-border)
 ;(print (game-loop "test.txt"))
 (setq *random-state* (make-random-state t))
 (color 255 255 255 0 0 0)
-(print (game-loop "laberints_exemple/10x10_massapetit_1.txt"))
+(print (game-loop "laberints_exemple/25x25_1.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
