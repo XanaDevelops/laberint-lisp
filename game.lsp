@@ -44,13 +44,13 @@
         (cls)
         (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
         (draw-border (- (car mazepos) 8) (+ (cadr mazepos) 8) (1+ TILE_W) (1+ TILE_H))
-        
+        ;minimapa
+        (paint-minimap (get extra 'minimap) (car mmappos) (cadr mmappos))
+        (draw-border (- (car mmappos) 12) (+ (cadr mmappos) 12) 13 13)    
     )
     )
 
-    ;minimapa
-        (paint-minimap (get extra 'minimap) 400 (- (cadr mazepos) 4))
-        (draw-border 388 (+ (cadr mazepos) 8) 13 13)    
+
         
     ;dibuixa la sortida tancada, si escau
     (let* ((sx (car (get maze 'pos-sortida))) (sy (cadr (get maze 'pos-sortida)))

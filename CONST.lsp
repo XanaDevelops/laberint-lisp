@@ -32,6 +32,7 @@
 (setq key_per_maze 3)
 
 (setq mazepos '(64 332))
+(setq mmappos (list 400 (- (cadr mazepos) 4)))
 
 (setq TILESIZE 16)
 (setq TILE_W 16)

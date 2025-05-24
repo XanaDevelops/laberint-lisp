@@ -2,8 +2,8 @@
 
 
 
-(defun draw-minimap(x y maze player extra)
-    
+(defun draw-mm-player(player extra)
+
 )
 
 ;actualitza el FoW del minimapa
@@ -20,14 +20,20 @@
 
     )
     (t 
-        (let* ((tile (get-in-maze maze px py)))
+        (let* ((tile (get-in-maze maze px py)) (mtile (get-in-maze mmaze px py)))
         (cond 
             ((eq tile Cparet)
                 mmaze
             )
             (t 
+                (cond 
+                ((eq mtile mm-paret)
+                    (draw-mm-cami (+ (car mmappos) (* px MM_TILESIZE)) (+ (cadr mmappos) (* (- py) MM_TILESIZE)))
+                )
+                (t t)
+                )
                 (update-minimap maze (+ px (car dir)) (+ py (cadr dir))
-                (establir-I-valor py mmaze (establir-I-valor px (obtenir-element-I py mmaze) mm-cami)) dir)
+                    (establir-I-valor py mmaze (establir-I-valor px (obtenir-element-I py mmaze) mm-cami)) dir)
             )
         )
         )
