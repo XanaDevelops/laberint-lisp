@@ -41,7 +41,7 @@
 (setq SCREEN_W (+ (car mazepos) (* TILESIZE TILE_W)))
 (setq SCREEN_H (+ (cadr mazepos) (* TILESIZE (- -1 TILE_H))))
 
-(setq MM_TILESIZE 2)
+(setq MM_TILESIZE 3)
 
 (setq mm-paret 0)
 (setq mm-cami 1)
