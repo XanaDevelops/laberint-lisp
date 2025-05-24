@@ -99,6 +99,7 @@
                 )
                 (cond 
                     ((and (eq px kx) (eq py ky))
+                        (play-song sfx-key)
                         (update-keys player extra (cdr remain-keys) aux-keys)
                     )
                     (t 

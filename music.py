@@ -6,9 +6,12 @@ from typing import Dict, Tuple
 
 # Diccionario de canciones (índice -> ruta al archivo WAV)
 songs: Dict[int, str] = {
-    666: r'music\\rickroll hq.wav',
-    1: r"music\\fireboy and watergirl.wav",
-    3: r"C:\Music\song3.wav",
+    1: "music\\fireboy and watergirl.wav",
+    2: "music\\waterfall.wav",
+    3: "music\\win.wav",
+    4: "music\\key.wav",
+    5: "music\\menu.wav"
+
 }
 
 # Configuración de socket

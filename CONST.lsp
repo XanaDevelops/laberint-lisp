@@ -49,5 +49,8 @@
 (setq mm-player 3)
 
 (setq snd-fw 1)
-(setq snd-a 2)
-(setq rickroll 666)
+(setq snd-water 2)
+(setq snd-win 3)
+(setq snd-menu 5)
+(setq sfx-key 4)
+
