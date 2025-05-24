@@ -49,5 +49,5 @@
 (setq mm-player 3)
 
 (setq snd-fw 1)
-(setq snd )
+(setq snd-a 2)
 (setq rickroll 666)
