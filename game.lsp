@@ -122,7 +122,7 @@
         )
         ((eq input 'admin)
             (eval (read))
-            (read)
+            (game-loop name maze player steps nil extra)
         )
         (t
 
