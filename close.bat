@@ -1,0 +1,1 @@
+@taskkill /F /IM xlwin32.exe

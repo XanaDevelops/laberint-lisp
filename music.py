@@ -1,115 +1,168 @@
-#!/usr/bin/env python3
-"""
-Script for silent music control server over a local socket on Windows.
-
-Usage:
-  music_control.py --start    # Inicia de forma silenciosa sin ventana
-  music_control.py --play <track_id> <loop>
-  music_control.py --stop
-  music_control.py --kill
-"""
 import argparse
 import socket
 import threading
-import sys
-import winsound
-import os
-import ctypes
+import subprocess
+from typing import Dict, Tuple
 
-# Constants para ocultar ventana de consola
-SW_HIDE = 0
-SW_SHOW = 5
-
-def hide_console():
-    """Oculta la ventana de la consola en Windows."""
-    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-    if hwnd:
-        ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
-
-
-def detach_console():
-    """Desvincula el proceso de cualquier consola inmediatamente al iniciar."""
-    ctypes.windll.kernel32.FreeConsole()
-
-# Dictionary mapping track IDs to WAV file paths
-TRACKS = {
+# Diccionario de canciones (índice -> ruta al archivo WAV)
+songs: Dict[int, str] = {
     1: r'music\\rickroll hq.wav',
-    2: r'C:\Music\song2.wav',
-    3: r'C:\Music\song3.wav',
+    2: r"C:\Music\song2.wav",
+    3: r"C:\Music\song3.wav",
 }
 
+# Configuración de socket
+HOST: str = '127.0.0.1'
+PORT: int = 666
+BUFFER_SIZE: int = 1024
 
-HOST = '127.0.0.1'
-PORT = 666
+# Almacena procesos de reproducción activos (índice -> subprocess.Popen)
+players: set[subprocess.Popen] = set()
+
+# Variables globales de servidor
+server_socket: socket.socket
+server_thread: threading.Thread
+running: bool = False
 
 
-def start_server(host=HOST, port=PORT):
-    """Inicia el servidor silencioso de control de música."""
-    #hide_console()
-    detach_console()
-    stop_event = threading.Event()
-
-    def handle_client(conn):
-        data = conn.recv(1024).decode().strip()
-        conn.close()
-        if data == 'KILL':
-            stop_event.set()
-            return
-        parts = data.split(':')
-        try:
-            cmd = int(parts[0])
-        except ValueError:
-            return
-
-        if cmd == -1:
-            winsound.PlaySound(None, winsound.SND_PURGE)
-        elif cmd in TRACKS:
-            loop = len(parts) == 2 and parts[1].lower() in ('true', '1', 'yes')
-            flags = winsound.SND_FILENAME | winsound.SND_ASYNC
-            if loop:
-                flags |= winsound.SND_LOOP
-            winsound.PlaySound(TRACKS[cmd], flags)
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((host, port))
-        s.listen()
-        while not stop_event.is_set():
-            s.settimeout(1.0)
+def handle_client(client_sock: socket.socket, addr: Tuple[str, int]) -> None:
+    """Maneja los comandos recibidos de clientes."""
+    global running
+    with client_sock:
+        while running:
             try:
-                conn, _ = s.accept()
-            except socket.timeout:
-                continue
-            threading.Thread(target=handle_client, args=(conn,), daemon=True).start()
-        s.close()
-        winsound.PlaySound(None, winsound.SND_PURGE)
+                data = client_sock.recv(BUFFER_SIZE).decode('utf-8').strip().split()
+                if not data:
+                    break
+                cmd = data[0].upper()
+                if cmd == 'PLAY' and len(data) >= 2:
+                    idx = int(data[1])
+                    loop_flag = (len(data) >= 3 and data[2].lower() == 'loop')
+                    play_song(idx, loop_flag)
+                    client_sock.sendall(f"Playing {idx}{' with loop' if loop_flag else ''}\n".encode())
+                elif cmd == 'STOP':
+                    stop_all()
+                    client_sock.sendall(b"Stopped all songs\n")
+                elif cmd == 'KILL':
+                    kill_server()
+                    client_sock.sendall(b"Server killed\n")
+                    break
+                else:
+                    client_sock.sendall(b"Unknown command\n")
+            except Exception as e:
+                client_sock.sendall(f"Error: {e}\n".encode())
+                break
 
 
-def send_command(message, host=HOST, port=PORT):
-    """Envía un comando silencioso al servidor de música."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((host, port))
-        s.sendall(message.encode())
+def play_song(index: int, loop: bool = False) -> None:
+    """
+    Inicia la reproducción de la canción indicada por su índice.
+    Si loop es True, se reproduce en bucle.
+    """
+    if index not in songs:
+        raise ValueError(f"Índice {index} no encontrado en canciones.")
+    path = songs[index]
+    # Construir comando PowerShell
+    if loop:
+        ps_command = [
+            "powershell", "-Command",
+            f"while($true){{(New-Object Media.SoundPlayer '{path}').PlaySync()}}"
+        ]
+    else:
+        ps_command = [
+            "powershell", "-Command",
+            f"(New-Object Media.SoundPlayer '{path}').PlaySync()"
+        ]
+    proc = subprocess.Popen(ps_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    players.add(proc)
 
 
-def main():
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('--start', action='store_true')
-    parser.add_argument('--play', nargs=2, metavar=('TRACK_ID', 'LOOP'))
-    parser.add_argument('--stop', action='store_true')
-    parser.add_argument('--kill', action='store_true')
+def stop_all() -> None:
+    """Detiene todas las reproducciones en curso usando taskkill."""
+    for proc in list(players):
+        try:
+            subprocess.run([
+                "taskkill", "/PID", str(proc.pid), "/T", "/F"
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+    players.clear()
+
+
+def start_server() -> None:
+    """Inicia el servidor de sockets."""
+    global server_socket, server_thread, running
+    if running:
+        print("Server ya está en ejecución.")
+        return
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
+    running = True
+    print(f"Server escuchando en {HOST}:{PORT}")
+
+    def run() -> None:
+        while running:
+            try:
+                client, addr = server_socket.accept()
+                threading.Thread(target=handle_client, args=(client, addr), daemon=True).start()
+            except OSError:
+                break
+
+    server_thread = threading.Thread(target=run, daemon=True)
+    server_thread.start()
+
+
+def kill_server() -> None:
+    """Detiene el servidor y libera recursos."""
+    global running
+    running = False
+    try:
+        server_socket.close()
+    except Exception:
+        pass
+    stop_all()
+    print("Server detenido.")
+
+
+def send_command(command: str) -> None:
+    """Envía un comando al servidor y muestra la respuesta."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect((HOST, PORT))
+        sock.sendall(command.encode('utf-8'))
+        response = sock.recv(BUFFER_SIZE).decode('utf-8')
+        print(response.strip())
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description='Cliente/Servidor de canciones vía sockets')
+    parser.add_argument(
+        'mode', choices=['server', 'play', 'stop', 'kill'],
+        help="'server' para iniciar, 'play', 'stop' o 'kill' para cliente"
+    )
+    parser.add_argument('-i', '--index', type=int, help='Índice de la canción para play')
+    parser.add_argument('-l', '--loop', action='store_true', help='Loop para play')
     args = parser.parse_args()
 
-    if args.start:
+    if args.mode == 'server':
         start_server()
-    elif args.play:
-        track_id, loop_flag = args.play
-        send_command(f"{int(track_id)}:{loop_flag}")
-    elif args.stop:
-        send_command(str(-1))
-    elif args.kill:
-        send_command('KILL')
+        try:
+            while running:
+                threading.Event().wait(1)
+        except KeyboardInterrupt:
+            kill_server()
     else:
-        parser.print_help()
+        if args.mode == 'play':
+            if args.index is None:
+                print("Error: --index es requerido para play.")
+            else:
+                cmd = f"PLAY {args.index}{' loop' if args.loop else ''}"
+                send_command(cmd)
+        elif args.mode == 'stop':
+            send_command("STOP")
+        elif args.mode == 'kill':
+            send_command("KILL")
+
 
 if __name__ == '__main__':
     main()
