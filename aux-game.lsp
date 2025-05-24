@@ -17,6 +17,31 @@
     )
 )
 
+(defun you-win(name steps)
+    (goto-xy 25 8)
+    (princ "                           \n")
+    (goto-xy 25 9)
+    (princ "                           \n")
+    (goto-xy 25 10)
+    (princ "                           \n")
+    (goto-xy 25 11)
+    (princ "                           \n")
+    (goto-xy 25 12)
+    (princ "                           \n")
+    (goto-xy 25 13)
+    (princ "                           \n")
+    (goto-xy 26 9)
+    (princ "           HAS GUANYAT\n")
+    (goto-xy 26 11)
+    (format t "~S ha fet passes: ~S\n" name steps)
+    (goto-xy 26 12)
+    (princ "premi qualsevol tecla per sortir")
+    (draw-border 192 258 17 5)
+    (stop-all)
+    (play-song snd-win)
+    (get-key)
+)
+
 ; -- MAZE --
 
 ; cerca la primera occurencia de casella sobre maze[][]

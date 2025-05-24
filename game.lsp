@@ -17,6 +17,8 @@
 (defun-tco game-loop(name &optional (maze (gensym "maze-")) (player (gensym "player-")) (steps 0) (repaint t) (extra (gensym "extra-")))
     (cond
     ((null (get maze 'data))
+        (color 255 255 255 0 0 0)
+        (cls)
         ; en la primera cridada inicialitza els valors per defecte
         (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data Centrada)) (x (* (car start-pos) TILESIZE)) (y (* (cadr start-pos) (* -1 TILESIZE))))
         (putprop maze (* (- SCREENPIXEL-M1) (floor x SCREENPIXEL-M1)) 'x)
@@ -24,6 +26,11 @@
         (putprop maze maze-data 'data)
         (putprop maze (find-in-maze (get maze 'data) Csortida) 'pos-sortida)
         ;player
+        (goto-xy 27 5)
+        (princ "Introdueix el teu nom:\n")
+        (goto-xy 24 6)
+        (draw-border 180 310 15 3)
+        (putprop player (read) 'pname)
         (putprop player x 'x)
         (putprop player y 'y)
         (putprop player 4 'speed) ; que sigui par
@@ -118,9 +125,7 @@
             steps 
         )
         ((check-win maze player extra)
-            (princ "HAS GUANYAT!!!!!!!!!!!\n") ; missatge provisional
-            (stop-all)
-            (play-song snd-win)
+            (you-win (get player 'pname) steps)
             steps
         )
         ((eq input 'admin)

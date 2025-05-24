@@ -29,7 +29,7 @@
 (setq estadistiquesFile "estadistiques.txt")
 (setq ID 0)
 
-(setq key_per_maze 3)
+(setq key_per_maze 0)
 
 (setq mazepos '(64 348))
 (setq mmappos (list 400 (- (cadr mazepos) 4)))
@@ -54,3 +54,4 @@
 (setq snd-menu 5)
 (setq sfx-key 4)
 
+(setq do-music t)

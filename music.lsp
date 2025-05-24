@@ -19,4 +19,6 @@
 )
 
 ;(kill-server)
-(start-server)
+(cond 
+    (do-music (start-server))
+)
