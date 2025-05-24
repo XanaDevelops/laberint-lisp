@@ -8,6 +8,7 @@
 (load 'draw_laberint)
 (load 'draw_border)
 (load 'draw_minimap)
+(load 'libs\\listLib)
 
 
 ;loop principal del joc
@@ -28,7 +29,7 @@
         (putprop player (floor (- y) TILESIZE) 'tiley)
         ;extra
         (putprop extra (gen-keys maze-data) 'keys)
-        (putprop extra (gen-minimap (get maze 'data)) 'minimap)
+        (putprop extra (update-minimap maze-data (get player 'tilex) (get player 'tiley) (gen-minimap (get maze 'data))) 'minimap)
 
         (game-loop name maze player 0 t extra)
         )
@@ -43,11 +44,14 @@
         (cls)
         (paint-maze (get maze 'data) (+ (car mazepos) (getx maze)) (+ (cadr mazepos) (gety maze)))
         (draw-border (- (car mazepos) 8) (+ (cadr mazepos) 8) (1+ TILE_W) (1+ TILE_H))
-        (paint-minimap (get maze 'data) 400 (- (cadr mazepos) 4))
-        (draw-border 388 (+ (cadr mazepos) 8) 13 13)
+        
     )
     )
 
+    ;minimapa
+        (paint-minimap (get extra 'minimap) 400 (- (cadr mazepos) 4))
+        (draw-border 388 (+ (cadr mazepos) 8) 13 13)    
+        
     ;dibuixa la sortida tancada, si escau
     (let* ((sx (car (get maze 'pos-sortida))) (sy (cadr (get maze 'pos-sortida)))
                 (sd (tile-to-draw sx sy maze)) (sdx (car sd)) (sdy (cadr sd))
@@ -135,7 +139,7 @@
                 (update-prop (update-prop (update-prop (update-prop player 'x newpx) 'y newpy) 'tilex newtilex) 'tiley newtiley)
                 (+ steps addsteps)
                 do-repaint 
-                (update-keys player extra)
+                (update-prop (update-keys player extra) 'minimap (update-minimap (get maze 'data) newtilex newtiley (get extra 'minimap)))
             )
         )
         )
@@ -160,6 +164,7 @@
 ;(print (game-loop "test.txt"))
 (setq *random-state* (make-random-state t)) ;revisar seeds
 (print (game-loop "laberints_exemple/25x25_2.txt"))
+;(print (game-loop "laberints_exemple/10x10_massapetit_1.txt"))
 (color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)

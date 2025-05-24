@@ -1,11 +1,42 @@
 (load 'CONST)
 
+
+
 (defun draw-minimap(x y maze player extra)
     
 )
 
+;actualitza el FoW del minimapa
+(defun update-minimap(maze px py mmaze &optional (dir nil))
+    (cond
+    ((null dir)
+        (update-minimap maze px py 
+            (update-minimap maze px py 
+                (update-minimap maze px py 
+                    (update-minimap maze px py mmaze '(0 -1)) '(0 1)) '(-1 0)) '(1 0))
+        
+        
+        
+
+    )
+    (t 
+        (let* ((tile (get-in-maze maze px py)))
+        (cond 
+            ((eq tile Cparet)
+                mmaze
+            )
+            (t 
+                (update-minimap maze (+ px (car dir)) (+ py (cadr dir))
+                (establir-I-valor py mmaze (establir-I-valor px (obtenir-element-I py mmaze) mm-cami)) dir)
+            )
+        )
+        )
+        )
+    )
+)
+
 ;genera doble array de mm-paret analog a maze
-(defun-tco gen-minimap (maze &optional (row (car maze)) (mmap (gensym "mmaze-")) (mrow (gensym "mrow-")) )
+(defun-tco gen-minimap (maze &optional (row (car maze)) (mmap nil) (mrow nil) )
     (cond 
         ((and (null maze) (null row))
             (cons mrow mmap)
@@ -21,6 +52,8 @@
 
 ; pinta el laberint a (x,y) SC
 (defun-tco paint-minimap(maze x y &optional (w 0) (h 0) (row (car maze)))
+    ;(princ maze)
+    ;(get-key)
     (cond 
         ((and (null maze) (null row))
             t
@@ -34,16 +67,13 @@
         ; pinta el tile corresponent
         (let ((elem (car row)) (xtile (+ (* w MM_TILESIZE) x)) (ytile (+ (* h MM_TILESIZE) y)))
             (cond
-                ((eq elem Cparet)
+                ((eq elem mm-paret)
                     (draw-mm-paret xtile ytile)
                 )
-                ((eq elem Ccami)
+                ((eq elem mm-cami)
                     (draw-mm-cami xtile ytile)
                 )
                 
-                ((eq elem newline)
-                    nil
-                )
                 (t
                     nil
                 )

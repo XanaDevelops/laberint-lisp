@@ -124,7 +124,7 @@
 
 (defun can-move-h (maze x y)
     (let ((xtile (floor x TILESIZE)) (ytile (floor (- y) TILESIZE)) (ytile2 (floor (+ (- y) (1- TILESIZE)) TILESIZE)))
-        (not (or (eq (get-in-maze maze xtile ytile) Cparet) (eq (get-in-maze maze xtile ytile2) paret)))
+        (not (or (eq (get-in-maze maze xtile ytile) Cparet) (eq (get-in-maze maze xtile ytile2) Cparet)))
     )
 )
 
