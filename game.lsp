@@ -72,30 +72,36 @@
     ;dibuixa extres
     ; claus
     (draw-keys (get extra 'keys) maze)
+    ;mmap
+    (draw-mm-player player extra)
 
     ; DEBUG
-    (color 255 255 255 0 0 0)
-    (goto-xy 0 0)
-    (princ "                    \n")
-    (princ "                    \n")
-    (princ "      \n")
-    (princ "      \n")
-    (princ "      \n")
-    (princ "      \n")
-    (princ "      \n")
-    (princ "      \n")
-    (princ "      \n")
-    (princ "      \n")
-    (goto-xy 0 0)
-    (print (symbol-plist player))
-    (print (get extra 'keys))
-    (print pdrawx)
-    (print pdrawy)
-    (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
-    (print (get maze 'pos-sortida))
-    (print (getx maze))
-    (print (gety maze))
-    (print steps)
+    (cond 
+    ((eq dbg t)
+        (color 255 255 255 0 0 0)
+        (goto-xy 0 0)
+        (princ "                    \n")
+        (princ "                    \n")
+        (princ "      \n")
+        (princ "      \n")
+        (princ "      \n")
+        (princ "      \n")
+        (princ "      \n")
+        (princ "      \n")
+        (princ "      \n")
+        (princ "      \n")
+        (goto-xy 0 0)
+        (print (symbol-plist player))
+        (print (get extra 'keys))
+        (print pdrawx)
+        (print pdrawy)
+        (print (get-in-maze (get maze 'data) (floor (getx player) TILESIZE) (- (floor (gety player) TILESIZE))))
+        (print (get maze 'pos-sortida))
+        (print (getx maze))
+        (print (gety maze))
+        (print steps)
+        )
+    )
     ; DEBUG
 
     ; llegeix entrada i calcula nova posició, comproba colisions
@@ -118,6 +124,8 @@
         ;borra tile del jugador
         (cls-player px py maze)
 
+        (cls-mm-player player extra)
+
         ; calcula nova posició del laberint, depenent de a quina direcció es vol anar i la posició del jugador respecte la pantala
         ; fa scroll o no
         (let* (
@@ -132,6 +140,7 @@
               (newtilex (car newtileplayer))
               (newtiley (cadr newtileplayer))
               (addsteps (caddr newtileplayer))
+            (newminimap (update-minimap (get maze 'data) newtilex newtiley (get extra 'minimap)))
             )
             ; nou estat de la partida
             (game-loop name 
@@ -139,7 +148,7 @@
                 (update-prop (update-prop (update-prop (update-prop player 'x newpx) 'y newpy) 'tilex newtilex) 'tiley newtiley)
                 (+ steps addsteps)
                 do-repaint 
-                (update-prop (update-keys player extra) 'minimap (update-minimap (get maze 'data) newtilex newtiley (get extra 'minimap)))
+                (update-recorregut player (update-prop (update-keys player extra) 'minimap newminimap))
             )
         )
         )

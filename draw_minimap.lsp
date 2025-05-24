@@ -1,9 +1,29 @@
 (load 'CONST)
 
 
-
 (defun draw-mm-player(player extra)
+    (let* ((x (get player 'tilex)) (y (get player 'tiley))
+            (coords (tile-to-mm-coord x y))
+            )
+        (draw-mm-player-intern (car coords) (cadr coords))
+    )
+)
+(defun cls-mm-player(player extra)
+     (let* ((x (get player 'tilex)) (y (get player 'tiley))
+            (coords (tile-to-mm-coord x y))
+            )
+        (draw-mm-recorregut (car coords) (cadr coords))
+    )
+)
 
+;retorna nou extra
+(defun update-recorregut(player extra)
+    (let* ((x (get player 'tilex)) (y (get player 'tiley))
+            (mmaze (get extra 'minimap))
+        )
+        (update-prop extra 'minimap
+            (establir-I-valor y mmaze (establir-I-valor x (obtenir-element-I y mmaze) mm-recorregut)))
+    )
 )
 
 ;actualitza el FoW del minimapa
@@ -33,7 +53,11 @@
                 (t t)
                 )
                 (update-minimap maze (+ px (car dir)) (+ py (cadr dir))
-                    (establir-I-valor py mmaze (establir-I-valor px (obtenir-element-I py mmaze) mm-cami)) dir)
+                    (cond 
+                        ((eq mtile mm-recorregut) mmaze)
+                        (t (establir-I-valor py mmaze (establir-I-valor px (obtenir-element-I py mmaze) mm-cami)))
+                    )
+                    dir)
             )
         )
         )
@@ -79,6 +103,9 @@
                 ((eq elem mm-cami)
                     (draw-mm-cami xtile ytile)
                 )
+                ((eq elem mm-recorregut)
+                    (draw-mm-recorregut xtile ytile)
+                )
                 
                 (t
                     nil
@@ -103,22 +130,27 @@
 )
 (defun draw-mm-recorregut (x y)
     (move x y)
-    (color 50 0 0)
+    (color 255 255 255)
     (draw-mm-square)
 )
-(defun draw-mm-player (x y)
+(defun draw-mm-player-intern (x y)
     (move x y)
-    (color 255 0 255)
+    (color 0 220 0)
     (draw-mm-square)
 )
 
-(defun draw-mm-square()
-    (drawrel MM_TILESIZE 0)
-    (moverel (- MM_TILESIZE) -1)
-    (drawrel MM_TILESIZE 0)
-    (moverel (- MM_TILESIZE) -1)
-    (drawrel MM_TILESIZE 0)
-    (moverel (- MM_TILESIZE) -1)
-    (drawrel MM_TILESIZE 0)
+(defun draw-mm-square(&optional (i MM_TILESIZE))
+    (cond 
+    ((= i 0) t)
+    (t (drawrel MM_TILESIZE 0)
+        (moverel (- MM_TILESIZE) -1)
+        (draw-mm-square (1- i))
+    )
+    )
+)
 
+(defun tile-to-mm-coord (tx ty)
+    (list
+        (+ (* tx MM_TILESIZE) (car mmappos)) (+ (* (- ty) MM_TILESIZE) (cadr mmappos))
+    )
 )
