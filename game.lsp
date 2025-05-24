@@ -8,6 +8,7 @@
 (load 'draw_laberint)
 (load 'draw_border)
 (load 'draw_minimap)
+(load 'draw_hud)
 (load 'libs\\listLib)
 
 
@@ -74,6 +75,9 @@
     (draw-keys (get extra 'keys) maze)
     ;mmap
     (draw-mm-player player extra)
+    ;HUD
+    (draw-hud extra steps)
+
 
     ; DEBUG
     (cond 

@@ -7,6 +7,7 @@
 
 ;optimitzar recursio +3?
 (defun user-input()
+    (goto-xy 0 0)
     (let ((key (get-key)))
         (cond
         ((some (lambda (x) (= x key)) '(87 119 328))

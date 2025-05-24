@@ -28,7 +28,7 @@
             (draw-tile-nocheck "border_X_U" drawx drawy)
             (draw-border x y w h (1+ cw) ch)        
         )
-        ((eq ch w)
+        ((eq ch h)
             (draw-tile-nocheck "border_X_D" drawx drawy)
             (draw-border x y w h (1+ cw) ch)        
         )
