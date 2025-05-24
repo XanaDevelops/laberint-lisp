@@ -47,3 +47,7 @@
 (setq mm-cami 1)
 (setq mm-recorregut 2)
 (setq mm-player 3)
+
+(setq snd-fw 1)
+(setq snd )
+(setq rickroll 666)

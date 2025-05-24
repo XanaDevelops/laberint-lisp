@@ -6,8 +6,8 @@ from typing import Dict, Tuple
 
 # Diccionario de canciones (índice -> ruta al archivo WAV)
 songs: Dict[int, str] = {
-    1: r'music\\rickroll hq.wav',
-    2: r"C:\Music\song2.wav",
+    666: r'music\\rickroll hq.wav',
+    1: r"music\\fireboy and watergirl.wav",
     3: r"C:\Music\song3.wav",
 }
 
@@ -73,7 +73,8 @@ def play_song(index: int, loop: bool = False) -> None:
             "powershell", "-Command",
             f"(New-Object Media.SoundPlayer '{path}').PlaySync()"
         ]
-    proc = subprocess.Popen(ps_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    print(f"cancion {index=}")
+    proc = subprocess.Popen(ps_command)
     players.add(proc)
 
 

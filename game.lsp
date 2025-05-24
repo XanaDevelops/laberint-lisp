@@ -32,7 +32,7 @@
         ;extra
         (putprop extra (gen-keys maze-data) 'keys)
         (putprop extra (update-minimap maze-data (get player 'tilex) (get player 'tiley) (gen-minimap (get maze 'data))) 'minimap)
-
+        (play-song 1 t)
         (game-loop name maze player 0 t extra)
         )
     )
