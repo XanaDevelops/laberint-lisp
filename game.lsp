@@ -2,6 +2,7 @@
 (load 'tco)
 (load 'fitxer-io)
 (load 'graphfx)
+(load 'music)
 (load 'user-input)
 (load 'prop-util)
 (load 'aux-game)
@@ -79,7 +80,7 @@
     (draw-hud extra steps)
 
 
-    ; DEBUG
+; DEBUG
     (cond 
     ((eq dbg t)
         (color 255 255 255 0 0 0)
@@ -106,7 +107,7 @@
         (print steps)
         )
     )
-    ; DEBUG
+; DEBUG
 
     ; llegeix entrada i calcula nova posició, comproba colisions
     (let* ((input (user-input)) (px (getx player)) (py (gety player)))
