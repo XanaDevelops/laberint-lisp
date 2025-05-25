@@ -173,7 +173,7 @@
 )
 
 
-(cls)
+;cls)
 ;si peta algo descomentar
 ;(trace game-loop)
 ;(trace update-prop)
@@ -184,10 +184,10 @@
 ;(trace draw-tile)
 ;(trace draw-border)
 ;(print (game-loop "test.txt"))
-(setq *random-state* (make-random-state t)) ;revisar seeds
-(print (game-loop "laberints_exemple/25x25_2.txt"))
+;(setq *random-state* (make-random-state t)) ;revisar seeds
+;(print (game-loop "laberints_exemple/25x25_2.txt"))
 ;(print (game-loop "laberints_exemple/10x10_massapetit_1.txt"))
-(color 0 0 0 255 255 255)
+;(color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)
 ;(draw-tile "rickroll" 250 250)

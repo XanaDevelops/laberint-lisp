@@ -14,7 +14,67 @@
 (load 'game)
 
 (defun main()
+    (play-song snd-menu t)
+    (menu-loop 0)
+)
+(defun-tco menu-loop(id)
+    (color 255 255 255 0 0 0)
+    (cls)
+    (draw-tile "banner" 100 340)
+    (menu-text id)
     
+    (goto-xy 0 0)
+    (draw-border 150 150 20 5)
+        
+    (menu-loop (update-menu id (get-key)))
+)
+
+(defun menu-text(id)
+    (color 255 255 255 0 0 0)
+    (cond
+        ((eq id id-menu)
+            (goto-xy 20 16)
+            (princ "1) Generar laberint")
+            (goto-xy 20 17)
+
+            (princ "2) Explorar laberint")
+            (goto-xy 20 18)
+
+            (princ "3) Veure records")
+            (goto-xy 20 19)
+            (princ "0) Sortir")
+        )
+        ((eq id id-explora)
+            (goto-xy 20 16)
+            (princ "nom arxiu")
+            (goto-xy 20 17)
+
+        )
+        (t 
+            (goto-xy 20 16)
+            (princ "IM A ERROR!!!!")) ;+1 punt a la nota final si pilles la referència :)
+    )
+)
+
+(defun update-menu(id opt)
+    (cond
+        ((eq id id-menu)
+            (cond 
+                ((eq opt opt2)
+                    id-explora   
+                )
+                (t id-menu)
+            )
+        )
+        ((eq id id-explora)
+            (let ((steps (game-loop (read))))
+                (princ steps)
+                id-menu
+            )
+
+        )
+        (t id-menu)
+    )
 )
 
 
