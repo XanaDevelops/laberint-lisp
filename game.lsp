@@ -13,8 +13,34 @@
 (load 'libs\\listLib)
 
 
-;loop principal del joc
-(defun-tco game-loop(name &optional (maze (gensym "maze-")) (player (gensym "player-")) (steps 0) (repaint t) (extra (gensym "extra-")))
+;; =========================================
+;; Funció: "explora"
+;; La funcio principal per explorar un laberint.
+;; amb els parametres opcionals, detecta si es la primera cridada, si es així, inicialitza els valors.
+;; Amb succesius let es poden crear variables per no recalcular valors, així, es pot jugar al laberint
+;; Per dibuixar cada vegada que s'arriba a una altra secció del laberint, es repinta tot, però 
+;; si no fa falta, només es repinta el jugador i s'actualitza el minimapa, si escau.
+;; Per a fer el codi més llegible, nombroses funcions auxiliars s'han fet servir
+;;
+;; Extres:
+;;  - Us d'sprites detallats + GUI
+;;  - Minimapa
+;;  - Claus
+;;  - Fog of War (al minimapa)
+;;  - Pintat de recorregut (al minimapa)
+
+;; Paràmetres:
+;;  - name: ruta del laberint
+;;  - (opcional) maze: emmagatzema la informació relativa al laberint
+;;  - (opcional) player: emmagatzema la informació relativa al jugador
+;;  - (opcional) steps: comptador de passos
+;;  - (opcional) repaint: si t, fa repintar tot
+;;  - (opcional) extra: emmagatzema la informació relativa als extres o miscelanea
+;;
+;; Retorn:
+;;  - Jugador amb el resultat de la partida o nil si abortat
+;; ==========================================
+(defun-tco explora(name &optional (maze (gensym "maze-")) (player (gensym "player-")) (steps 0) (repaint t) (extra (gensym "extra-")))
     (cond
     ((null (get maze 'data))
         (color 255 255 255 0 0 0)
@@ -41,7 +67,7 @@
         (putprop extra (gen-keys maze-data) 'keys)
         (putprop extra (update-minimap maze-data (get player 'tilex) (get player 'tiley) (gen-minimap (get maze 'data))) 'minimap)
         (play-song (+ (random 2) 1) t)
-        (game-loop name maze player 0 t extra)
+        (explora name maze player 0 t extra)
         )
     )
     (t 
@@ -60,8 +86,6 @@
     )
     )
 
-
-        
     ;dibuixa la sortida tancada, si escau
     (let* ((sx (car (get maze 'pos-sortida))) (sy (cadr (get maze 'pos-sortida)))
                 (sd (tile-to-draw sx sy maze)) (sdx (car sd)) (sdy (cadr sd))
@@ -129,8 +153,8 @@
             (make-jugador :nom (get player 'pname) :passos steps :laberint name)
         )
         ((eq input 'admin)
-            (eval (read))
-            (game-loop name maze player steps nil extra)
+            (eval (read)) ;permet modificar constants, però no pot llegir 
+            (explora name maze player steps nil extra)
         )
         (t
 
@@ -156,7 +180,7 @@
             (newminimap (update-minimap (get maze 'data) newtilex newtiley (get extra 'minimap)))
             )
             ; nou estat de la partida
-            (game-loop name 
+            (explora name 
                 (update-prop (update-prop maze 'x newmx) 'y newmy)
                 (update-prop (update-prop (update-prop (update-prop player 'x newpx) 'y newpy) 'tilex newtilex) 'tiley newtiley)
                 (+ steps addsteps)
@@ -173,9 +197,9 @@
 )
 
 
-;cls)
+;(cls)
 ;si peta algo descomentar
-;(trace game-loop)
+;(trace explora)
 ;(trace update-prop)
 ;(trace find-in-maze)
 ;(trace paint-maze)
@@ -183,10 +207,10 @@
 ;(trace draw-keys)
 ;(trace draw-tile)
 ;(trace draw-border)
-;(print (game-loop "test.txt"))
-;(setq *random-state* (make-random-state t)) ;revisar seeds
-;(print (game-loop "laberints_exemple/25x25_2.txt"))
-;(print (game-loop "laberints_exemple/10x10_massapetit_1.txt"))
+;(print (explora "test.txt"))
+;
+;(print (explora "laberints_exemple/25x25_2.txt"))
+;(print (explora "laberints_exemple/10x10_massapetit_1.txt"))
 ;(color 0 0 0 255 255 255)
 ;(draw-maze "test.txt" 1 1 )
 ;(terpri)

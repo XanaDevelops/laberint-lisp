@@ -98,7 +98,7 @@
             (goto-xy 20 16)
             (princ "         Escriu el nom de l'arxiu:")
             (goto-xy 20 17)
-            (let ((jugador (game-loop (read))))
+            (let ((jugador (explora (read))))
                 (cond
                     ((not (null jugador))
                         (guardarJugador jugador)
@@ -257,4 +257,5 @@
     )
 )
 
+(setq *random-state* (make-random-state t)) ;revisar seeds
 (main)

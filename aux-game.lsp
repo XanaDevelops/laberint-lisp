@@ -1,7 +1,19 @@
 (load 'CONST)
 (load 'prop-util)
 
-;retorna t si ha guanyat, nil si no
+;; =========================================
+;; Funció: "check-win"
+;; Comproba si es compleixen les condicions per guanyar
+;; (en casella de sortida + tenir totes les claus)
+;;
+;; Paràmetres:
+;;  - maze: propietats del laberint
+;;  - player: propietats del jugador
+;;  - extra: propietats extra
+;;
+;; Retorn:
+;;  - t o nil si s'ha guanyat o no
+;; ==========================================
 (defun check-win (maze player extra)
     (let* ((xpos (getx player)) (ypos (* -1 (gety player))) (xsor (* (car (get maze 'pos-sortida)) TILESIZE)) (ysor (* (cadr (get maze 'pos-sortida)) TILESIZE))
             (nkeys (length (get extra 'keys)))
@@ -17,19 +29,20 @@
     )
 )
 
+;; =========================================
+;; Funció: "you win"
+;; Mostra el missatge de victoria
+;;
+;; Paràmetres:
+;;  - name: nom del jugador
+;;  - steps: passos realitzats
+;;
+;; Retorn:
+;;  - res
+;; ==========================================
 (defun you-win(name steps)
-    (goto-xy 25 8)
-    (princ "                                  \n")
-    (goto-xy 25 9)
-    (princ "                                  \n")
-    (goto-xy 25 10)
-    (princ "                                  \n")
-    (goto-xy 25 11)
-    (princ "                                  \n")
-    (goto-xy 25 12)
-    (princ "                                  \n")
-    (goto-xy 25 13)
-    (princ "                                  \n")
+    (clear-text 25 8 34 6)
+
     (goto-xy 26 9)
     (princ "           HAS GUANYAT\n")
     (goto-xy 26 11)
@@ -43,10 +56,19 @@
     (get-key)
 )
 
-; -- MAZE --
-
-; cerca la primera occurencia de casella sobre maze[][]
-; retorna (i,j) indexos sobre maze[][]
+;; =========================================
+;; Funció: "find-in-maze"
+;; Cerca la primera occurencia de casella sobre maze[][]
+;;
+;; Paràmetres:
+;;  - maze: doble llista de caselles
+;;  - casella: casella a cercar
+;;  - (opcional) i,j: indexos per a maze
+;;  - (opcional) aux: emmagatzema la fila actual
+;;
+;; Retorn:
+;;  - (i, j) amb la posició de la primera casella
+;; ==========================================
 (defun-tco find-in-maze(maze casella &optional (i 0) (j 0) (aux nil))
     (let ((c (car maze)))
     (cond
@@ -66,8 +88,18 @@
     )
 )
 
-; retorna la casella en maze[y][x]
-;                                          pots fer això
+;; =========================================
+;; Funció: "get-in-maze"
+;; Retorna maze[y][x]
+;;
+;; Paràmetres:
+;;  - maze: doble llista de caselles
+;;  - x, y: indexos
+;;  - (opcional) aux: emmagatzema la fila actual
+;;
+;; Retorn:
+;;  - casella = maze[y][x], nil si OoB
+;; ==========================================
 (defun-tco get-in-maze(maze x y &optional (row (car maze)))
     (cond 
         ((and (= x 0) (= y 0))
@@ -83,20 +115,31 @@
     )
 )
 
-; -- GENS ---
-
-;genera les posicions de les claus
-;retorna :((x1, y1), (x2, y2), ...)
-(defun gen-keys(maze &optional (n 0) (keys '()))
-    ;ja es un suplici un laberint de 50x50, un de 100x100...
+;; =========================================
+;; Funció: "gen-keys"
+;; Genera aleatoriament key_per_maze claus al laberint.
+;; Aquests ha de ser totalment conex si no es vol generar un laberint
+;; irresoluble.
+;; Existeix la posibilitat no nula de generar dues claus a la mateixa casella (pero és molt poc problable)
+;;
+;; Paràmetres:
+;;  - maze: doble llista de caselles
+;;  - (opcional) n: nº claus a generar
+;;  - (opcional) keys: llista amb les claus generades
+;;
+;; Retorn:
+;;  - keys
+;; ==========================================
+(defun gen-keys(maze &optional (n key_per_maze) (keys '()))
+    ;ja es un suplici resoldre un laberint de 50x50, un de 100x100...
     (let* ((x (random 100)) (y (random 100))
             (tile (get-in-maze maze x y))
         )
         (cond 
             ((eq tile Ccami)
                 (cond 
-                    ((< n key_per_maze)
-                        (gen-keys maze (1+ n) (cons (list x y) keys))
+                    ((> n 0)
+                        (gen-keys maze (1- n) (cons (list x y) keys))
                     )
                     (t
                         keys
@@ -110,10 +153,19 @@
     )
 )
 
-; ------ UPDATES ----------
-
-;Actualitza les claus
-; retorna 'extra acutalitzat
+;; =========================================
+;; Funció: "update-keys"
+;; Elimina (de forma no destructiva) les claus que el jugador ha recollit (per proximitat)
+;;
+;; Paràmetres:
+;;  - player: dades del jugador
+;;  - extra: dades de les claus
+;;  - (opcional) remain-keys: claus a comprovar
+;;  - (opcional) aux-keys: claus no recollides
+;;
+;; Retorn:
+;;  - extra actualitzat
+;; ==========================================
 (defun update-keys(player extra &optional (remain-keys (get extra 'keys)) (aux-keys '()))
     (cond 
         ((null remain-keys)
@@ -137,8 +189,18 @@
     )
 )
 
-;Calcula si s'ha d'augmentar els steps
-;retorna (newTileX, newTileY 0/1)
+
+;; =========================================
+;; Funció: "update-steps"
+;; Comprova si el jugador es troba en un nou tile
+;;
+;; Paràmetres:
+;;  - player: dades del jugador
+;;
+;; Retorn:
+;;  - (nou tile actual, valor a sumar a steps)
+;;  - (newTileX, newTileY, 0/1)
+;; ==========================================
 (defun update-steps (player)
     (let* ((px (getx player)) (py (gety player))
             (xtile (round px TILESIZE)) (ytile (round (- py) TILESIZE))
@@ -149,20 +211,42 @@
 )
 
 
+;; =========================================
+;; Funció: "can-move-h/v"
+;; Comprova si el jugador pot moure-se'n en un eix de coordenades.
+;; Per lograr-ho mira si els tiles posteriors son paret o no
+
+;; Paràmetres:
+;;  - maze: dades del laberint
+;;  - x,y: posicio del jugador
+;;
+;; Retorn:
+;;  - extra actualitzat
+;; ==========================================
 (defun can-move-h (maze x y)
     (let ((xtile (floor x TILESIZE)) (ytile (floor (- y) TILESIZE)) (ytile2 (floor (+ (- y) (1- TILESIZE)) TILESIZE)))
         (not (or (eq (get-in-maze maze xtile ytile) Cparet) (eq (get-in-maze maze xtile ytile2) Cparet)))
     )
 )
-
 (defun can-move-v (maze x y)
     (let ((xtile (floor x TILESIZE)) (xtile2 (floor (+ x (1- TILESIZE)) TILESIZE)) (ytile (floor (- y) TILESIZE)))
         (not (or (eq (get-in-maze maze xtile ytile) Cparet) (eq (get-in-maze maze xtile2 ytile) Cparet)))
     )
 )
 
-; Calcula la nova posició del jugador
-; retorna (newx, newy)
+;; =========================================
+;; Funció: "new-player-pos"
+;; Segons un input i la posició actual del jugador respecte al laberint
+;; retorna la nova posició
+;;
+;; Paràmetres:
+;;  - player: dades del jugador
+;;  - maze: dades del laberint
+;;  - input: direcció de moviment
+;;
+;; Retorn:
+;;  - (newX, newY)
+;; ==========================================
 (defun new-player-pos (player maze input)
     (let* ((px (getx player)) (py (gety player)) (ps (get player 'speed)))
         (list
@@ -179,8 +263,19 @@
 )
 
 
-; calcula la nova posició del laberint
-; retorna (newmx newmy repaint)
+;; =========================================
+;; Funció: "new-maze-pos"
+;; Segons un input i la nova posició del jugador respecte al laberint
+;; decideix si fa falta fer scroll del laberint, (si el jugador arriba a un borde de la pantalla)
+;;
+;; Paràmetres:
+;;  - newpx, newpy: nova posició del jugador
+;;  - maze: dades del laberint
+;;  - input: direcció de moviment
+;;
+;; Retorn:
+;;  - (newX, newY, repaint?)
+;; ==========================================
 (defun new-maze-pos(newpx newpy maze input)
 (let* 
     (
@@ -257,7 +352,16 @@
 
 
 
-
+;; =========================================
+;; Funció: "easter-egg"
+;; :)
+;;
+;; Paràmetres:
+;;  - cap
+;;
+;; Retorn:
+;;  - res
+;; ==========================================
 (defun easter-egg()
     (let ((val (random 5)))
         (cond 
@@ -266,7 +370,6 @@
                 (color 0 0 0 255 255 255)
             )
             (t t)
-
         )
     )
 )
