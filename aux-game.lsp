@@ -33,12 +33,13 @@
     (goto-xy 26 9)
     (princ "           HAS GUANYAT\n")
     (goto-xy 26 11)
-    (format t "~S ha fet passes: ~S\n" name steps)
-    (goto-xy 26 12)
-    (princ "premi qualsevol tecla per sortir")
+    (format t "~S ha fet: ~S passes\n" name steps)
     (draw-border 192 258 17 5)
     (stop-all)
     (play-song snd-win)
+    (sleep 2)
+    (goto-xy 26 12)
+    (princ "premi qualsevol tecla per sortir")
     (get-key)
 )
 
@@ -191,4 +192,81 @@
           (cond ((or r l u d) t) (t nil))
     )
 )
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(defun easter-egg()
+    (let ((val (random 5)))
+        (cond 
+            ((= val 0)
+                (draw-tile "rickroll" 100 300)
+                (color 0 0 0 255 255 255)
+            )
+            (t t)
+
+        )
+    )
 )

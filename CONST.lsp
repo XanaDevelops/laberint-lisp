@@ -60,6 +60,7 @@
 (setq id-explora 1)
 (setq id-gen 2)
 (setq id-gen-name 3)
+(setq id-stats 4)
 
 (setq opt0 48)
 (setq opt1 49)

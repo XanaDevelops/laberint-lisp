@@ -1,6 +1,6 @@
 (load "tco.lsp")
 (load "libs/listLib.lsp")
-(load "VARSGLOBALS.lsp")
+(load "CONST.lsp")
 (load "fitxer-io.lsp")
 
 

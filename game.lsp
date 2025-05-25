@@ -122,11 +122,11 @@
         (cond
         ; sortir del joc
         ((eq input 'esq)
-            steps 
+            nil 
         )
         ((check-win maze player extra)
             (you-win (get player 'pname) steps)
-            steps
+            (make-jugador :nom (get player 'pname) :passos steps :laberint name)
         )
         ((eq input 'admin)
             (eval (read))

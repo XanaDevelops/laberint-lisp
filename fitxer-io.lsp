@@ -1,4 +1,4 @@
-(load "VARSGLOBALS.lsp")
+(load "CONST.lsp")
 ;; =============================================================================
 ;; Funció: 'llegeix-exp'
 ;; Llegeix i retorna el contingut d'un fitxer en forma d'expressions.
