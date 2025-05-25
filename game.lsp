@@ -19,6 +19,7 @@
     ((null (get maze 'data))
         (color 255 255 255 0 0 0)
         (cls)
+        (stop-all)
         ; en la primera cridada inicialitza els valors per defecte
         (let* ((maze-data (read-maze name)) (start-pos (find-in-maze maze-data Centrada)) (x (* (car start-pos) TILESIZE)) (y (* (cadr start-pos) (* -1 TILESIZE))))
         (putprop maze (* (- SCREENPIXEL-M1) (floor x SCREENPIXEL-M1)) 'x)
@@ -39,7 +40,6 @@
         ;extra
         (putprop extra (gen-keys maze-data) 'keys)
         (putprop extra (update-minimap maze-data (get player 'tilex) (get player 'tiley) (gen-minimap (get maze 'data))) 'minimap)
-        (stop-all)
         (play-song (+ (random 2) 1) t)
         (game-loop name maze player 0 t extra)
         )

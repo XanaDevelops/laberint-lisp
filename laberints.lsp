@@ -63,12 +63,21 @@
                 ((eq opt opt2)
                     id-explora   
                 )
+                ((eq opt opt0)
+                    (stop-all)
+                    (color 0 0 0 255 255 255)
+                    (cls)
+                    (princ "ADEU\n\n")
+                    (top-level)
+                )
                 (t id-menu)
             )
         )
         ((eq id id-explora)
             (let ((steps (game-loop (read))))
                 (princ steps)
+                (stop-all)
+                (play-song snd-menu t)
                 id-menu
             )
 
