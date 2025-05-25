@@ -8,7 +8,7 @@
 (setq DFS 'DFS)
 (setq PRIM 'PRIM)
 (setq RDV 'RDV) ; recursive division
-(setq algorisme-generacio RDV)
+(setq def-algorisme-generacio DFS)
 (setq HORIZONTAL 1)
 (setq VERTICAL 0)
 
@@ -58,6 +58,8 @@
 
 (setq id-menu 0)
 (setq id-explora 1)
+(setq id-gen 2)
+(setq id-gen-name 3)
 
 (setq opt0 48)
 (setq opt1 49)
