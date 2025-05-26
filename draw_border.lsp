@@ -1,3 +1,17 @@
+;; =============================================================================
+;; Funció: draw-border
+;;  Utilitzant la tecnica del "9-slicing", dibuixa un borde rectangular de tamany (w,h)
+;;  a (x, y).
+;;  S'ha de tenir en compte que no dibuixa per dins, només el borde en si.
+;;
+;; Paràmetres:
+;;   - x,y: posició de pantalla a pintar
+;;   - w,h: tamany del borde
+;;   - (optional) cw, ch: iteradors per a la recursivitat
+;; 
+;; Retorn:
+;;   - res
+;; =============================================================================
 (defun draw-border (x y w h &optional (cw 0) (ch 0))
     (let* ((drawx (+ x (* cw TILESIZE))) (drawy (+ y (* (- ch) TILESIZE))))
         (cond

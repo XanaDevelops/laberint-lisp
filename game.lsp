@@ -107,7 +107,7 @@
     ; claus
     (draw-keys (get extra 'keys) maze)
     ;mmap
-    (draw-mm-player player extra)
+    (draw-mm-player player)
     ;HUD
     (draw-hud extra steps)
 
@@ -161,7 +161,7 @@
         ;borra tile del jugador
         (cls-player px py maze)
 
-        (cls-mm-player player extra)
+        (cls-mm-player player)
 
         ; calcula nova posició del laberint, depenent de a quina direcció es vol anar i la posició del jugador respecte la pantala
         ; fa scroll o no

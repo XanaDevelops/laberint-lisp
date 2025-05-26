@@ -1,14 +1,35 @@
 (load 'CONST)
 
-
-(defun draw-mm-player(player extra)
+;; =============================================================================
+;; Funció: draw-mm-player
+;;  Dibuixa al minimapa la posició del jugador.
+;;
+;; Paràmetres:
+;;   - player: dades jugador
+;;
+;; Retorn:
+;;   - res
+;; =============================================================================
+(defun draw-mm-player(player)
     (let* ((x (get player 'tilex)) (y (get player 'tiley))
             (coords (tile-to-mm-coord x y))
             )
         (draw-mm-player-intern (car coords) (cadr coords))
     )
 )
-(defun cls-mm-player(player extra)
+
+;; =============================================================================
+;; Funció: cls-mm-player
+;;  Borra del minimapa la posició del jugador.
+;;  Lo que fa es pintar-ho com a recorregut
+;;
+;; Paràmetres:
+;;   - player: dades jugador
+;;
+;; Retorn:
+;;   - res
+;; =============================================================================
+(defun cls-mm-player(player)
      (let* ((x (get player 'tilex)) (y (get player 'tiley))
             (coords (tile-to-mm-coord x y))
             )
