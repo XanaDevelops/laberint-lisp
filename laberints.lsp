@@ -6,8 +6,9 @@
 (load 'draw_laberint)
 (load 'draw_border)
 (load 'game)
-(load 'gen_laberint)
+
 (load 'partida)
+(load 'gen_laberint)
 
 ;; ========================================
 ;; Funció: "main"
@@ -91,7 +92,7 @@
             )
             (goto-xy 20 19)
             (princ "OK")
-            (menu-loop 0)
+            (menu-loop id-menu)
             
         )
         ((eq id id-explora)
