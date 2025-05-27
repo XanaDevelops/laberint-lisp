@@ -363,7 +363,7 @@
 ;;  - res
 ;; ==========================================
 (defun easter-egg()
-    (let ((val (random 5)))
+    (let ((val (random 3)))
         (cond 
             ((= val 0)
                 (draw-tile "rickroll" 100 300)

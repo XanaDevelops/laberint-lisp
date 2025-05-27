@@ -115,7 +115,7 @@
             (goto-xy 20 17)
             (let* ((laberint (read)) (stats (getLlistaClassificacions (make-jugador :laberint laberint))))
                 (clear-text 26 3 29 17)
-                (show-text (append (list "    ESTADISTIQUES"
+                (show-text (append (list "       ESTADISTIQUES"
                                 (format nil "~S" laberint) ""
                                 )
                                 (mapcar (lambda (x) (format nil "~S: ~S passos" (jugador-nom x) (jugador-passos x))) (capar-a stats 10))
@@ -167,6 +167,7 @@
                     (cls)
                     (princ "ADEU\n\n")
                     (easter-egg)
+                    (kill-server)
                     (top-level)
                 )
                 (t id-menu)
