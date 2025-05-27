@@ -1,8 +1,0 @@
-#S(jugador nom lol passos 31 laberint laberints_exemple/10x10_massapetit_1.txt)
-#S(jugador nom lol passos 14 laberint laberints_exemple/10x10_massapetit_1.txt)
-#S(jugador nom lol2 passos 534 laberint laberints_exemple/10x10_massapetit_1.txt)
-#S(jugador nom lol passos 93 laberint laberints_exemple/10x10_massapetit_1.txt)
-#S(jugador nom lol1 passos 16 laberint laberints_exemple/10x10_massapetit_1.txt)
-#S(jugador nom lol2 passos 27 laberint laberints_exemple/10x10_massapetit_1.txt)
-#S(jugador nom lol passos 35 laberint laberints_exemple/10x10_massapetit_1.txt)
-#S(jugador nom a passos 242 laberint laberints_exemple/25x25_1.txt)
