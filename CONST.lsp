@@ -13,8 +13,8 @@
 (setq VERTICAL 0)
 
 
-(setq FILES (- 50 2)) ; 2 de files extra de parets que s'afegeixen
-(setq COLUMNES (- 50 2))
+(setq FILES (- 66 2)) ; 2 de files extra de parets que s'afegeixen
+(setq COLUMNES (- 66 2))
 (setq iniciEntrada (list (list 0 0) (list (- FILES 1) 0)))
 
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
@@ -42,7 +42,7 @@
 (setq SCREEN_H (+ (cadr mazepos) (* TILESIZE (- -1 TILE_H))))
 
 ;(setq MM_TILESIZE 2) ;permet mostrar 100x100
-(setq MM_TILESIZE 3) ;permet mostrar aprox 75x75
+(setq MM_TILESIZE 3) ;permet mostrar aprox 66x66
 ;(setq MM_TILESIZE 4) ;permet mostrar 50x50
 
 (setq mm-paret 0)
