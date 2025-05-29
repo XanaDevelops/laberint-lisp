@@ -16,7 +16,7 @@
 (setq iniciEntrada (list (list 0 0) (list (- FILES 1) 0)))
 
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
-
+(setq dreta-baix '((1 0) (0 1)))
 (setq Cparet #\#)
 (setq Ccami #\.)
 (setq Centrada #\e)
