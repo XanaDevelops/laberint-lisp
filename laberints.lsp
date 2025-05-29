@@ -51,7 +51,7 @@
         )
         (t t)
     )
-    (clear-text 20 15 40 7)
+    (clear-text 19 15 41 7)
 
     (draw-border 150 150 20 6)
 

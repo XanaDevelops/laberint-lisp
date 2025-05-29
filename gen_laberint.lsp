@@ -1917,7 +1917,7 @@
   )
 )
 
-(defun binary-tree-aux (pos-inici pos-fi lab) 
+(defun-tco binary-tree-aux (pos-inici pos-fi lab) 
   (cond 
     ((equal pos-inici pos-fi) lab)
     (t
