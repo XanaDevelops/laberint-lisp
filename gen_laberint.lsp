@@ -1,6 +1,6 @@
 (load "tco.lsp")
 (load "libs/listLib.lsp")
-(load "VARSGLOBALS.lsp")
+(load "CONST.lsp")
 (load "fitxer-io.lsp")
 
 
@@ -35,14 +35,15 @@
 ;; Funció: 'genera'
 ;;
 ;;  Genera un laberint segons un algorisme que es tria a través de l'interfície             
-;;  del joc.El valor de l'algorisme es guarda a la variable global 'algorisme-generacio'         
+;;  del joc.El valor de l'algorisme per defecte es guarda a la variable global 'def-algorisme-generacio'         
 ;;
 ;; Paràmetres:
 ;;   - nom-fitxer: nom del fitxer on s'ha de guardar el laberint generat
+;;   - (opcional) algorisme-generacio: algorisme específic per a la generació
 ;;  
 ;; =============================================================================
 
-(defun genera (nom-fitxer) 
+(defun genera (nom-fitxer &optional (algorisme-generacio def-algorisme-generacio))
 
   (cond 
     ((equal DFS algorisme-generacio) (algorisme-DFS nom-fitxer))

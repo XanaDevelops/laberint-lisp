@@ -1,82 +1,184 @@
-(load 'tco)
-
-(setq wall #\#)
-(setq path #\.)
-(setq newline #\NewLine)
-(setq mazepos '(64 336))
-
-(load 'fitxer-io)
-(load 'graphfx)
-(load 'user-input)
-
-
-
-
-(defun read-maze(fn)
-    (llegeix fn)
+;; =========================================
+;; Funció: "read-maze"
+;; Llegeix un laberint des d'un fitxer
+;;
+;; Paràmetres:
+;;  - fn: ruta al fitxer
+;;  - (opcional) maze: dades del fitxer
+;;  - (opcional) r, s: acumuladors de les files procesades i al fila actual, respectivament 
+;;
+;; Retorn:
+;;  - maze[][]
+;; ==========================================
+(defun-tco read-maze (fn &optional (maze nil) (r nil) (s nil))
+    (cond
+    ((and (null maze) (null r))
+        (read-maze fn (llegeix fn))
+    )
+    (t 
+    (let ((c (car maze)))
+        (cond
+        ((null c)
+            (cons s r)
+        )
+        ((eq c newline)
+            (read-maze fn (cdr maze) (cond ((null r) (cond ((null (car s)) r) (t (list s))))
+                                            (t (cons s r)) )
+                            nil
+            )
+        )
+        (t
+            (read-maze fn (cdr maze) r (cons c s))
+        )
+        )
+    ))
+    )
 )
 
-(defun-tco paint-maze(maze x y w h offsetx offsety)
+;; =========================================
+;; Funció: "paint-maze"
+;;  Dibuixa el laberint a una coordenada concreta.
+;;  Amb les limitacions de draw-tile, només pinta el viewport corresponent
+;;
+;; Paràmetres:
+;;  - maze: laberint[][]
+;;  - x,y: coordenades de la pantalla a dibuixar
+;;  - (opcional) w,h: indexos per dibuixar
+;;  - (opcional) row: fila actual
+;;
+;; Retorn:
+;;  - t
+;; ==========================================
+(defun-tco paint-maze(maze x y &optional (w 0) (h 0) (row (car maze)))
     (cond 
-        ((null maze)
-            nil
+        ((and (null maze) (null row))
+            t
+        )
+        
+        ((null row)
+            (paint-maze (cdr maze) x y 0 (1- h))
+
         )
         (t 
-        (let ((elem (car maze)))
+        ; pinta el tile corresponent
+        (let ((elem (car row)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
             (cond
-                ((eq elem wall)
-                    (paint-wall (+ (* (+ w offsetx) TILESIZE) x) (+ (* (+ h offsety) TILESIZE) y))
+                ((eq elem Cparet)
+                    (draw-tile "wall" xtile ytile)
                 )
-                ((eq elem path)
-                    (paint-path (+ (* (+ w offsetx) TILESIZE) x) (+ (* (+ h offsety) TILESIZE) y))
+                ((eq elem Ccami)
+                    (draw-tile "path2" xtile ytile)
+                )
+                ((eq elem Centrada)
+                    (draw-tile "start" xtile ytile)
+                )
+                ((eq elem Csortida)
+                    (draw-tile "end" xtile ytile)
                 )
                 ((eq elem newline)
                     nil
                 )
                 (t
-                    (paint-unk (+ (* (+ w offsetx) TILESIZE) x) (+ (* (+ h offsety) TILESIZE) y))
+                    (draw-tile "error" xtile ytile)
                 )
             )
             ;(get-key)
-            (paint-maze 
-            ;x y w h
-            (cdr maze) x y (cond ((eq elem newline) 0) (t (1+ w))) (cond ((eq elem newline) (1- h)) (t h))
-            ;offsetx offsety
-            offsetx offsety
+            (paint-maze maze x y (1+ w) h (cdr row))
+        )
+
+        )
+    )
+)
+
+;; =========================================
+;; Funció: "clear-text"
+;; Borra una secció rectangular de la pantalla amb el color de fons gràcies
+;; al " "
+;;
+;; Paràmetres:
+;;  - x,y: coordenades text de l'esquina superior del rectangle
+;;  - w,h: tamany del rectangle
+;;
+;; Retorn:
+;;  - res
+;; ==========================================
+; TODO: canviar a recorrer rec un array
+(defun get-strname (tile)
+    (cond
+        ((eq tile Centrada)
+            "start"
+        )
+        ((eq tile Csortida)
+            "end"
+        )
+        ((eq tile Cparet)
+            "wall"
+        )
+        ((eq tile Ccami)
+            "path2"
+        )
+        (t
+            "error"
+        )
+    )
+)
+; borra el tile del jugador de forma optima, mirant quines caselles hi és sobre
+(defun cls-player(xpos ypos maze)
+    (let* ((xtile (floor xpos TILESIZE)) (ytile (floor (- ypos) TILESIZE))
+            (tile (get-in-maze (get maze 'data) xtile ytile)))
+        ; sempre esta sobre l'origen de arredonir les coordenades
+        (draw-tile (get-strname tile) (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
+    ;comprova quina casella del costat
+    (cond 
+        ((> (mod xpos TILESIZE) 0)
+            (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) ytile))
+                (+ (* (1+ xtile) TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
+        )
+        ((> (mod (- ypos) TILESIZE) 0)
+            (draw-tile (get-strname (get-in-maze (get maze 'data) xtile (1+ ytile)))
+                (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
+        )
+    )
+    )
+)
+
+(defun tile-to-draw(xt yt maze)
+    (list 
+        (+ (* xt TILESIZE) (car mazepos) (getx maze))
+        (+ (* (- yt) TILESIZE) (cadr mazepos) (gety maze))
+    )
+)
+
+(defun tile-to-coord(xt yt)
+    (list 
+        (+ (* xt TILESIZE))
+        (+ (* yt TILESIZE))
+    )
+)
+
+(defun coord-to-tile(x y &optional (exact t))
+    (mapcar (lambda (x) (apply (cond ((eq exact t) 'floor) (t 'round)) x)) (list (list x TILESIZE) (list (- y) TILESIZE)))
+)
+
+;dibuixa les claus
+(defun draw-keys(key-coords maze)
+    (cond 
+    ((null key-coords)
+        t
+    )
+    (t
+        (let* ((coords (car key-coords)) (xt (car coords)) (yt (cadr coords))
+                (draw-coords (tile-to-draw xt yt maze)) (drawx (car draw-coords)) (drawy (cadr draw-coords))
             )
-
+            (draw-tile "llave" drawx drawy)
+            (draw-keys (cdr key-coords) maze)
         )
-
-        )
+    )
     )
 )
 
-(defun paint-wall(x y)
-    (draw-tile "wall" x y)
-)
-(defun paint-path(x y)
-    ;(princ " ")
-)
-(defun paint-unk(x y)
-    (draw-tile "error" x y)
-)
-(defun-tco draw-maze(name &optional (offsetx 0) (offsety 0))
-    (cls)
-    ; aprofitant \n es pot ignorar la longitud
-    ; la altura es pot suposar maxima, paint-maze atura al extinguir el maze
-    ; o pintar de baix a dalt amb un reverse
-    (paint-maze (reverse (read-maze name)) (car mazepos) (cadr mazepos) 0 0 offsetx offsety)
-    (let ((input (user-input)))
-        (cond
-        ((eq input 'esq)
-            (top-level) ;;hacky way
-        )
-        )
-        (draw-maze name (cond ((eq input 'right) (1+ offsetx)) ((eq input 'left) (1- offsetx)) (t offsetx))
-                        (cond ((eq input 'up) (1+ offsety)) ((eq input 'down) (1- offsety)) (t offsety)))
-    )
-)
-(draw-maze "laberint.txt")
-;(draw-maze "test.txt" 1 1 )
-;(terpri)
-;(draw-tile "rickroll" 250 250)
+
+
+
+
+

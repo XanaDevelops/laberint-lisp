@@ -1,5 +1,5 @@
 (load "libs/listLib.lsp")
-(load "VARSGLOBALS.lsp")
+(load "CONST.lsp")
 ; guarda en el fixter estadistiques.txt la jugada recent
 ;; =============================================================================
 ;; Estructura: 'jugador'
@@ -8,10 +8,9 @@
 ;; Camps:
 ;;   - nom: Nom del jugador.
 ;;   - passos: Nombre de passos realitzats pel jugador.
-;;   - f: Nombre de files del laberint.
-;;   - c: Nombre de columnes del laberint.
+;;   - laberint: Ruta del laberint
 ;; =============================================================================
-(defstruct jugador nom passos f c)
+(defstruct jugador nom passos laberint)
 
 ;; =============================================================================
 ;; Funció: 'equal-Jugador'
@@ -27,8 +26,7 @@
 (defun equal-Jugador (j1 j2) 
   (and (equal (jugador-nom j1) (jugador-nom j2)) 
        (equal (jugador-passos j1) (jugador-passos j2))
-       (equal (jugador-f j1) (jugador-f j2))
-       (equal (jugador-c j1) (jugador-c j2))
+       (equal (jugador-laberint j1) (jugador-laberint j2))
   )
 )
 
@@ -57,13 +55,13 @@
 
 ;; =============================================================================
 ;; Funció: 'getLlistaClassificacions'
-;; Obté la llista de classificacions per un jugador donat.
+;; Obté la llista ordenada de classificacions per un jugador donat.
 ;;
 ;; Paràmetres:
 ;;   - jug: Jugador del qual es volen obtenir les estadístiques.
 ;;
 ;; Retorn:
-;;   - Llista de jugadors amb la mateixa mida de laberint.
+;;   - Llista de jugadors ordenada del mateix laberint.
 ;; =============================================================================
 (defun getLlistaClassificacions (jug) 
   ; llegir el fitxer d'estadistiques
@@ -72,13 +70,13 @@
       (llista (getLlistaLab jug stream))
     )
     (close stream)
-    llista
+    (ordena llista)
   )
 )
 
 ;; =============================================================================
 ;; Funció: 'getLlistaLab'
-;; Filtra els jugadors del fitxer d'estadístiques segons la mida del laberint.
+;; Filtra els jugadors del fitxer d'estadístiques segons el laberint.
 ;;
 ;; Paràmetres:
 ;;   - jug: Jugador de referència.
@@ -86,7 +84,7 @@
 ;;   - llista(opcional): Llista acumuladora.
 ;;
 ;; Retorn:
-;;   - Llista de jugadors que han jugat en laberints de la mateixa mida.
+;;   - Llista de jugadors que han jugat en el mateix laberint.
 ;; =============================================================================
 (defun getLlistaLab (jug stream &optional (llista '())) 
   (let 
@@ -94,8 +92,7 @@
     (cond 
       ((null jugadorActual) llista) ; EOF
       ; mateixa dimensió del laberint
-      ((and (equal (jugador-f jug) (jugador-f jugadorActual)) 
-            (equal (jugador-c jug) (jugador-c jugadorActual))
+      ((and (equal (jugador-laberint jug) (jugador-laberint jugadorActual)) 
        )
        (getLlistaLab jug stream (cons jugadorActual llista))
       )
@@ -165,7 +162,7 @@
 (defun ordena (l) 
   (cond 
     ((null l) nil)
-    (t (cons (minim l) (ordena (remove (minim l) l :test # 'equal-Jugador))))
+    (t (cons (minim l) (ordena (remove (minim l) l :test #'equal-Jugador))))
   )
 )
 
@@ -191,6 +188,15 @@
        )
      )
     )
+  )
+)
+
+(defun capar-a(llista max)
+  (cond 
+    ((or (= max 0) (null llista))
+      nil
+    )
+    (t (cons (car llista) (capar-a (cdr llista) (1- max))))
   )
 )
 
