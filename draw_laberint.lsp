@@ -1,9 +1,15 @@
-;README
-; SC -> Screen Coords. Coordenades respecte la finestra
-; GC -> Game Coords. Coordenades ingame
-; TC -> Tile Coords. Coordenada del tile (index sobre el laberint)
-
-; llegeix el laberint del fitxer i crea un doble array
+;; =========================================
+;; Funció: "read-maze"
+;; Llegeix un laberint des d'un fitxer
+;;
+;; Paràmetres:
+;;  - fn: ruta al fitxer
+;;  - (opcional) maze: dades del fitxer
+;;  - (opcional) r, s: acumuladors de les files procesades i al fila actual, respectivament 
+;;
+;; Retorn:
+;;  - maze[][]
+;; ==========================================
 (defun-tco read-maze (fn &optional (maze nil) (r nil) (s nil))
     (cond
     ((and (null maze) (null r))
@@ -29,7 +35,20 @@
     )
 )
 
-; pinta el laberint a (x,y) SC
+;; =========================================
+;; Funció: "paint-maze"
+;;  Dibuixa el laberint a una coordenada concreta.
+;;  Amb les limitacions de draw-tile, només pinta el viewport corresponent
+;;
+;; Paràmetres:
+;;  - maze: laberint[][]
+;;  - x,y: coordenades de la pantalla a dibuixar
+;;  - (opcional) w,h: indexos per dibuixar
+;;  - (opcional) row: fila actual
+;;
+;; Retorn:
+;;  - t
+;; ==========================================
 (defun-tco paint-maze(maze x y &optional (w 0) (h 0) (row (car maze)))
     (cond 
         ((and (null maze) (null row))
@@ -45,10 +64,10 @@
         (let ((elem (car row)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
             (cond
                 ((eq elem Cparet)
-                    (paint-paret xtile ytile)
+                    (draw-tile "wall" xtile ytile)
                 )
                 ((eq elem Ccami)
-                    (paint-cami xtile ytile)
+                    (draw-tile "path2" xtile ytile)
                 )
                 ((eq elem Centrada)
                     (draw-tile "start" xtile ytile)
@@ -60,7 +79,7 @@
                     nil
                 )
                 (t
-                    (paint-unk xtile ytile)
+                    (draw-tile "error" xtile ytile)
                 )
             )
             ;(get-key)
@@ -71,16 +90,18 @@
     )
 )
 
-(defun paint-paret(x y)
-    (draw-tile "wall" x y)
-)
-(defun paint-cami(x y)
-    (draw-tile "path2" x y)
-)
-(defun paint-unk(x y)
-    (draw-tile "error" x y)
-)
-
+;; =========================================
+;; Funció: "clear-text"
+;; Borra una secció rectangular de la pantalla amb el color de fons gràcies
+;; al " "
+;;
+;; Paràmetres:
+;;  - x,y: coordenades text de l'esquina superior del rectangle
+;;  - w,h: tamany del rectangle
+;;
+;; Retorn:
+;;  - res
+;; ==========================================
 ; TODO: canviar a recorrer rec un array
 (defun get-strname (tile)
     (cond
