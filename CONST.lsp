@@ -10,8 +10,8 @@
 (setq BTR 'BTR) ; recursive division
 (setq algorisme-generacio DFS)
 
-(setq FILES (- 66 2)) ; 2 de files extra de parets que s'afegeixen
-(setq COLUMNES (- 66 2))
+(setq FILES (- 50 2)) ; 2 de files extra de parets que s'afegeixen
+(setq COLUMNES (- 50 2))
 (setq iniciEntrada (list (list 0 0) (list (- FILES 1) 0)))
 
 (setq displacements '((1 0) (-1 0) (0 1) (0 -1)))
@@ -25,7 +25,14 @@
 
 (setq laberintOutputFile "laberintGenerat.txt")
 (setq estadistiquesFile "estadistiques.txt")
-(setq ID 0)
+
+(setq left 0)
+(setq right 1)
+(setq up 2)
+(setq down 3)
+(setq admin 666)
+(setq esc -1)
+
 
 (setq key_per_maze 3)
 
@@ -67,3 +74,5 @@
 (setq opt2 50)
 (setq opt3 51)
 (setq opt4 52)
+
+(setq optRepaint 1)

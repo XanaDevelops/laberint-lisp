@@ -1,9 +1,4 @@
-(setq left 0)
-(setq right 1)
-(setq up 2)
-(setq down 3)
-(setq admin 666)
-(setq esc -1)
+
 
 ;optimitzar recursio +3?
 (defun user-input()

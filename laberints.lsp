@@ -23,7 +23,12 @@
 (defun-tco main(&optional (id 0))
     (stop-all)
     (play-song snd-menu t)
-    (menu-loop id)
+    (color 255 255 255 0 0 0)
+
+    
+    
+    (menu-loop id optRepaint)
+
 )
 
 ;; =========================================
@@ -39,8 +44,13 @@
 ;; ==========================================
 (defun-tco menu-loop(id &optional (aux nil))
     (color 255 255 255 0 0 0)
-    (cls)
-    (draw-tile-nocheck "banner" 0 375)
+    (cond 
+        ((eq aux optRepaint)
+            (cls)
+            (draw-tile-nocheck "banner" 0 375)
+        )
+        (t t)
+    )
     (clear-text 20 15 40 7)
 
     (draw-border 150 150 20 6)
@@ -79,7 +89,7 @@
             (show-text '("              Tria l'algorisme"
                         "1) DFS"
                         "2) PRIM"
-                        "3) RDV"
+                        "3) BTR"
                         "0) Tornar enrera"
             ))
         )
@@ -90,7 +100,7 @@
             (let ((path (read)))
                 (goto-xy 20 18)
                 (princ "Generant...")
-                (genera path (cond ((eq aux opt1) DFS)((eq aux opt2) PRIM)((eq aux opt3) RDV)))
+                (genera path (cond ((eq aux opt1) DFS)((eq aux opt2) PRIM)((eq aux opt3) BTR)))
             )
             (goto-xy 20 19)
             (princ "OK")
@@ -116,7 +126,7 @@
             (princ "         Escriu el nom de l'arxiu:")
             (goto-xy 20 17)
             (let* ((laberint (read)) (stats (getLlistaClassificacions (make-jugador :laberint laberint))))
-                (clear-text 26 3 29 17)
+                (clear-text 26 2 29 18)
                 (show-text (append (list "       ESTADISTIQUES"
                                 (format nil "~S" laberint) ""
                                 )
@@ -128,7 +138,7 @@
                 
 
                 (get-key)
-                (menu-loop 0)
+                (menu-loop 0 optRepaint)
             )
         )
         (t 

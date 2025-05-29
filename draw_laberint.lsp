@@ -134,9 +134,17 @@
             (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) ytile))
                 (+ (* (1+ xtile) TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
         )
+    )
+    (cond
         ((> (mod (- ypos) TILESIZE) 0)
             (draw-tile (get-strname (get-in-maze (get maze 'data) xtile (1+ ytile)))
                 (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
+        )
+    )
+    (cond 
+        ((or (> (mod (- ypos) TILESIZE) 0) (> (mod xpos TILESIZE) 0))
+            (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) (1+ ytile)))
+                (+ (* (1+ xtile) TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
         )
     )
     )
