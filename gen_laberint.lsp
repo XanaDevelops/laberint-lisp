@@ -47,7 +47,7 @@
   (cond 
     ((equal DFS algorisme-generacio) (algorisme-DFS nom-fitxer))
     ((equal PRIM algorisme-generacio) (algorisme-PRIM nom-fitxer))
-    (t (divisio-recursiva nom-fitxer))
+    (t (binary-tree nom-fitxer))
   )
 )
 
@@ -1912,7 +1912,7 @@
       (pos-final (list (- FILES 1) (- COLUMNES 1)))
       (laberint-complet (binary-tree-aux pos-inici pos-final laberint))
     )
-    (escriu-fitxer laberint-complet nom-fitxer)
+    (completar-laberint laberint-complet nom-fitxer)
   )
 )
 
