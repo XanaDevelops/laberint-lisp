@@ -40,7 +40,9 @@
 (defun-tco menu-loop(id &optional (aux nil))
     (color 255 255 255 0 0 0)
     (cls)
-    (draw-tile "banner" 100 340)
+    (draw-tile-nocheck "banner" 0 375)
+    (clear-text 20 15 40 7)
+
     (draw-border 150 150 20 6)
 
     (menu-text id aux)
