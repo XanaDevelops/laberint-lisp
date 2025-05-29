@@ -48,7 +48,7 @@
   (cond 
     ((equal DFS algorisme-generacio) (algorisme-DFS nom-fitxer))
     ((equal PRIM algorisme-generacio) (algorisme-PRIM nom-fitxer))
-    (t (divisio-recursiva nom-fitxer))
+    (t (binary-tree nom-fitxer))
   )
 )
 
@@ -115,7 +115,7 @@
       ; crida al metòde recursiu de PRIM
       (nou-laberint (PRIM-recursiu paretsL laberint1))
     )
-     (completar-laberint nou-laberint nom-fitxer )
+    (completar-laberint nou-laberint nom-fitxer)
     ; (escriu-fitxer nou-laberint nom-fitxer)
   )
 )
@@ -143,13 +143,13 @@
       ;Establir una posició random com entrada
       (pos-entrada 
         (cond 
-          ((null posEntr)  (obtenir-Primir-ODarrer camins-accessibles))
+          ((null posEntr) (obtenir-Primir-ODarrer camins-accessibles))
           (t posEntr)
         )
-        )
-     
+      )
 
-      (laberint-amb-entrada  
+
+      (laberint-amb-entrada 
         (cond 
           ((null posEntr)
            (establir-valor-matriu laberint-amb-parets-externes entrada pos-entrada)
@@ -166,8 +166,8 @@
           (obtenir-casella-mes-llunyana pos-entrada camins-accessibles)
         )
       )
-     )
-  
+    )
+
     (escriu-fitxer laberint-complet nom-fitxer)
   )
 )
@@ -181,7 +181,13 @@
 ;;   - nom-fitxer: Nom del fitxer on es desarà el laberint generat.
 ;;
 ;; =============================================================================
-
+(defun triaOrientacio (cols filas) 
+  (cond 
+    ((< cols filas) 0)
+    ((> cols filas) 1)
+    (t (random 2))
+  )
+)
 (defun divisio-recursiva (nom-fitxer) 
   (let* 
     ;; inicialitzar el laberint a 'cami'
@@ -197,7 +203,7 @@
     )
     ; (escriu-fitxer laberint1 nom-fitxer)
 
-     (completar-laberint laberint1 nom-fitxer)
+    (completar-laberint laberint1 nom-fitxer)
   )
 )
 
@@ -375,14 +381,13 @@
   (cond 
     ((or (null i) (null j))
      llista-camins
-     
     )
     (t
      (let* 
-       ((next-pos (seguent-IJ i j laberint))
-        (rows (length laberint))
-        (cols (length (car laberint)))
-        )
+       ((next-pos (seguent-IJ i j laberint)) 
+         (rows (length laberint))
+         (cols (length (car laberint)))
+       )
        (cond 
          ((or (>= i rows) (>= j cols) (null next-pos))
           llista-camins
@@ -436,16 +441,26 @@
 ;   )
 ; )
 
-(defun seguent-IJ (i j laberint)
-  (let* ((rows (length laberint))
-         (cols (cond ((= rows 0) 0)
-                     (t (length (car laberint))))))
-    (cond
+(defun seguent-IJ (i j laberint) 
+  (let* 
+    ((rows (length laberint)) 
+      (cols 
+        (cond 
+          ((= rows 0) 0)
+          (t (length (car laberint)))
+        )
+      )
+    )
+    (cond 
       ((or (>= i rows) (>= j cols)) nil)
       ((and (= j (- cols 1)) (< i (- rows 1)))
-       (list (+ i 1) 0))
+       (list (+ i 1) 0)
+      )
       ((and (= j (- cols 1)) (>= i (- rows 1))) nil)
-      (t (list i (+ j 1))))))
+      (t (list i (+ j 1)))
+    )
+  )
+)
 
 
 
@@ -734,14 +749,14 @@
 ;; Retorn:
 ;;  - Llista de posicions adjacents vàlides.
 ;; =============================================================================
-(defun caselles-Adjacents (matrix pos) 
+(defun caselles-Adjacents (matrix pos &optional (displacs displacements)) 
   (let 
     ((pos-nova 
        (mapcar 
          (lambda (llista) 
            (list (+ (car pos) (car llista)) (+ (cadr pos) (cadr llista)))
          )
-         displacements
+         displacs
        )
      ) 
     )
@@ -958,7 +973,9 @@
 ;; Retorn:
 ;;  - Llista amb els camins accessibles (amb almenys dos camins veïns).
 ;; =============================================================================
-(defun-tco obtenir-Camins-Accessibles (laberint llista-camins &optional (i 0) (camins-accessibles '())) 
+(defun-tco 
+  obtenir-Camins-Accessibles
+  (laberint llista-camins &optional (i 0) (camins-accessibles '()))
   (cond 
     ((>= i (length llista-camins)) camins-accessibles)
     (t
@@ -968,15 +985,31 @@
        )
        (cond 
          ((>= (camins-veinats caselles-Adjacents llista-camins) 2)
-          (let ((camins-accessibles-actualitzada (cons cami-actual camins-accessibles)))
-             (obtenir-Camins-Accessibles laberint llista-camins (+ i 1) camins-accessibles-actualitzada )
+          (let 
+            ((camins-accessibles-actualitzada 
+               (cons cami-actual camins-accessibles)
+             ) 
+            )
+            (obtenir-Camins-Accessibles 
+              laberint
+              llista-camins
+              (+ i 1)
+              camins-accessibles-actualitzada
+            )
           )
-          ; (cons cami-actual 
+          ; (cons cami-actual
           ;       (obtenir-Camins-Accessibles laberint llista-camins (+ i 1))
           ; )
          )
 
-         (t (obtenir-Camins-Accessibles laberint llista-camins (+ i 1) camins-accessibles))
+         (t
+          (obtenir-Camins-Accessibles 
+            laberint
+            llista-camins
+            (+ i 1)
+            camins-accessibles
+          )
+         )
        )
      )
     )
@@ -1060,11 +1093,322 @@
 ;;     ben distribuïts.
 ;; =============================================================================
 
+
+
+; (defun draw-wall (laberint wx wy px py dx dy longitud &optional (i 0)) 
+;   (cond 
+;     ((= i longitud)
+;      laberint
+;     )
+;     (t
+;      (let* 
+;        ((cx (+ wx (* i dx))) 
+;          (cy (+ wy (* i dy)))
+;          ;; si (cx,cy) es la puerta, NO dibujamos pared:
+;          (nuevo-lab 
+;            (cond 
+;              ((and (= cx px) (= cy py))
+;               laberint
+;              )
+;              (t (establir-valor-matriu laberint cami (list cy cx)))
+;            )
+;          )
+;        )
+;        (draw-wall nuevo-lab wx wy px py dx dy longitud (1+ i))
+;      )
+;     )
+;   )
+; )
+
+; (defun-tco 
+;   divide-recursiu-auxiliar
+;   (laberint filas cols orient posX posY)
+;   (cond 
+;     ((or (< cols 2) (< filas 2))
+;      laberint
+;     )
+
+;     (t
+;      (let* 
+;        (
+;         ;Iniciam les variables segons l'orientació actual de la subregió
+;         (horizontal (= orient 0))
+
+;         (wx (cond (horizontal posX) (t (+ posX (random (1- cols))))))
+;         (wy (cond (horizontal (+ posY (random (1- filas)))) (t posY)))
+;         (px (cond (horizontal (+ wx (random cols))) (t wx)))
+;         (py (cond (horizontal wy) (t (+ wy (random filas)))))
+;         (dx (cond (horizontal 1) (t 0)))
+;         (dy (cond (horizontal 0) (t 1)))
+;         (longitud (cond (horizontal cols) (t filas)))
+
+
+;         ; Dibuixarem les parets de
+;         (lab (draw-wall laberint wx wy px py dx dy longitud))
+
+;         ;; Subregió 1
+;         (f1 (cond (horizontal (+ (- wy posY) 1)) (t filas)))
+;         (c1 (cond (horizontal cols) (t (+ (- wx posX) 1))))
+;         (x1 posX)
+;         (y1 posY)
+
+;         ;; Subregió 2
+;         (f2 (cond (horizontal (- filas f1)) (t filas)))
+;         (c2 (cond (horizontal cols) (t (- cols c1))))
+;         (x2 (cond (horizontal posX) (t (+ posX c1))))
+;         (y2 (cond (horizontal (+ posY f1)) (t posY)))
+
+;         (lab1 (funcall 'divide-recursiu-auxiliar lab f1 c1 (triaOrientacio c1 f1) x1 y1))
+;        )
+;        (divide-recursiu-auxiliar lab1 f2 c2 (triaOrientacio c2 f2) x2 y2)
+;      )
+;     )
+;   )
+; )
+
+
+
+; ;; =============================================================================
+; ;; Funció: 'dibuixar-liniesV-Parets'
+; ;; Dibuixa una línia vertical de camins en el laberint entre dues posicions donades.
+; ;;
+; ;; Paràmetres:
+; ;;  - pos-inicial: Posició inicial (i, j) de la regió de dibuix.
+; ;;  - pos-final: Posició final (i, j) de la regió de dibuix.
+; ;;  - laberint: Representació del laberint.
+; ;;
+; ;; Retorn:
+; ;;  - Laberint modificat amb la línia vertical de camins dibuixada.
+; ;; =============================================================================
+; (defun dibuixar-liniesV-Parets (pos-inicial pos-final laberint) 
+;   (cond 
+;     ((equal pos-inicial pos-final)
+;      (establir-valor-matriu laberint cami pos-inicial)
+;     )
+;     (t
+;      (let 
+;        ((nou-laberint (establir-valor-matriu laberint cami pos-inicial)))
+;        (dibuixar-liniesV-Parets 
+;          (list (car pos-inicial) (+ 1 (cadr pos-inicial)))
+;          pos-final
+;          nou-laberint
+;        )
+;      )
+;     )
+;   )
+; )
+; ;; =============================================================================
+; ;; Funció: 'dibuixar-liniesH-Parets'
+; ;; Dibuixa una línia horitzontal de parets en el laberint entre dues posicions donades.
+; ;;
+; ;; Paràmetres:
+; ;;  - pos-inicial: Posició inicial (i, j) de la regió de dibuix.
+; ;;  - pos-final: Posició final (i, j) de la regió de dibuix.
+; ;;  - laberint: Representació del laberint.
+; ;;
+; ;; Retorn:
+; ;;  - Laberint modificat amb la línia horitzontal de parets dibuixada.
+; ;; =============================================================================
+; (defun dibuixar-liniesH-Parets (pos-inicial pos-final laberint) 
+;   (cond 
+;     ((equal pos-inicial pos-final)
+;      (establir-valor-matriu laberint cami pos-inicial)
+;     )
+;     (t
+;      (let 
+;        ((nou-laberint (establir-valor-matriu laberint paret pos-inicial)))
+;        (dibuixar-liniesH-Parets 
+;          (list (+ 1 (car pos-inicial)) (cadr pos-inicial))
+;          pos-final
+;          nou-laberint
+;        )
+;      )
+;     )
+;   )
+; )
+; ;; =============================================================================
+; ;; Funció: 'dibuixar-parets'
+; ;; Dibuixa dues lineas perpendiculars de parets al voltant d'una posició aleatòria dins del laberint.
+; ;;
+; ;; Paràmetres:
+; ;;  - pos-aleatoria: Posició aleatòria (i, j).
+; ;;  - pos-inici: Posició inicial (i, j) de la regió de dibuix.
+; ;;  - pos-fi: Posició final (i, j) de la regió de dibuix.
+; ;;  - laberint: Representació del laberint.
+; ;;
+; ;; Retorn:
+; ;;  - Laberint modificat amb les parets dibuixades.
+; ;; =============================================================================
+; ; (defun dibuixar-parets (pos-aleatoria pos-inici pos-fi laberint) 
+; ;   (let* 
+; ;     ((lab1 
+; ;        (dibuixar-liniesV-Parets 
+; ;          (list (car pos-aleatoria) (cadr pos-inici))
+; ;          (list (car pos-aleatoria) (cadr pos-fi))
+; ;          laberint
+; ;        )
+; ;      ) 
+; ;       (lab2 
+; ;         (dibuixar-liniesH-Parets 
+; ;           (list (elemX pos-inici) (cadr pos-aleatoria))
+; ;           (list (elemX pos-fi) (cadr pos-aleatoria))
+; ;           lab1
+; ;         )
+; ;       )
+; ;       (punts-candidats (tria-punts pos-inici pos-aleatoria pos-fi))
+
+     
+; ;       (punts-finals 
+; ;         (remove_Elem_ByIndex (random (length punts-candidats)) punts-candidats)
+; ;       )
+; ;     )
+; ;     (obrir-camins punts-finals lab2)
+; ;   )
+; ; )
+; (defun dibuixar-parets (pos-aleatoria pos-inici pos-fi laberint) 
+;   (let* 
+;     ((lab1 
+;        (dibuixar-liniesV-Parets 
+;          (list (car pos-aleatoria) (cadr pos-inici))
+;          (list (car pos-aleatoria) (cadr pos-fi))
+;          laberint
+;        )
+;      ) 
+;       (lab2 
+;         (dibuixar-liniesH-Parets 
+;           (list (elemX pos-inici) (cadr pos-aleatoria))
+;           (list (elemX pos-fi) (cadr pos-aleatoria))
+;           lab1
+;         )
+;       )
+;       (punts-finals 
+;         (tria-rec (interval-aleatori 0 4) pos-inici pos-aleatoria pos-fi)
+;       )
+      
+;       ; (punts-finals 
+;       ;   (remove_Elem_ByIndex 
+;       ;     (random (length punts-candidats-totals))
+;       ;     punts-candidats-totals
+;       ;   )
+;       ; )
+;     ;  (punts-finals (tria-punts pos-inici pos-aleatoria pos-fi))
+;     )
+;     (obrir-camins punts-finals lab2)
+;   )
+; )
+
+; (defun tria-rec (n pos-inicial pos-aleatoria pos-fi &optional (llista '())) 
+;   (cond 
+;     ((= 0 n) (elimina-duplicats llista))
+;     (t
+;      (tria-rec 
+;        (- n 1)
+;        pos-inicial
+;        pos-aleatoria
+;        pos-fi
+;        (append (tria-punts pos-inicial pos-aleatoria pos-fi) llista)
+;      )
+;     )
+;   )
+; )
+; (defun elimina-duplicats (llista) 
+;   (cond
+;   ((null llista) nil)
+;   ((memberL (car llista) (cdr llista)) (elimina-duplicats (cdr llista)))
+;   (t (cons (car llista) (elimina-duplicats (cdr llista)))))
+; )
+; ;; =============================================================================
+; ;; Funció: 'obrir-camins'
+; ;; Obre camins en el laberint a partir d'una llista de punts candidats.
+; ;;
+; ;; Paràmetres:
+; ;;  - punts-candidats: Llista de posicions (i, j).
+; ;;  - laberint: Representació del laberint.
+; ;;
+; ;; Retorn:
+; ;;  - Laberint modificat amb els camins oberts.
+; ;; =============================================================================
+; (defun obrir-camins (punts-candidats laberint) 
+;   (cond 
+;     ((null punts-candidats)
+;      laberint
+;     )
+;     (t
+;      (let 
+;        ((laberint-modificat 
+;           (establir-valor-matriu laberint cami (car punts-candidats))
+;         ) 
+;        )
+;        (obrir-camins (cdr punts-candidats) laberint-modificat)
+;      )
+;     )
+;   )
+; )
+; ;; =============================================================================
+; ;; Funció: 'tria-punts'
+; ;; Genera quatre punts candidats per obrir camins dins el laberint.
+; ;;
+; ;; Paràmetres:
+; ;;  - pos-inici: Posició inicial (i, j).
+; ;;  - pos-aleatoria: Posició aleatòria (i, j).
+; ;;  - pos-fi: Posició final (i, j).
+; ;;
+; ;; Retorn:
+; ;;  - Llista de quatre punts en les quatre direcciones possibles seleccionats aleatòriament.
+; ;; =============================================================================
+; (defun tria-punts (pos-inici pos-aleatoria pos-fi) 
+;   (let* 
+;     ((punt1 
+;        (list (elemX pos-aleatoria) 
+;              (interval-aleatori (elemY pos-inici) (elemY pos-aleatoria))
+;        )
+;      )  ; dalt
+;       (punt2 
+;         (list (elemX pos-aleatoria) 
+;               (interval-aleatori (elemY pos-aleatoria) (elemY pos-fi))
+;         )
+;       ) ; baix
+;       (punt3 
+;         (list (interval-aleatori (elemX pos-inici) (elemX pos-aleatoria)) 
+;               (elemY pos-aleatoria)
+;         )
+;       ) ; esquerra
+;       (punt4 
+;         (list (interval-aleatori (elemX pos-aleatoria) (elemX pos-fi)) 
+;               (elemY pos-aleatoria)
+;         )
+;       )
+;     ) ; dreta
+;     (list punt1 punt2 punt3 punt4)
+;   )
+; )
+
+; ;; =============================================================================
+; ;; Funció: 'interval-aleatori'
+; ;; Retorna un valor aleatori dins un interval definit.
+; ;;
+; ;; Paràmetres:
+; ;;  - n: valor mínim.
+; ;;  - m: valor màxim.
+; ;;
+; ;; Retorn:
+; ;;  - Nombre aleatori dins el rang (n, m).
+; ;; =============================================================================
+; (defun interval-aleatori (n m) 
+;   (+ (1+ n) (random (max 1 (- m n 1))))
+; )
+
+
+; (defun elemX (pos) (car pos))
+; (defun elemY (pos) (cadr pos))
+ 
+
+
 (defun divisio-recursiva-auxiliar (posInici posFi laberint) 
 
   (cond 
-    ((or (< (- (elemX posFi) (elemX posInici)) 3) 
-         (< (- (elemY posFi) (elemY posInici)) 3 )
+    ((or (< (- (elemX posFi) (elemX posInici)) 2) 
+         (< (- (elemY posFi) (elemY posInici)) 2)
      )
      laberint
     )
@@ -1087,41 +1431,50 @@
              lab2
            )
          )
-        (lab4 (divisio-recursiva-auxiliar 
-         (list (elemX pos-aleatoria) (elemY posInici))
-         (list (elemX posFi) (elemY pos-aleatoria))
-         lab3
-       ))
+         (lab4 
+           (divisio-recursiva-auxiliar 
+             (list (elemX pos-aleatoria) (elemY posInici))
+             (list (elemX posFi) (elemY pos-aleatoria))
+             lab3
+           )
+         )
        )
        ; juntar els 4 sublaberints
-      ;  (combine-laberints lab1 lab2 lab3 lab4)
+       ;  (combine-laberints lab1 lab2 lab3 lab4)
        lab4
-
-       
      )
     )
   )
 )
 
 
-(defun combine-horizontal (labA labB)
- 
-  (mapcar (lambda (rowA rowB)
-            (append rowA rowB))
-          labA labB))
+(defun combine-horizontal (labA labB) 
 
-(defun combine-laberints (lab1 lab2 lab3 lab4)
-  
-  (let ((top-part (combine-horizontal lab1 lab2))
-        (bottom-part (combine-horizontal lab3 lab4)))
-    (append top-part bottom-part)))
+  (mapcar 
+    (lambda (rowA rowB) 
+      (append rowA rowB)
+    )
+    labA
+    labB
+  )
+)
+
+(defun combine-laberints (lab1 lab2 lab3 lab4) 
+
+  (let 
+    ((top-part (combine-horizontal lab1 lab2)) 
+      (bottom-part (combine-horizontal lab3 lab4))
+    )
+    (append top-part bottom-part)
+  )
+)
 
 
 
 
 ;; =============================================================================
 ;; Funció: 'dibuixar-liniesV-Parets'
-;; Dibuixa una línia vertical de camins en el laberint entre dues posicions donades.
+;; Dibuixa una línia vertical de parets en el laberint entre dues posicions donades.
 ;;
 ;; Paràmetres:
 ;;  - pos-inicial: Posició inicial (i, j) de la regió de dibuix.
@@ -1134,11 +1487,11 @@
 (defun dibuixar-liniesV-Parets (pos-inicial pos-final laberint) 
   (cond 
     ((equal pos-inicial pos-final)
-     (establir-valor-matriu laberint cami pos-inicial)
+     (establir-valor-matriu laberint paret pos-inicial)
     )
     (t
      (let 
-       ((nou-laberint (establir-valor-matriu laberint cami pos-inicial)))
+       ((nou-laberint (establir-valor-matriu laberint paret pos-inicial)))
        (dibuixar-liniesV-Parets 
          (list (car pos-inicial) (+ 1 (cadr pos-inicial)))
          pos-final
@@ -1299,5 +1652,284 @@
 
 (defun elemX (pos) (car pos))
 (defun elemY (pos) (cadr pos))
- 
+
+
+(defun pos-random-laberint (lab) 
+  (let 
+    ((f (length lab)) 
+      (c (length (car lab)))
+    )
+    (list (random f) (random c))
+  )
+)
+;---------Algorisme de Wilson. Funciona pero no és adaptat al nostre laberint
+
+
+
+; (defstruct 
+;   llista-composta
+;   laberint
+;   visitats
+;   path
+; )
+; (defun algorisme-wilson (nom-fitxer) 
+;   (let* 
+;     ((laberint (crea-matriu FILES COLUMNES paret)) 
+;       (pos-inicial (pos-random-laberint laberint))
+;       (pos-random (pos-random-laberint laberint))
+;       (lab-inicial (establir-valor-matriu laberint cami pos-inicial))
+
+;       (llista-args 
+;         (make-llista-composta 
+;           :laberint
+;           lab-inicial
+;           :visitats
+;           (list '(0 0))
+;           :path
+;           (list pos-random)
+;         )
+;       )
+
+;       ;; Pasar los visitados como lista cuyo primer elemento es la posición inicial
+;       (llista-final 
+;         (algorisme-wilson-aux llista-args)
+;       )
+;     )
+;     (format t "laberint-final~a~%" (llista-composta-laberint llista-final))
+;     (escriu-fitxer (llista-composta-laberint llista-final) nom-fitxer)
+;   )
+; )
+
+; (defun all-visited (visitats laberint) 
+;   (= (length visitats) (/ (* (length laberint) (length (car laberint))) 2))
+; )
+
+; (defun-tco 
+;   algorisme-wilson-aux
+;   (llista)
+;   (cond 
+;     ; ((visitats-completats
+;     ;    (llista-composta-visitats llista)
+;     ;    (llista-composta-laberint llista)
+;     ;  )
+;     ((all-visited 
+;        (llista-composta-visitats llista)
+;        (llista-composta-laberint llista)
+;      )
+;      llista
+;     )
+;     (t
+;      (let* 
+;        ((pos-random 
+;           (tria-pos-no-visitada 
+;             (llista-composta-visitats llista)
+;             (llista-composta-laberint llista)
+;           )
+;         ) 
+
+;          (compost (random-walk pos-random llista))
+;        )
+;        compost
+;        ;  (algorisme-wilson-aux compost)
+;      )
+;     )
+;   )
+; )
+
+; (defun pos-random-adjacent-2passes (current laberint) 
+;   (let* 
+
+;     ((direccions '((0 2) (2 0) (-2 0) (0 -2))) 
+;       (adjacents (caselles-Adjacents laberint current direccions))
+;     )
+;     (nth (random (length adjacents)) adjacents)
+;   )
+; )
+
+
+
+; (defun-tco 
+;   random-walk
+;   (current llista)
+;   (let* 
+;     ((visitats (llista-composta-visitats llista)) 
+;       (lab (llista-composta-laberint llista))
+;       (path (llista-composta-path llista))
+;       (next (pos-random-adjacent-2passes current lab))
+;     )
+;     (cond 
+;       ; CAS 1 : next s'ha visitat?
+;       ((memberL current visitats)
+;        ; actualitzar lab
+;        (let* 
+;          ; marcar les cel·les depath amb cami en el laberint
+;          ((lab-updated (actualitza-laberint lab path)) 
+;            ; marcar totes les cel·les de path com visitades
+;            (visitats-upd (union visitats path :test #'equal))
+;            (llista-upd 
+;              (make-llista-composta 
+;                :laberint
+;                lab-updated
+;                :visitats
+;                visitats-upd
+;                ; restablir el path
+;                :path
+;                '()
+;              )
+;            )
+;          )
+
+;          (algorisme-wilson-aux llista-upd)
+;        )
+;       )
+
+;       ;; CAS 2: next està en el camí actual --> tenim un bucle que s'ha d'eliminar
+;       ((memberL current path)
+;        (let* 
+;          ((new-path (elimina-bucle path current))  ; elimina el bucle
+;            (nova-llista 
+;              (make-llista-composta :laberint lab :visitats visitats :path new-path)
+;            )
+;          )
+
+;          ; segueix l'exploració a partir d'una pos random?
+;          ;  (random-walk next nova-llista)
+;          (random-walk next nova-llista)
+;        )
+;       )
+
+;       ;; CAS 3: posició nova
+;       (t
+;        (let 
+;          ((path-updated (snoc current path)))
+
+;          (random-walk 
+;            next
+;            (make-llista-composta :laberint lab :visitats visitats :path path-updated)
+;          )
+;        )
+;       )
+;     )
+;   )
+; )
+; (defun actualitza-laberint (lab path) 
+;   (cond 
+;     ((null (cdr path)) lab)
+;     (t
+;      (let* 
+;        ((lab1 (establir-valor-matriu lab cami (car path))) 
+;          (lab2 (establir-valor-matriu lab1 paret (cadr path)))
+;        )
+;        (actualitza-laberint lab2 (cddr path))
+;      )
+;     )
+;   )
+; )
+
+;   ; elimina de path des de pos final al final
+; (defun elimina-bucle (path pos) 
+;   (cond 
+;     ((equal (car path) pos) nil)
+;     (t (cons (car path) (elimina-bucle (cdr path) pos)))
+;   )
+; )
+; (defun tria-pos-no-visitada (visitats lab) 
+;   (let* 
+;     ((posicions-lab (construix-pos-lab lab)) 
+;       (pos-no-visitats (resta-llistes posicions-lab visitats))
+;       (no-visitats-shuffled (modernFisher-Yates pos-no-visitats))
+;     )
+
+;     (nth (random (length no-visitats-shuffled)) no-visitats-shuffled)
+;   )
+; )
+; (defun construix-pos-lab (lab &optional (llista '())) 
+;   (let* 
+;     ((l1 
+;        (genera-llista 
+;          (length (car lab))
+;        )
+;      )  ; files
+
+;       (l2 
+;         (genera-llista 
+;           (length lab)
+;         )
+;       ) ;columnes
+;     )
+;     (producte-llistes l2 l1)
+;   )
+; )
+; (defun genera-llista (N) 
+;   (cond 
+;     ((= 0 N) nil)
+;     (t (append (genera-llista (- N 1)) (list (- N 1))))
+;   )
+; )
+; (defun producte-llistes (l1 l2) 
+
+;   (cond 
+;     ((null l1) '())
+;     (t
+;      (append (mapcar (lambda (x) (list (first l1) x)) l2) 
+;              (producte-llistes (rest l1) l2)
+;      )
+;     )
+;   )
+; )
+; (defun visitats-completats (visitats laberint) 
+;   (cond 
+;     ((llistes-iguals visitats (construix-pos-lab laberint)) t)
+;     (t nil)
+;   )
+; )
+
+;   ; restar les posiciones l2 de l1;
+;   ; se sap que tots els elements de l2 estan a l1
+;   ; i que no hi ha elements duplicats
+; (defun resta-llistes (l1 l2) 
+;   (cond 
+;     ((null l2) l1)
+;     ((memberL (car l2) l1)
+;      (resta-llistes (esborra (car l2) l1) (cdr l2))
+;     )
+;     (t (resta-llistes l1 (cdr l2)))
+;   )
+; )
+; (defun llistes-iguals (l1 l2) 
+
+;   (cond 
+;     ((and (null l2) (null l1)) t)
+;     ((memberL (car l1) l2) (llistes-iguals (cdr l1) (esborra (car l1) l2)))
+;     (t nil)
+;   )
+; )
+
+;------------ Alternativa de wilson, binary tree que s'ha adaptar també al nostre laberint-----------
+(defun binary-tree (nom-fitxer) 
+  (let* 
+    ((laberint (crea-matriu FILES COLUMNES paret)) 
+      (pos-inici '(0 0))
+      (pos-final (list (- FILES 1) (- COLUMNES 1)))
+      (laberint-complet (binary-tree-aux pos-inici pos-final laberint))
+    )
+    (completar-laberint laberint-complet nom-fitxer)
+  )
+)
+
+(defun binary-tree-aux (pos-inici pos-fi lab) 
+  (cond 
+    ((equal pos-inici pos-fi) lab)
+    (t
+     (let* 
+       ((caselles-adjacents (caselles-Adjacents lab pos-inici )) 
+         (next (nth (random (length caselles-adjacents)) caselles-adjacents))
+         (lab-actualitzat (establir-valor-matriu lab cami next))
+         (seguent (seguent-IJ (car pos-inici) (cadr pos-inici) lab-actualitzat)) 
+       )
+       (binary-tree-aux seguent pos-fi lab-actualitzat)
+     )
+    )
+  )
+)
 

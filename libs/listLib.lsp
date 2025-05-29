@@ -23,7 +23,7 @@
 
 (defun snoc (e l) 
   (cond 
-    ((null l) (cons e nil))
+    ((null l) (cons  e nil))
     (t (cons (car l) (snoc e (cdr l))))
   )
 )
