@@ -1,10 +1,3 @@
-;========================================================================
-; Classe encarregada de la gestió visual del laberint.
-; Implementa funcions per llegir el laberint des d’un fitxer, pintar-lo a la
-; pantalla, esborrar posicions del jugador, gestionar la conversió de
-; coordenades, i dibuixar les claus.
-;========================================================================
-
 ;; =========================================
 ;; Funció: "read-maze"
 ;; Llegeix un laberint des d'un fitxer
