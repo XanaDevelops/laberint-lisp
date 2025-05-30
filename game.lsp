@@ -11,6 +11,7 @@
 (load 'draw_minimap)
 (load 'draw_hud)
 (load 'libs\\listLib)
+(load 'Partida)
 
 ;========================================================================
 ;; Aquesta classe implementa la funció principal `explora`, que implementa

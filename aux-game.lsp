@@ -294,7 +294,46 @@
 )
 )
 
-
+;; =========================================
+;; Funció: "clear-text"
+;; Borra una secció rectangular de la pantalla amb el color de fons gràcies
+;; al " "
+;;
+;; Paràmetres:
+;;  - x,y: coordenades text de l'esquina superior del rectangle
+;;  - w,h: tamany del rectangle
+;;
+;; Retorn:
+;;  - res
+;; ==========================================
+(defun clear-text(x y w h)
+    ;; =========================================
+    ;; Funció: "gen-white"
+    ;; Crea " "*n 
+    ;;
+    ;; Paràmetres:
+    ;;  - n: nº d'espais
+    ;;
+    ;; Retorn:
+    ;;  - " "*n
+    ;; ==========================================
+    (defun gen-white(n)
+        (cond 
+            ((= n 0) "")
+            (t (strcat " " (gen-white (1- n))))
+        )
+    )
+    (cond 
+        ((= h 0)
+            t
+        )
+        (t 
+            (goto-xy x y)
+            (princ (gen-white w))
+            (clear-text x (1+ y) w (1- h))
+        )
+    )
+)
 
 
 

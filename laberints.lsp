@@ -1,3 +1,14 @@
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>HEADER>>>>>>>>>>>>>>>>>>>>>>>>>
+; Autors: Daniel García Vázquez, Khaoula Ikkene.
+; Data de començament: 20 Març, 2025
+; Dara d'entrega : 03 Juny, 2025
+; Assignatura: 21721 - Llenguatges de Programació. 
+; Grup: PF1-13
+; Professors: Antoni Oliver Tomàs, Francesc Xavier Gayà Morey
+; Convocatòria Ordinària
+;
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 (load 'CONST)
 (load 'tco)
 (load 'fitxer-io)
@@ -9,17 +20,6 @@
 
 (load 'partida)
 (load 'gen_laberint)
-
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>HEADER>>>>>>>>>>>>>>>>>>>>>>>>>
-; Autors: Daniel García Vázquez, Khaoula Ikkene.
-; Data de començament: 20 Març, 2025
-; Dara d'entrega : 03 Juny, 2025
-; Assignatura: 21721 - Llenguatges de Programació. 
-; Grup: PF1-13
-; Professors: Antoni Oliver Tomàs, Francesc Xavier Gayà Morey
-; Convocatòria Ordinària
-;
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 ;========================================================================
 ; Classe principal del joc.
@@ -248,47 +248,6 @@
     )
 )
 
-
-;; =========================================
-;; Funció: "clear-text"
-;; Borra una secció rectangular de la pantalla amb el color de fons gràcies
-;; al " "
-;;
-;; Paràmetres:
-;;  - x,y: coordenades text de l'esquina superior del rectangle
-;;  - w,h: tamany del rectangle
-;;
-;; Retorn:
-;;  - res
-;; ==========================================
-(defun clear-text(x y w h)
-    ;; =========================================
-    ;; Funció: "gen-white"
-    ;; Crea " "*n 
-    ;;
-    ;; Paràmetres:
-    ;;  - n: nº d'espais
-    ;;
-    ;; Retorn:
-    ;;  - " "*n
-    ;; ==========================================
-    (defun gen-white(n)
-        (cond 
-            ((= n 0) "")
-            (t (strcat " " (gen-white (1- n))))
-        )
-    )
-    (cond 
-        ((= h 0)
-            t
-        )
-        (t 
-            (goto-xy x y)
-            (princ (gen-white w))
-            (clear-text x (1+ y) w (1- h))
-        )
-    )
-)
 
 (setq *random-state* (make-random-state t)) ;revisar seeds
 (main)

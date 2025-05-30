@@ -127,12 +127,12 @@
 ;; Retorn:
 ;;  - res
 ;; ==========================================
-; borra el tile del jugador de forma optima, mirant quines caselles hi és sobre
 (defun cls-player(xpos ypos maze)
     (let* ((xtile (floor xpos TILESIZE)) (ytile (floor (- ypos) TILESIZE))
-            (tile (get-in-maze (get maze 'data) xtile ytile)))
+            (tile (get-in-maze (get maze 'data) xtile ytile))
+            (draw-pos (tile-to-draw xtile ytile maze)))
         ; sempre esta sobre l'origen de arredonir les coordenades
-        (draw-tile (get-strname tile) (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
+        (draw-tile (get-strname tile) (car draw-pos) (cadr draw-pos))   
     ;comprova quina casella del costat
     ;casella dreta
     (cond 
@@ -182,6 +182,16 @@
     )
 )
 
+;; =========================================
+;; Funció: "tile-to-coord"
+;;  Transforma unes coordenades de tile a coordenades de joc
+;;
+;; Paràmetres:
+;;  - xt, yt: coordenades tile
+;;
+;; Retorn:
+;;  - (x,y) coordenades de joc
+;; ==========================================
 (defun tile-to-coord(xt yt)
     (list 
         (+ (* xt TILESIZE))
@@ -189,10 +199,32 @@
     )
 )
 
+;; =========================================
+;; Funció: "coord-to-tile"
+;;  Transforma unes coordenades de joc a unes de tile, de forma exacta (floor) o no (round)
+;;
+;; Paràmetres:
+;;  - x, y: coordenades tile
+;;  - (opcional) exact: si usar floor o round
+;;
+;; Retorn:
+;;  - (xt, yt) coordenades de tile
+;; ==========================================
 (defun coord-to-tile(x y &optional (exact t))
     (mapcar (lambda (x) (apply (cond ((eq exact t) 'floor) (t 'round)) x)) (list (list x TILESIZE) (list (- y) TILESIZE)))
 )
 
+;; =========================================
+;; Funció: "draw-keys"
+;;  Dibuixa al laberint les claus no recollides
+;;
+;; Paràmetres:
+;;  - key-coords: llista amb les coordenades de les claus
+;;  - maze: dades del laberint
+;;
+;; Retorn:
+;;  - t
+;; ==========================================
 ;dibuixa les claus
 (defun draw-keys(key-coords maze)
     (cond 
