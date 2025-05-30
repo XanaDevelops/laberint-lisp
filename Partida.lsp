@@ -1,6 +1,10 @@
 (load "libs/listLib.lsp")
 (load "CONST.lsp")
-; guarda en el fixter estadistiques.txt la jugada recent
+;========================================================================
+;Aquesta classe serveix per poder guardar els jugados en el fitxer
+; estadistiquesFile declarat a la classe CONST.lsp, obtenir jugador 
+; d'aquell mateix fitxer i calcular la classificació d'un jugador donat
+;========================================================================
 ;; =============================================================================
 ;; Estructura: 'jugador'
 ;; Defineix una estructura per representar un jugador dins el joc.

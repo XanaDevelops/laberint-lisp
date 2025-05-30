@@ -12,6 +12,13 @@
 (load 'draw_hud)
 (load 'libs\\listLib)
 
+;========================================================================
+;; Aquesta classe implementa la funció principal `explora`, que implementa
+;; el bucle de joc per explorar un laberint, incloent la inicialització, 
+;; moviment del jugador, dibuix del laberint, gestió d'objectes 
+;; especials (claus, sortida), actualització del HUD, i lògica de 
+;; guany o sortida.
+;========================================================================
 
 ;; =========================================
 ;; Funció: "explora"

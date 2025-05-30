@@ -10,6 +10,25 @@
 (load 'partida)
 (load 'gen_laberint)
 
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>HEADER>>>>>>>>>>>>>>>>>>>>>>>>>
+; Autors: Daniel García Vázquez, Khaoula Ikkene.
+; Data de començament: 20 Març, 2025
+; Dara d'entrega : 03 Juny, 2025
+; Assignatura: 21721 - Llenguatges de Programació. 
+; Grup: PF1-13
+; Professors: Antoni Oliver Tomàs, Francesc Xavier Gayà Morey
+; Convocatòria Ordinària
+;
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+;========================================================================
+; Classe principal del joc.
+; És la classe que s'ha de cridar des del programa per iniciar el joc.
+; Carrega el menú principal, comunica a l'usuari la informació necessària
+; segons l'opció triada, i crida als mètodes corresponents per 
+; generar/explorar laberints, mostrar estadístiques, actualitzar dades, etc.
+;========================================================================
+
 ;; ========================================
 ;; Funció: "main"
 ;; Funció d'entrada de laberints.lsp

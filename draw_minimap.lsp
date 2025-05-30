@@ -1,5 +1,10 @@
 (load 'CONST)
-
+;========================================================================
+; Classe usada per gestionar i dibuixar el minimapa.
+; Permet mostrar, actualitzar i esborrar la posició del jugador,
+; així com representar el laberint en format reduït i gestionar el
+; recorregut i el camp de visió (Fog of War).
+;========================================================================
 ;; =============================================================================
 ;; Funció: draw-mm-player
 ;;  Dibuixa al minimapa la posició del jugador.

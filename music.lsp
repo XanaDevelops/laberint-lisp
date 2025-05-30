@@ -1,4 +1,10 @@
 (load 'sleep)
+;========================================================================
+; Classe que maneja el so del joc.
+; Permet iniciar i aturar el servidor de música, reproduir cançons
+; aturar tota la música i finalitzar el servidor.
+; Utilitza un script extern en Python per controlar la reproducció d'àudio.
+;========================================================================
 
 (defun start-server()
     (system "python music.py server")

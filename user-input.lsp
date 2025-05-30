@@ -1,4 +1,7 @@
 
+;========================================================================
+; Aquesta classe obté les tecles que pitja el jugador durant el joc
+;========================================================================
 
 ;optimitzar recursio +3?
 (defun user-input()

@@ -1,6 +1,12 @@
 (load 'CONST)
 (load 'draw_border)
 
+;========================================================================
+; Classe encarregada de gestionar el HUD (Head-Up Display) del joc.
+; Aquesta classe inclou funcionalitats per dibuixar la interfície 
+; gràfica que mostra informació rellevant al jugador durant la partida,
+; com ara el nombre de claus restants per recollir i els passos realitzats.
+;========================================================================
 ;; =============================================================================
 ;; Funció: draw-hud
 ;;  Dibuixa el hud a la pantalla.

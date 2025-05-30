@@ -3,7 +3,22 @@
 (load "CONST.lsp")
 (load "fitxer-io.lsp")
 
-
+;========================================================================
+; Classe principal per a la generació dels laberints
+; Implementa les funciones necessàries per crear laberints, accedir i 
+; modificar posiciones concretes del laberint, a més de totes les 
+; funciones auxiliars concretes de cada algorisme de generació.
+; EXTRES:
+; Implementació de dos mètodes de generació de laberints:
+;     * Algorsime de PRIM
+;     * Algorisme basat en arbre binari
+; Generació de laberints de mides superiors (fins 66x66) usant la macro defun-tco
+; Generació de laberints no quadrats
+; Selecció millorada d'entrada i sortida:
+;   * Donada una posició d'entrada, calcula la posició més llunyana 
+;     i l'estableix a sortida
+; 
+;========================================================================
 ;; =============================================================================
 ;; Funció: 'crea-matriu'
 ;; Crea una matriu representada como una llista de llistes de dimensió n x m 
@@ -1905,7 +1920,20 @@
 ;   )
 ; )
 
-;------------ Alternativa de wilson, binary tree que s'ha adaptar també al nostre laberint-----------
+;; =============================================================================
+;; Funció: 'binary-tree'
+;; Genera un laberint utilitzant una variant de l'algorisme de l'arbre binari.
+;; L'algorisme recorre el laberint de dalt a baix i de dreta a esquerra.
+;; En cada posició, es mou aleatòriament a una casella adjacent entre les quatre
+;; direccions possibles (sempre que estiguin disponibles).
+;; Les caselles recorregudes s'estableixen com a camí, mentre que la resta
+;; conserven el seu valor inicial: paret.
+;; Donat aquest enfocament, la posició d'entrada i la de sortida són fixes.
+;;
+;; Paràmetres:
+;;  - nom-fitxer: fitxer on es desarà el laberint generat.
+;; =============================================================================
+
 (defun binary-tree (nom-fitxer) 
   (let* 
     ((laberint (crea-matriu FILES COLUMNES paret)) 
@@ -1916,6 +1944,24 @@
     (completar-laberint laberint-complet nom-fitxer)
   )
 )
+
+;;=============================================================================
+;; Funció: 'binary-tree-aux'
+;; Mètode que implementa l'algorisme recursiu de l'arbre binari.
+;; Mentre la posició actual (pos-inici) no sigui igual a la posició final (pos-fi),
+;; recorre el laberint i estableix les caselles que visita com a camí.
+;;
+;; Paràmetres:
+;;  - n: valor mínim.
+;;  - m: valor màxim.
+;;  - pos-inici: posició actual dins del laberint
+;;  - pos-fi: posició final del laberint
+;;  - lab: laberint actual
+;;
+;; Retorn:
+;;  - Nombre aleatori dins el rang (n, m).
+;;  - el laberint generat 
+;; =============================================================================
 
 (defun-tco binary-tree-aux (pos-inici pos-fi lab) 
   (cond 
