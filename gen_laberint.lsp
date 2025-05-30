@@ -718,14 +718,14 @@
 ;; Retorn:
 ;;  - Llista de posicions adjacents vàlides.
 ;; =============================================================================
-(defun caselles-Adjacents (matrix pos ) 
+(defun caselles-Adjacents (matrix pos &optional(disp displacements)) 
   (let 
     ((pos-nova 
        (mapcar 
          (lambda (llista) 
            (list (+ (car pos) (car llista)) (+ (cadr pos) (cadr llista)))
          )
-         displacements
+         disp
        )
      ) 
     )
@@ -1018,8 +1018,7 @@
 ;; Funció: 'binary-tree'
 ;; Genera un laberint utilitzant una variant de l'algorisme de l'arbre binari.
 ;; L'algorisme recorre el laberint de dalt a baix i de dreta a esquerra.
-;; En cada posició, es mou aleatòriament a una casella adjacent entre les quatre
-;; direccions possibles (sempre que estiguin disponibles).
+;; En cada posició, es mou aleatòriament a la dreta o cap a baix.
 ;; Les caselles recorregudes s'estableixen com a camí, mentre que la resta
 ;; conserven el seu valor inicial: paret.
 ;; Donat aquest enfocament, la posició d'entrada i la de sortida són fixes.
@@ -1062,7 +1061,7 @@
     ((equal pos-inici pos-fi) lab)
     (t
      (let* 
-       ((caselles-adjacents (caselles-Adjacents lab pos-inici )) 
+       ((caselles-adjacents (caselles-Adjacents lab pos-inici dreta-baix)) 
          (next (nth (random (length caselles-adjacents)) caselles-adjacents))
          (lab-actualitzat (establir-valor-matriu lab cami next))
          (seguent (seguent-IJ (car pos-inici) (cadr pos-inici) lab-actualitzat)) 
