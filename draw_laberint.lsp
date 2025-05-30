@@ -70,23 +70,11 @@
         ; pinta el tile corresponent
         (let ((elem (car row)) (xtile (+ (* w TILESIZE) x)) (ytile (+ (* h TILESIZE) y)))
             (cond
-                ((eq elem Cparet)
-                    (draw-tile "wall" xtile ytile)
-                )
-                ((eq elem Ccami)
-                    (draw-tile "path2" xtile ytile)
-                )
-                ((eq elem Centrada)
-                    (draw-tile "start" xtile ytile)
-                )
-                ((eq elem Csortida)
-                    (draw-tile "end" xtile ytile)
-                )
                 ((eq elem newline)
                     nil
                 )
                 (t
-                    (draw-tile "error" xtile ytile)
+                    (draw-tile (get-strname elem) xtile ytile)
                 )
             )
             ;(get-key)
@@ -98,18 +86,15 @@
 )
 
 ;; =========================================
-;; Funció: "clear-text"
-;; Borra una secció rectangular de la pantalla amb el color de fons gràcies
-;; al " "
+;; Funció: "get-strname"
+;; Retorna el nom del string d'un tile per a (draw-tile)
 ;;
 ;; Paràmetres:
-;;  - x,y: coordenades text de l'esquina superior del rectangle
-;;  - w,h: tamany del rectangle
+;;  - tile: el tile
 ;;
 ;; Retorn:
-;;  - res
+;;  - string amb el nom
 ;; ==========================================
-; TODO: canviar a recorrer rec un array
 (defun get-strname (tile)
     (cond
         ((eq tile Centrada)
@@ -129,6 +114,19 @@
         )
     )
 )
+
+;; =========================================
+;; Funció: "cls-player"
+;; "Borra" el sprite del jugador al laberint.
+;; Realment pinta per damunt els tiles del laberint sobre el que jugador hi és.
+;;
+;; Paràmetres:
+;;  - xpos, ypos: posició del jugador
+;;  - maze: dades del laberint
+;;
+;; Retorn:
+;;  - res
+;; ==========================================
 ; borra el tile del jugador de forma optima, mirant quines caselles hi és sobre
 (defun cls-player(xpos ypos maze)
     (let* ((xtile (floor xpos TILESIZE)) (ytile (floor (- ypos) TILESIZE))
@@ -136,18 +134,21 @@
         ; sempre esta sobre l'origen de arredonir les coordenades
         (draw-tile (get-strname tile) (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
     ;comprova quina casella del costat
+    ;casella dreta
     (cond 
         ((> (mod xpos TILESIZE) 0)
             (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) ytile))
                 (+ (* (1+ xtile) TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
         )
     )
+    ;casella abaix
     (cond
         ((> (mod (- ypos) TILESIZE) 0)
             (draw-tile (get-strname (get-in-maze (get maze 'data) xtile (1+ ytile)))
                 (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
         )
     )
+    ;diagonal abaix
     (cond 
         ((or (> (mod (- ypos) TILESIZE) 0) (> (mod xpos TILESIZE) 0))
             (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) (1+ ytile)))
@@ -157,6 +158,17 @@
     )
 )
 
+;; =========================================
+;; Funció: "tile-to-draw"
+;;  Transforma unes coordenades de tile a coordenades de dibuix del laberint
+;;
+;; Paràmetres:
+;;  - xt, yt: coordenades tile
+;;  - maze: dades del laberint
+;;
+;; Retorn:
+;;  - (x,y) coordenades de dibuix laberint
+;; ==========================================
 (defun tile-to-draw(xt yt maze)
     (list 
         (+ (* xt TILESIZE) (car mazepos) (getx maze))
