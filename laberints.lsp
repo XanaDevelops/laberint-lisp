@@ -1,3 +1,48 @@
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>HEADER>>>>>>>>>>>>>>>>>>>>>>>>>
+; Autors: Daniel García Vázquez, Khaoula Ikkene.
+; Data de començament: 20 Març, 2025
+; Dara d'entrega : 03 Juny, 2025
+; Assignatura: 21721 - Llenguatges de Programació. 
+; Grup: PF1-13
+; Professors: Antoni Oliver Tomàs, Francesc Xavier Gayà Morey
+; Convocatòria Ordinària
+;
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+;========================================================================
+; Classe principal del joc.
+; És la classe que s'ha de cridar des del programa per iniciar el joc.
+; Carrega el menú principal, comunica a l'usuari la informació necessària
+; segons l'opció triada, i crida als mètodes corresponents per 
+; generar/explorar laberints, mostrar estadístiques, actualitzar dades, etc.
+;========================================================================
+
+(load 'sleep)
+
+(defun start-server()
+    (system "python music.py server")
+)   
+
+(defun play-song (id &optional (n nil))
+    (system (format nil "pythonw music.py play -i ~D ~A" id
+                  (cond (n "-l")
+                        (t ""))))
+)
+
+(defun stop-all()
+    (system "pythonw music.py stop")
+)
+
+(defun kill-server()
+    (system "pythonw music.py kill")
+)
+
+;(kill-server)
+(stop-all)
+(cond 
+    (do-music (start-server))
+)
+
 (load 'CONST)
 (load 'tco)
 (load 'fitxer-io)

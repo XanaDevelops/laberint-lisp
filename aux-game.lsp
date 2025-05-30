@@ -1,3 +1,10 @@
+;========================================================================
+; Classe que implementa diversos mètodes auxiliars per al control del joc.
+; Inclou funcions per a la gestió del moviment del jugador, detecció de 
+; col·lisions, control de claus, condicions de victòria, i altres accions
+; relacionades amb la lògica del laberint.
+;========================================================================
+
 (load 'CONST)
 (load 'prop-util)
 

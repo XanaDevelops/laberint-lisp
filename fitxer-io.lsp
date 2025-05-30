@@ -1,3 +1,12 @@
+;========================================================================
+;; Classe que gestiona la lectura i escriptura dels fitxers. 
+;; S'implementen funcions per gestionar la lectura i escriptura.
+;; Inclou la lectura de fitxers com a expressions Lisp (Jugador) 
+;; o com a llistes de caràcters, així com l'escriptura del laberint
+;; en el format demanat en l'enunciat.
+;========================================================================
+
+
 (load "CONST.lsp")
 ;; =============================================================================
 ;; Funció: 'llegeix-exp'

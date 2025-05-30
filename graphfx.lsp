@@ -1,3 +1,9 @@
+;========================================================================
+; Classe que s'encarrega de dibuixar els elements gràfics del joc.
+; Inclou funcions per pintar 'tiles' amb o sense comprovació de límits 
+; de pantalla.
+;========================================================================
+
 (load 'CONST)
 
 ;; =============================================================================
