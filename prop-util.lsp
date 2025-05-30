@@ -1,6 +1,15 @@
-
-; Actualitza una propietat 'prop' amb el valor 'val de 'c'
-; Funciona creant un nou simbol y copia els valors de 'c'
+;; =============================================================================
+;; Funció: update-prop
+;;  Crea un nou simbol amb les dades que conté l'anterior, però modificant un atribut d'aquest per
+;;  la modificació desitgada
+;;
+;; Paràmetres:
+;;   - c: simbol a actualitzar
+;;   - prop: propietat a actualitzar
+;;   - val: nou valor
+;;   - (opcional) props: llistat original del simbol
+;;
+;; =============================================================================
 (defun update-prop (c prop val &optional (props -1))
     (cond
         ((eq props -1)
@@ -33,9 +42,4 @@
     (get a 'y)
 )
 
-;(putprop 'player 30 'z)
-;(putprop 'player 10 'x)
-;(putprop 'player 15 'y)
-;(print (symbol-plist 'player))
-;(print (symbol-plist (update-prop 'player 'x 20)))
 
