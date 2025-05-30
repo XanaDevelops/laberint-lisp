@@ -966,9 +966,7 @@
               camins-accessibles-actualitzada
             )
           )
-          ; (cons cami-actual
-          ;       (obtenir-Camins-Accessibles laberint llista-camins (+ i 1))
-          ; )
+         
          )
 
          (t
