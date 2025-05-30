@@ -41,6 +41,7 @@
 ;; ======================================
 (defun-tco main(&optional (id 0))
     (stop-all)
+    (start-server) ; per si de cas
     (play-song snd-menu t)
     (color 255 255 255 0 0 0)
 

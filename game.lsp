@@ -164,6 +164,9 @@
             (eval (read)) ;permet modificar constants, però no pot llegir 
             (explora name maze player steps nil extra)
         )
+        ((eq input 'redraw)
+            (explora name maze player steps t extra)
+        )
         (t
 
         ;borra tile del jugador

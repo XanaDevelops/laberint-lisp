@@ -31,6 +31,7 @@
 (setq up 2)
 (setq down 3)
 (setq admin 666)
+(setq redraw 777)
 (setq esc -1)
 
 
@@ -46,8 +47,8 @@
 (setq SCREEN_W (+ (car mazepos) (* TILESIZE TILE_W)))
 (setq SCREEN_H (+ (cadr mazepos) (* TILESIZE (- -1 TILE_H))))
 
-(setq MM_TILESIZE 2) ;permet mostrar fins 100x100
-;(setq MM_TILESIZE 3) ;permet mostrar fins aprox 66x66
+;(setq MM_TILESIZE 2) ;permet mostrar fins 100x100
+(setq MM_TILESIZE 3) ;permet mostrar fins aprox 66x66
 ;(setq MM_TILESIZE 4) ;permet mostrar fins 50x50
 
 (setq mm-paret 0)

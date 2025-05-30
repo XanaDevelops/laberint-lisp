@@ -3,7 +3,7 @@
 ; Aquesta classe obté les tecles que pitja el jugador durant el joc
 ;========================================================================
 
-;optimitzar recursio +3?
+
 (defun user-input()
     (goto-xy 0 0)
     (let ((key (get-key)))
@@ -20,8 +20,11 @@
         ((some (lambda (x) (= x key)) '(68 100 333))
             'right
         )
-        ((some (lambda (x) (= x key)) '(80 112)) ;"P"
+        ((some (lambda (x) (= x key)) '(80 112)) ;Permet fer un eval dins el joc
             'admin
+        )
+        ((some (lambda (x) (= x key)) '(82 114)) ;Repinta la pantalla dins el joc
+            'redraw
         )
         ((= key 27)
             'esq
