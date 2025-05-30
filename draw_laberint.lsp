@@ -137,22 +137,28 @@
     ;casella dreta
     (cond 
         ((> (mod xpos TILESIZE) 0)
-            (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) ytile))
-                (+ (* (1+ xtile) TILESIZE) (car mazepos) (getx maze)) (+ (* (- ytile) TILESIZE) (cadr mazepos) (gety maze)))
+            (let ((newtpos (tile-to-draw (1+ xtile) ytile maze)))
+                (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) ytile))
+                (car newtpos) (cadr newtpos))
+            )
         )
     )
+    
     ;casella abaix
     (cond
         ((> (mod (- ypos) TILESIZE) 0)
+        (let ((newtpos (tile-to-draw xtile (1+ ytile) maze)))
             (draw-tile (get-strname (get-in-maze (get maze 'data) xtile (1+ ytile)))
-                (+ (* xtile TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
+                (car newtpos) (cadr newtpos))
+        )
         )
     )
     ;diagonal abaix
     (cond 
         ((or (> (mod (- ypos) TILESIZE) 0) (> (mod xpos TILESIZE) 0))
+        (let ((newtpos (tile-to-draw (1+ xtile) (1+ ytile) maze)))
             (draw-tile (get-strname (get-in-maze (get maze 'data) (1+ xtile) (1+ ytile)))
-                (+ (* (1+ xtile) TILESIZE) (car mazepos) (getx maze)) (+ (* (- (1+ ytile)) TILESIZE) (cadr mazepos) (gety maze)))
+                (car newtpos) (cadr newtpos)))
         )
     )
     )
