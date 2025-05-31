@@ -11,6 +11,7 @@
 (load 'draw_minimap)
 (load 'draw_hud)
 (load 'libs\\listLib)
+(load 'Partida)
 
 ;========================================================================
 ;; Aquesta classe implementa la funció principal `explora`, que implementa
@@ -162,6 +163,9 @@
         ((eq input 'admin)
             (eval (read)) ;permet modificar constants, però no pot llegir 
             (explora name maze player steps nil extra)
+        )
+        ((eq input 'redraw)
+            (explora name maze player steps t extra)
         )
         (t
 

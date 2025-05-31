@@ -8,7 +8,7 @@
 (setq DFS 'DFS)
 (setq PRIM 'PRIM)
 (setq BTR 'BTR) ; recursive division
-(setq algorisme-generacio DFS)
+(setq def-algorisme-generacio DFS)
 
 (setq FILES (- 66 2)) ; 2 de files extra de parets que s'afegeixen
 (setq COLUMNES (- 66 2))
@@ -31,6 +31,7 @@
 (setq up 2)
 (setq down 3)
 (setq admin 666)
+(setq redraw 777)
 (setq esc -1)
 
 
@@ -46,9 +47,9 @@
 (setq SCREEN_W (+ (car mazepos) (* TILESIZE TILE_W)))
 (setq SCREEN_H (+ (cadr mazepos) (* TILESIZE (- -1 TILE_H))))
 
-;(setq MM_TILESIZE 2) ;permet mostrar 100x100
-(setq MM_TILESIZE 3) ;permet mostrar aprox 66x66
-;(setq MM_TILESIZE 4) ;permet mostrar 50x50
+;(setq MM_TILESIZE 2) ;permet mostrar fins 100x100
+(setq MM_TILESIZE 3) ;permet mostrar fins aprox 66x66
+;(setq MM_TILESIZE 4) ;permet mostrar fins 50x50
 
 (setq mm-paret 0)
 (setq mm-cami 1)
