@@ -2,7 +2,25 @@ import argparse
 import socket
 import threading
 import subprocess
+import time
 from typing import Dict, Tuple
+
+def play_song(index: int, loop:bool) -> None:
+    ...
+def stop_all() -> None:
+    ...
+
+def configure():
+    # tot per no posar ifs (*^_^*)
+    global play_song, stop_all, sa
+    try:
+        import simpleaudio as sa
+        play_song = play_song_sa
+        stop_all = stop_all_sa   
+    except Exception:
+        print("simpleaudio no trobat, usant powershell")
+        play_song = play_song_pwsh
+        stop_all = stop_all_pwsh
 
 # Diccionario de canciones (índice -> ruta al archivo WAV)
 songs: Dict[int, str] = {
@@ -21,6 +39,9 @@ BUFFER_SIZE: int = 1024
 
 # Almacena procesos de reproducción activos (índice -> subprocess.Popen)
 players: set[subprocess.Popen] = set()
+
+_play_objects = []
+_stop_flags = []
 
 # Variables globales de servidor
 server_socket: socket.socket
@@ -57,7 +78,7 @@ def handle_client(client_sock: socket.socket, addr: Tuple[str, int]) -> None:
                 break
 
 
-def play_song(index: int, loop: bool = False) -> None:
+def play_song_pwsh(index: int, loop: bool = False) -> None:
     """
     Inicia la reproducción de la canción indicada por su índice.
     Si loop es True, se reproduce en bucle.
@@ -81,7 +102,7 @@ def play_song(index: int, loop: bool = False) -> None:
     players.add(proc)
 
 
-def stop_all() -> None:
+def stop_all_pwsh() -> None:
     """Detiene todas las reproducciones en curso usando taskkill."""
     for proc in list(players):
         try:
@@ -92,6 +113,44 @@ def stop_all() -> None:
             pass
     players.clear()
 
+
+
+def play_song_sa(index: int, loop=False) -> None:
+    wave_obj = sa.WaveObject.from_wave_file(songs[index])
+    if loop:
+        stop_flag = threading.Event()
+        _stop_flags.append(stop_flag)
+        def _play_loop():
+            while True:
+                if stop_flag.is_set():
+                    break
+                play_obj = wave_obj.play()
+                _play_objects.append(play_obj)
+                while play_obj.is_playing():
+                    if stop_flag.is_set():
+                        play_obj.stop()
+                        break
+                    time.sleep(0.1)
+                if stop_flag.is_set():
+                    break
+        thread = threading.Thread(target=_play_loop, daemon=True)
+        thread.start()
+    else:
+        play_obj = wave_obj.play()
+        _play_objects.append(play_obj)
+
+def stop_all_sa() -> None:
+    # Señalizamos a todos los loops que terminen
+    print(len(_stop_flags))
+    for flag in _stop_flags:
+        print("flag set")
+        flag.set()
+    # Detenemos cualquier instancia activa
+    for po in _play_objects:
+        po.stop()
+    # Limpiamos listas
+    _stop_flags.clear()
+    _play_objects.clear()
 
 def start_server() -> None:
     """Inicia el servidor de sockets."""
@@ -169,4 +228,5 @@ def main() -> None:
 
 
 if __name__ == '__main__':
+    configure()
     main()
