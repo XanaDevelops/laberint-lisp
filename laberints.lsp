@@ -24,7 +24,7 @@
 ;       - Fog of War
 ;       - Recorregut
 ;     - Debug (amb p) (és un eval)
-;
+;  - Easter egg al sortir (random)
 ;
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
