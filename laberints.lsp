@@ -7,6 +7,25 @@
 ; Professors: Antoni Oliver Tomàs, Francesc Xavier Gayà Morey
 ; Convocatòria Ordinària
 ;
+; Executar amb (load 'laberints) o (main)
+;
+; Resum del extres:
+;  - Menu
+;     - Música
+;  - Generació:
+;     - Tamany màxim 66x66 (permet rectangles)
+;     - Assegurar entrada/sortida allunyades
+;     - PRIM
+;     - BTR
+;  - Exploració:
+;     - Gràfics millorats
+;     - Cerca de claus
+;     - Minimapa:
+;       - Fog of War
+;       - Recorregut
+;     - Debug (amb p) (és un eval)
+;
+;
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 (load 'CONST)

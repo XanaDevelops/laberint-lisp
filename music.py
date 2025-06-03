@@ -12,6 +12,7 @@ def stop_all() -> None:
 
 def configure():
     # tot per no posar ifs (*^_^*)
+    # metaprogramant
     global play_song, stop_all, sa
     try:
         import simpleaudio as sa
